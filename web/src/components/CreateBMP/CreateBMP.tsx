@@ -3,33 +3,33 @@ import { useState } from 'react'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
-const CREATE_BMP = gql`
-  mutation CreateBmp($input: CreateBmpInput!) {
-    createBmp(input: $input) {
-      id
-      name
-      description
-      isStandard
-    }
-  }
-`
+// const CREATE_BMP = gql`
+//   mutation CreateBmp($input: CreateBmpInput!) {
+//     createBmp(input: $input) {
+//       id
+//       name
+//       description
+//       isStandard
+//     }
+//   }
+// `
 
 const CreateBMP = () => {
-  const [createBmp] = useMutation(CREATE_BMP)
+  // const [createBmp] = useMutation(CREATE_BMP)
   const [name, setName] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [isStandard, setIsStandard] = useState<boolean>(false)
 
   const handleCreateBmp = async () => {
-    await createBmp({
-      variables: {
-        input: {
-          name,
-          description,
-          isStandard,
-        },
-      },
-    })
+    // await createBmp({
+    //   variables: {
+    //     input: {
+    //       name,
+    //       description,
+    //       isStandard,
+    //     },
+    //   },
+    // })
     toast.success('BMP created')
   }
 

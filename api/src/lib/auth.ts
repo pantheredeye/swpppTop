@@ -13,12 +13,12 @@ import { db } from './db'
 export const cookieName = 'session_%port%'
 
 interface CurrentUser {
-  id: string;
-  organizationIds: string[];
+  id: string
+  organizationIds: string[]
   globalSettings: {
-    defaultOrganizationId?: string;
-    [key: string]: any; // To allow for other global settings if needed
-  };
+    defaultOrganizationId?: string
+    [key: string]: any // To allow for other global settings if needed
+  }
 }
 
 /**
@@ -45,7 +45,8 @@ export const getCurrentUser = async (session: Decoded) => {
 
   return await db.user.findUnique({
     where: { id: session.id },
-    select: { id: true,
+    select: {
+      id: true,
       globalSettings: true,
       memberships: {
         select: {

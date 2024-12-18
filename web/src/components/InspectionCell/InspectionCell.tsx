@@ -17,47 +17,47 @@ export const QUERY: TypedDocumentNode<
   FindInspectionQuery,
   FindInspectionQueryVariables
 > = gql`
-  query FindInspectionQuery($id: Int!) {
+  query FindInspectionQuery($id: String!) {
     inspection: inspection(id: $id) {
       id
       site {
         name
       }
-      inspector {
-        id
-      }
-      date
-      startTime
-      endTime
-      permitOnSite
-      swpppOnSite
-      bmpsInstalledPerSwppp
-      siteInspectionReports
-      inspectionType
-      title
-      description
-      severity
-      violationsNotes
-      whomToContact
-      newStormEvent
-      stormDateTime
-      stormDuration
-      approximatePrecipitation
-      weatherAtTime
-      temperature
-      previousDischarge
-      newDischarges
-      dischargeAtThisTime
-      currentDischarges
-      createdAt
-      updatedAt
-      bmpData {
-        id
-      }
-      media {
-        id
-        url
-      }
+      # inspector {
+      #   id
+      # }
+      # date
+      # startTime
+      # endTime
+      # permitOnSite
+      # swpppOnSite
+      # bmpsInstalledPerSwppp
+      # siteInspectionReports
+      # inspectionType
+      # title
+      # description
+      # severity
+      # violationsNotes
+      # whomToContact
+      # newStormEvent
+      # stormDateTime
+      # stormDuration
+      # approximatePrecipitation
+      # weatherAtTime
+      # temperature
+      # previousDischarge
+      # newDischarges
+      # dischargeAtThisTime
+      # currentDischarges
+      # createdAt
+      # updatedAt
+      # bmpData {
+      #   id
+      # }
+      # media {
+      #   id
+      #   url
+      # }
     }
   }
 `

@@ -10,7 +10,7 @@ import ProfileForm from '../ProfileForm/ProfileForm'
 
 export const QUERY: TypedDocumentNode<FindUserQuery, FindUserQueryVariables> =
   gql`
-    query FindUserQuery($id: Int!) {
+    query FindUserQuery($id: String!) {
       user(id: $id) {
         id
         firstName

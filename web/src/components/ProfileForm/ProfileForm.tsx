@@ -11,7 +11,7 @@ import { useMutation } from '@redwoodjs/web'
 import { Label } from 'src/components/ui/Label'
 
 export const UPDATE_USER_MUTATION = gql`
-  mutation UpdateUserMutation($id: Int!, $input: UpdateUserInput!) {
+  mutation UpdateUserMutation($id: String!, $input: UpdateUserInput!) {
     updateUser(id: $id, input: $input) {
       id
       firstName

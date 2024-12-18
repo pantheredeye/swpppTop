@@ -15,36 +15,36 @@ import { navigate, routes } from '@redwoodjs/router'
 import { useMutation, useQuery } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
-const GET_STANDARD_BMPS_NEW_SITE = gql`
-  query GetStandardBmpsNewSite {
-    standardBmps {
-      id
-      name
-      description
-    }
-    siteTypes {
-      id
-      name
-    }
-  }
-`
+// const GET_STANDARD_BMPS_NEW_SITE = gql`
+//   query GetStandardBmpsNewSite {
+//     standardBmps {
+//       id
+//       name
+//       description
+//     }
+//     siteTypes {
+//       id
+//       name
+//     }
+//   }
+// `
 
 const CREATE_SITE = gql`
   mutation CreateSite($input: CreateSiteInput!) {
     createSite(input: $input) {
       id
       name
-      bmps {
-        id
-        name
-        description
-      }
+      # bmps {
+      #   id
+      #   name
+      #   description
+      # }
     }
   }
 `
 
 const NewSitePage = () => {
-  const { data, loading, error } = useQuery(GET_STANDARD_BMPS_NEW_SITE)
+  // const { data, loading, error } = useQuery(GET_STANDARD_BMPS_NEW_SITE)
   const [createSite] = useMutation(CREATE_SITE)
   const [name, setName] = useState<string>('')
   const [addressLine1, setAddressLine1] = useState<string>('')
@@ -63,11 +63,11 @@ const NewSitePage = () => {
   const [newBmpName, setNewBmpName] = useState<string>('')
   const [newBmpDescription, setNewBmpDescription] = useState<string>('')
 
-  useEffect(() => {
-    if (data && data.siteTypes.length > 0) {
-      setSiteTypeId(data.siteTypes[0].id)
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if (data && data.siteTypes.length > 0) {
+  //     setSiteTypeId(data.siteTypes[0].id)
+  //   }
+  // }, [data])
 
   const handleAddBmp = () => {
     setBmps([
@@ -108,9 +108,6 @@ const NewSitePage = () => {
     toast.success('Site created')
     navigate(routes.dashboard())
   }
-
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error loading data</div>
 
   return (
     <div className="min-h-screen bg-gray-800">
@@ -284,13 +281,13 @@ const NewSitePage = () => {
                     onChange={(e) => setSiteTypeId(Number(e.target.value))}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   >
-                    {data.siteTypes.map(
+                    {/* {data.siteTypes.map(
                       (type: { id: number; name: string }) => (
                         <option key={type.id} value={type.id}>
                           {type.name}
                         </option>
                       )
-                    )}
+                    )} */}
                   </SelectField>
                 </div>
               </div>
@@ -452,10 +449,7 @@ const NewSitePage = () => {
             >
               Cancel
             </button>
-            <Submit
-              disabled={loading}
-              className="rounded-md bg-indigo-600 px-6 py-2 font-semibold text-gray-100 hover:bg-indigo-500"
-            >
+            <Submit className="rounded-md bg-indigo-600 px-6 py-2 font-semibold text-gray-100 hover:bg-indigo-500">
               Create Site
             </Submit>
           </div>

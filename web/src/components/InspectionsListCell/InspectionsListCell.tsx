@@ -22,11 +22,6 @@ export const QUERY: TypedDocumentNode<
       site {
         name
       }
-      date
-      inspectionType
-      inspector {
-        email
-      }
     }
   }
 `

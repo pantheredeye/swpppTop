@@ -21,8 +21,6 @@ export const QUERY: TypedDocumentNode<
     sites: sites {
       id
       name
-      ownerName
-      addressLine1
     }
   }
 `
@@ -48,7 +46,7 @@ export const Success = ({
       >
         Add Site
       </Link>
-      <DataTable columns={columns} data={sites} />
+      {/* <DataTable columns={columns} data={sites} /> */}
     </div>
   )
 }

@@ -1,7 +1,3 @@
-import type {
-  inspectionBmpsQuery,
-  inspectionBmpsQueryVariables,
-} from 'types/graphql'
 
 import type {
   CellSuccessProps,
@@ -11,18 +7,18 @@ import type {
 
 import BmpItem from '../BmpItem/BmpItem'
 
-export const QUERY: TypedDocumentNode<
-  inspectionBmpsQuery,
-  inspectionBmpsQueryVariables
-> = gql`
-  query inspectionBmpsQuery($isStandard: Boolean, $siteId: Int) {
-    inspectionBmps(isStandard: $isStandard, siteId: $siteId) {
-      id
-      name
-      description
-    }
-  }
-`
+// export const QUERY: TypedDocumentNode<
+//   inspectionBmpsQuery,
+//   inspectionBmpsQueryVariables
+// > = gql`
+//   query inspectionBmpsQuery($isStandard: Boolean, $siteId: Int) {
+//     inspectionBmps(isStandard: $isStandard, siteId: $siteId) {
+//       id
+//       name
+//       description
+//     }
+//   }
+// `
 
 // interface Bmp {
 //   id: number
@@ -50,7 +46,7 @@ export const Failure = ({ error }: CellFailureProps) => (
 
 export const Success = ({
   inspectionBmps,
-}: CellSuccessProps<inspectionBmpsQuery>) => {
+}) => {
   return (
     <>
       <div className="mt-4 space-y-4">

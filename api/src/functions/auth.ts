@@ -125,55 +125,117 @@ export const handler = async (
     //
     // If this returns anything else, it will be returned by the
     // `signUp()` function in the form of: `{ message: 'String here' }`.
+
+    // Set this as part of seed script.
+
+    // const ownerRole = await tx.membershipRole.create({
+    //   data: {
+    //     name: 'OWNER',
+    //     organizationId: personalOrg.id,
+    //     permission: {
+    //       create: {
+    //         name: 'FULL_ORGANIZATION_ACCESS',
+    //         scope: 'ORGANIZATION',
+    //         description: 'Complete administrative access to personal organization',
+    //       }
+    //     }
+    //   }
+    // });
+
     handler: ({ username, hashedPassword, salt }) => {
       return db.$transaction(async (tx) => {
-        // Create the user
-        const user = await tx.user.create({
-          data: {
-            email: username,
-            hashedPassword: hashedPassword,
-            salt: salt,
-          },
-        })
-
-        const personalOrg = await tx.organization.create({
-          data: {
-            name: `Personal Organization (${user.id})`,
-          },
-        })
-
-        const ownerRole = await tx.membershipRole.create({
-          data: {
-            name: 'Owner',
-            organization: {
-              connect: { id: personalOrg.id },
-            },
-            permission: {
-              create: {
-                name: 'Full Access',
-                scope: 'ORGANIZATION',
-                description: 'Complete access to personal organization',
+        try {
+          // Create the personal organization FIRST
+          // This ensures we have an organization ID to reference
+          const personalOrg = await tx.organization.create({
+            data: {
+              name: `Personal Organization`, // Base name
+              settings: {
+                userId: 'PENDING', // Placeholder to track unique creation
+                creationType: 'USER_SIGNUP'
               },
-            },
-          },
-        })
+              status: 'ACTIVE'
+            }
+          });
 
-        await tx.membership.create({
-          data: {
-            userId: user.id,
-            organizationId: personalOrg.id,
-            roles: {
-              connect: { id: ownerRole.id }, // Link the "Owner" role
-            },
-            status: 'ACTIVE',
-            invitationChannel: 'INTERNAL',
-          },
-        })
+          // Now create the user, connecting to the pre-created organization
+          const user = await tx.user.create({
+            data: {
+              email: username,
+              hashedPassword: hashedPassword,
+              salt: salt,
+              defaultOrganizationId: personalOrg.id, // Direct connection
+              isActive: true,
+              lastLoginAt: new Date()
+            }
+          });
 
-        return user
-      })
+          // Update the organization with the specific user identifier
+          await tx.organization.update({
+            where: { id: personalOrg.id },
+            data: {
+              name: `Personal Organization (${user.id})`, // Now includes user ID
+              settings: {
+                userId: user.id, // Update with actual user ID
+                creationType: 'USER_SIGNUP'
+              }
+            }
+          });
+
+          // Find the existing FULL_ACCESS permission (from seed data)
+          const fullAccessPermission = await tx.permission.findUnique({
+            where: {
+              name_scope: {
+                name: 'FULL_ACCESS',
+                scope: 'ORGANIZATION'
+              }
+            }
+          });
+
+          // Create the Owner role for this organization
+          const ownerRole = await tx.membershipRole.create({
+            data: {
+              name: 'OWNER', // Unique role
+              organizationId: personalOrg.id,
+              permissionId: fullAccessPermission?.id // Connect existing permission
+            }
+          });
+
+          // Create membership linking user to organization
+          await tx.membership.create({
+            data: {
+              userId: user.id,
+              organizationId: personalOrg.id,
+              roles: {
+                connect: { id: ownerRole.id }
+              },
+              status: 'ACTIVE',
+              invitationChannel: 'INTERNAL',
+              joinedAt: new Date()
+            }
+          });
+
+          return user;
+          } catch (error) {
+            // Comprehensive error handling
+            console.error('User registration failed:', error)
+
+            // Handle specific error cases
+            if (error.code === 'P2002') {
+              // Unique constraint violation (likely email already exists)
+              throw new Error('An account with this email already exists')
+            }
+
+            // Re-throw other errors
+            throw new Error('Unable to complete user registration')
+          }
+        },
+        {
+          // Optional transaction isolation level for stronger consistency
+          isolationLevel: 'Serializable',
+        }
+      )
     },
-
     // Include any format checks for password here. Return `true` if the
     // password is valid, otherwise throw a `PasswordValidationError`.
     // Import the error along with `DbAuthHandler` from `@redwoodjs/api` above.

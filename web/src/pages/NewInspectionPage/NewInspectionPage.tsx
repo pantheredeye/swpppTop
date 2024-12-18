@@ -25,14 +25,6 @@ const CREATE_INSPECTION_MUTATION = gql`
   mutation CreateInspectionMutation($input: CreateInspectionInput!) {
     createInspection(input: $input) {
       id
-      bmpData {
-        id
-        implemented
-        maintenanceRequired
-        repeatOccurrence
-        correctiveActionNeeded
-        notes
-      }
     }
   }
 `
@@ -232,7 +224,7 @@ const NewInspectionPage = () => {
                   Inspector*
                 </Label>
                 <div className="mt-2">
-                  <UsersCell currentUserId={currentUser.id} />
+                  {/* <UsersCell currentUserId={currentUser.id} /> */}
                   <FieldError
                     name="inspectorId"
                     className="mt-1 text-red-500"

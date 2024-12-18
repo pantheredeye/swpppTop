@@ -1,21 +1,21 @@
 import { Link, routes } from '@redwoodjs/router'
 import { useQuery } from '@redwoodjs/web'
 
-const GET_QUICK_ACTIONS = gql`
-  query GetQuickActions {
-    standardBmps {
-      id
-    }
-  }
-`
+// const GET_QUICK_ACTIONS = gql`
+//   query GetQuickActions {
+//     standardBmps {
+//       id
+//     }
+//   }
+// `
 
 const QuickActionsCard = () => {
-  const { data, loading, error } = useQuery(GET_QUICK_ACTIONS)
+  // const { data, loading, error } = useQuery(GET_QUICK_ACTIONS)
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error loading data</div>
+  // if (loading) return <div>Loading...</div>
+  // if (error) return <div>Error loading data</div>
 
-  const hasStandardBmps = data.standardBmps.length > 0
+  // const hasStandardBmps = data.standardBmps.length > 0
 
   return (
     <div className="rounded-xl bg-gray-800 p-6 shadow-lg">
@@ -29,21 +29,13 @@ const QuickActionsCard = () => {
         >
           New Inspection
         </Link>
-        {!hasStandardBmps ? (
-          <Link
-            to={routes.standardBmpSettings()}
-            className="flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 font-medium text-white shadow-lg hover:bg-indigo-500 focus:outline-none"
-          >
-            Configure Standard BMPs
-          </Link>
-        ) : (
-          <Link
-            to={routes.newSite()}
-            className="flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 font-medium text-white shadow-lg hover:bg-indigo-500 focus:outline-none"
-          >
-            Add Site
-          </Link>
-        )}
+
+        <Link
+          to={routes.newSite()}
+          className="flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 font-medium text-white shadow-lg hover:bg-indigo-500 focus:outline-none"
+        >
+          Add Site
+        </Link>
       </div>
     </div>
   )

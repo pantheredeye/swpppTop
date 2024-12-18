@@ -20,13 +20,13 @@ export const OrganizationProvider: React.FC = ({ children }) => {
   const switchOrganization = async (organizationId: string) => {
     // Validate organization access (use your current user's memberships)
     const user = // get current user from context/auth
-    const hasAccess = user.memberships.some(
-      membership => membership.organizationId === organizationId
-    )
+    // const hasAccess = user.memberships.some(
+    //   membership => membership.organizationId === organizationId
+    // )
 
-    if (!hasAccess) {
-      throw new Error('Unauthorized organization access')
-    }
+    // if (!hasAccess) {
+    //   throw new Error('Unauthorized organization access')
+    // }
 
     // Update local state and storage
     setCurrentOrganization(organizationId)
