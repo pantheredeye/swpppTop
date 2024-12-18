@@ -145,8 +145,6 @@ export const handler = async (
     handler: ({ username, hashedPassword, salt }) => {
       return db.$transaction(async (tx) => {
         try {
-          // Create the personal organization FIRST
-          // This ensures we have an organization ID to reference
           const personalOrg = await tx.organization.create({
             data: {
               name: `Personal Organization`, // Base name
@@ -158,7 +156,6 @@ export const handler = async (
             }
           });
 
-          // Now create the user, connecting to the pre-created organization
           const user = await tx.user.create({
             data: {
               email: username,
@@ -182,7 +179,6 @@ export const handler = async (
             }
           });
 
-          // Find the existing FULL_ACCESS permission (from seed data)
           const fullAccessPermission = await tx.permission.findUnique({
             where: {
               name_scope: {
@@ -192,16 +188,14 @@ export const handler = async (
             }
           });
 
-          // Create the Owner role for this organization
           const ownerRole = await tx.membershipRole.create({
             data: {
-              name: 'OWNER', // Unique role
+              name: 'OWNER',
               organizationId: personalOrg.id,
-              permissionId: fullAccessPermission?.id // Connect existing permission
+              permissionId: fullAccessPermission?.id
             }
           });
 
-          // Create membership linking user to organization
           await tx.membership.create({
             data: {
               userId: user.id,
@@ -217,21 +211,14 @@ export const handler = async (
 
           return user;
           } catch (error) {
-            // Comprehensive error handling
             console.error('User registration failed:', error)
-
-            // Handle specific error cases
             if (error.code === 'P2002') {
-              // Unique constraint violation (likely email already exists)
               throw new Error('An account with this email already exists')
             }
-
-            // Re-throw other errors
             throw new Error('Unable to complete user registration')
           }
         },
         {
-          // Optional transaction isolation level for stronger consistency
           isolationLevel: 'Serializable',
         }
       )
