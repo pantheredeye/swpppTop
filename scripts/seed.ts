@@ -5,12 +5,16 @@ import { hashPassword } from '@redwoodjs/auth-dbauth-api'
 
 export default async () => {
   try {
-    await db.permission.create({
-      data: {
-        name: 'FULL_ORGANIZATION_ACCESS',
-        scope: 'ORGANIZATION',
-        description: 'Complete administrative access to an organization',
-      },
+    await db.permission.createMany({
+      data: [
+        {
+          name: 'FULL_ACCESS',
+          scope: 'ORGANIZATION',
+          description: 'Complete access to personal organization'
+        }
+        // Other standard permissions...
+      ],
+      skipDuplicates: true
     })
 
     //     // Seed data for Standard BMPs
