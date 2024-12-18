@@ -14,10 +14,13 @@ import { toast, Toaster } from '@redwoodjs/web/toast'
 
 import { useAuth } from 'src/auth'
 import Button from 'src/components/Button/Button'
+import { getCurrentUser } from 'src/lib/auth'
 
 const LoginPage = () => {
-  const { isAuthenticated, logIn } = useAuth()
+  const { isAuthenticated, logIn, currentUser } = useAuth()
   const formMethods = useForm()
+  console.log(isAuthenticated)
+  console.log("currentUser " + currentUser)
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -36,6 +39,7 @@ const LoginPage = () => {
       password: data.password,
     })
 
+    console.log(response)
     if (response.message) {
       toast(response.message)
     } else if (response.error) {
@@ -80,7 +84,6 @@ const LoginPage = () => {
                   <TextField
                     name="email"
                     ref={emailRef}
-                    type="email"
                     autoComplete="email"
                     required
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
