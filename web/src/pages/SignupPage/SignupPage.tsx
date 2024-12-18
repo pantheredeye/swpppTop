@@ -43,7 +43,10 @@ const SignupPage = () => {
       toast.error(response.error)
     } else {
       toast.success('Welcome!')
-      navigate(routes.profile({ id: response.id }) + '?firstTime=true')
+      navigate(routes.profile({
+        id: response.id,
+        organizationId: response.organizationId
+      }) + '?firstTime=true')
     }
   }
 

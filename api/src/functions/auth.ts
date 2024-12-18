@@ -126,21 +126,6 @@ export const handler = async (
     // If this returns anything else, it will be returned by the
     // `signUp()` function in the form of: `{ message: 'String here' }`.
 
-    // Set this as part of seed script.
-
-    // const ownerRole = await tx.membershipRole.create({
-    //   data: {
-    //     name: 'OWNER',
-    //     organizationId: personalOrg.id,
-    //     permission: {
-    //       create: {
-    //         name: 'FULL_ORGANIZATION_ACCESS',
-    //         scope: 'ORGANIZATION',
-    //         description: 'Complete administrative access to personal organization',
-    //       }
-    //     }
-    //   }
-    // });
 
     handler: ({ username, hashedPassword, salt }) => {
       return db.$transaction(async (tx) => {
@@ -208,8 +193,10 @@ export const handler = async (
               joinedAt: new Date()
             }
           });
-
-          return user;
+          return {
+            ...user,
+            defaultOrganizationId: personalOrg.id
+          }
           } catch (error) {
             console.error('User registration failed:', error)
             if (error.code === 'P2002') {
@@ -261,7 +248,7 @@ export const handler = async (
     // client when invoking a handler that returns a user (like forgotPassword
     // and signup). This list should be as small as possible to be sure not to
     // leak any sensitive information to the client.
-    allowedUserFields: ['id', 'email'],
+    allowedUserFields: ['id', 'email', 'defaultOrganizationId'],
 
     // Specifies attributes on the cookie that dbAuth sets in order to remember
     // who is logged in. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies
