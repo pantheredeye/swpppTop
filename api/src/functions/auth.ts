@@ -152,11 +152,10 @@ export const handler = async (
             }
           });
 
-          // Update the organization with the specific user identifier
           await tx.organization.update({
             where: { id: personalOrg.id },
             data: {
-              name: `Personal Organization (${user.id})`, // Now includes user ID
+              name: `Personal Organization (${user.id})`,
               settings: {
                 userId: user.id, // Update with actual user ID
                 creationType: 'USER_SIGNUP'
