@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { navigate } from '@redwoodjs/router'
 import { useMutation, useQuery } from '@redwoodjs/web'
 import { useAuth } from 'src/auth'
@@ -86,4 +86,12 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       {children}
     </OrganizationContext.Provider>
   )
+}
+
+export const useOrganization = () => {
+  const context = useContext(OrganizationContext)
+  if (!context) {
+    throw new Error('useOrganization must be used within an OrganizationProvider')
+  }
+  return context
 }
