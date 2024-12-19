@@ -15,7 +15,7 @@ import {
 import { Link } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
-import { useOrganization } from 'src/context/OrganizationContext'
+import { currentOrganization, switchOrganization } from 'src/context/OrganizationContext'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -30,16 +30,16 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const { logOut } = useAuth()
   const { currentUser } = useAuth()
-  const { switchOrganization } = useOrganization()
+  // const { switchOrganization } = useOrganization()
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-    { name: 'Inspections', href: '/inspections', icon: UsersIcon },
-    { name: 'Sites', href: '/sites', icon: FolderIcon },
-    { name: 'BMPs', href: '/bmps', icon: DocumentDuplicateIcon },
+    { name: 'Dashboard', href: `/org/${currentOrganization}/dashboard`, icon: HomeIcon },
+    { name: 'Inspections', href: `/org/${currentOrganization}/inspections`, icon: UsersIcon },
+    { name: 'Sites', href: `/org/${currentOrganization}/sites`, icon: FolderIcon },
+    { name: 'BMPs', href: `/org/${currentOrganization}/bmps`, icon: DocumentDuplicateIcon },
     {
       name: 'Profile',
-      href: currentUser ? `/profile/${currentUser.id}` : '/profile',
+      href: currentUser ? `/org/${currentOrganization}/profile/${currentUser.id}` : '/profile',
       icon: UserIcon,
     },
   ]
