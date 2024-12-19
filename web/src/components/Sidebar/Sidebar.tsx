@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 
 import {
   HomeIcon,
@@ -15,7 +15,7 @@ import {
 import { Link } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
-import { currentOrganization, switchOrganization } from 'src/context/OrganizationContext'
+import { useOrganization } from 'src/context/OrganizationContext'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -28,9 +28,9 @@ const actions = [
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const { logOut } = useAuth()
-  const { currentUser } = useAuth()
-  // const { switchOrganization } = useOrganization()
+  const { logOut, currentUser } = useAuth()
+  const { currentOrganization, switchOrganization } = useOrganization()
+
 
   const navigation = [
     { name: 'Dashboard', href: `/org/${currentOrganization}/dashboard`, icon: HomeIcon },
