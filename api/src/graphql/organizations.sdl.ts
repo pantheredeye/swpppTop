@@ -29,6 +29,7 @@ export const schema = gql`
   type Query {
     organizations: [Organization!]! @requireAuth
     organization(id: String!): Organization @requireAuth
+    userOrganizations: [Organization!]! @requireAuth
   }
 
   input CreateOrganizationInput {
@@ -57,5 +58,6 @@ export const schema = gql`
       input: UpdateOrganizationInput!
     ): Organization! @requireAuth
     deleteOrganization(id: String!): Organization! @requireAuth
+    setDefaultOrganization(id: String!): User! @requireAuth
   }
 `

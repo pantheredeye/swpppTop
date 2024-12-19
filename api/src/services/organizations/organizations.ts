@@ -42,6 +42,28 @@ export const deleteOrganization: MutationResolvers['deleteOrganization'] = ({
   })
 }
 
+export const userOrganizations: QueryResolvers['userOrganizations'] = () => {
+  const { currentUser } = context
+  return db.organization.findMany({
+    where: {
+      users: {
+        some: {
+          userId: currentUser.id,
+          status: 'ACTIVE',
+        },
+      },
+    },
+  })
+}
+
+export const setDefaultOrganization: MutationResolvers['setDefaultOrganization'] = async ({ id }) => {
+  const { currentUser } = context
+  return db.user.update({
+    where: { id: currentUser.id },
+    data: { defaultOrganizationId: id },
+  })
+}
+
 export const Organization: OrganizationRelationResolvers = {
   users: (_obj, { root }) => {
     return db.organization.findUnique({ where: { id: root?.id } }).users()
