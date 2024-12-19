@@ -22,7 +22,6 @@ const SignupPage = () => {
   useEffect(() => {
     if (isAuthenticated) {
       navigate(routes.home())
-      return null
     }
   }, [isAuthenticated])
 
@@ -43,10 +42,17 @@ const SignupPage = () => {
       toast.error(response.error)
     } else {
       toast.success('Welcome!')
-      navigate(routes.profile({
-        id: response.id,
-        organizationId: response.organizationId
-      }) + '?firstTime=true')
+      if (response.id && response.organizationId) {
+        navigate(
+          routes.profile({
+            id: response.id,
+            organizationId: response.organizationId,
+          }) + '?firstTime=true'
+        )
+      } else {
+        toast.error('Missing profile information')
+        navigate(routes.home())
+      }
     }
   }
 
@@ -60,7 +66,7 @@ const SignupPage = () => {
             className="mx-auto h-10 w-auto"
             src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
             alt="SWPPP-TOP"
-          /> */}{' '}
+          /> */}
           <h1>THE ONE PROGRAM FOR STORMWATER MANAGEMENT</h1>
           <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Create your account

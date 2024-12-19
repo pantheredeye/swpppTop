@@ -48,6 +48,7 @@ export const getCurrentUser = async (session: Decoded) => {
     select: {
       id: true,
       globalSettings: true,
+      defaultOrganizationId: true,
       memberships: {
         select: {
           organizationId: true,

@@ -30,7 +30,7 @@ const Routes = () => {
       <PrivateSet unauthenticated="login" wrap={AuthenticatedLayout}>
         <Route path="/org/{organizationId}/dashboard" page={DashboardPage} name="dashboard" />
         <Route path="/org/{organizationId}/profile/{id}" page={ProfilePage} name="profile" />
-        <Route path="/org/{organizationId}/view-inspection" page={ViewInspectionPage} name="viewInspection" />
+        <Route path="/org/{organizationId}/view-inspection/{id}" page={ViewInspectionPage} name="viewInspection" />
         <Route path="/org/{organizationId}/inspections" page={InspectionsPage} name="inspections" />
         <Route path="/org/{organizationId}/sites" page={SitesPage} name="sites" />
         <Route path="/org/{organizationId}/bmps" page={StandardBMPSettingsPage} name="bmps" />

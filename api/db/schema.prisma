@@ -91,13 +91,14 @@ model Membership {
 
 model MembershipRole {
   id             String       @id @default(cuid())
-  name           String       @unique
+  name           String
   membership     Membership[]
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String
   permission     Permission?  @relation(fields: [permissionId], references: [id])
   permissionId   String?
 
+  @@unique([name, organizationId])
   @@index([organizationId])
 }
 

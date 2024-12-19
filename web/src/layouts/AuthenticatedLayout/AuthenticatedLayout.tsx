@@ -122,7 +122,7 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
         {/* Footer */}
         <footer className="bg-gray-900 py-4 text-center">
           <p className="text-sm text-gray-500">
-            &copy; 2024 BetterSWPPP. All rights reserved.
+            &copy; 2024 SWPPP-TOP. All rights reserved.
           </p>
         </footer>
       </div>

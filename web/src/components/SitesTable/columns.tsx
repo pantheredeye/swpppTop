@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'src/components/ui/DropdownMenu'
+import { useAuth } from 'src/auth'
 
 export type Site = {
   id: number
@@ -64,7 +65,7 @@ export const columns: ColumnDef<Site>[] = [
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
-                navigate(routes.viewInspection({ id: inspection.id }))
+                navigate(routes.viewInspection({ organizationId: useAuth().currentUser.defaultOrganizationId, id: String(inspection.id) }))
               }
             >
               View All Inspections
@@ -73,7 +74,7 @@ export const columns: ColumnDef<Site>[] = [
 
             <DropdownMenuItem
               onClick={() =>
-                navigate(routes.viewInspection({ id: inspection.id }))
+                navigate(routes.viewInspection({ organizationId: useAuth().currentUser.defaultOrganizationId, id: String(inspection.id) }))
               }
             >
               Edit Site

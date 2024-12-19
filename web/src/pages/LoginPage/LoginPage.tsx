@@ -24,7 +24,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(routes.dashboard())
+      navigate(routes.dashboard({ organizationId: currentUser.defaultOrganizationId }))
     }
   }, [isAuthenticated])
 
@@ -46,7 +46,7 @@ const LoginPage = () => {
       toast.error(response.error)
     } else {
       toast.success('Welcome back!')
-      navigate(routes.dashboard())
+      navigate(routes.dashboard({ organizationId: currentUser.defaultOrganizationId }))
     }
   }
 
@@ -59,7 +59,7 @@ const LoginPage = () => {
           <img
             className="mx-auto h-10 w-auto"
             src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt="BetterSWPPP"
+            alt="SWPPP-TOP"
           />
           <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Sign in to your account
