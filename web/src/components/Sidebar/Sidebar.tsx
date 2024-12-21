@@ -5,14 +5,13 @@ import {
   UsersIcon,
   FolderIcon,
   DocumentDuplicateIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ArrowLeftOnRectangleIcon, // Logout icon
+  BuildingOfficeIcon,
+  ArrowLeftEndOnRectangleIcon, // Logout icon
   ArrowUturnLeftIcon, // Back icon
   UserIcon,
 } from '@heroicons/react/24/outline'
 
-import { Link, navigate } from '@redwoodjs/router'
+import { Link, navigate, routes } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
 import { useOrganization } from 'src/context/OrganizationContext'
@@ -24,7 +23,7 @@ function classNames(...classes) {
 
 const actions = [
   { name: 'Back', action: 'back', icon: ArrowUturnLeftIcon },
-  { name: 'Logout', action: 'logout', icon: ArrowLeftOnRectangleIcon },
+  { name: 'Logout', action: 'logout', icon: ArrowLeftEndOnRectangleIcon },
 ]
 
 const Sidebar = () => {
@@ -66,12 +65,10 @@ const Sidebar = () => {
         'flex flex-col transition-all duration-300 w-64 bg-gray-900 text-gray-300 shadow-inner'
       )}
     >
-      {/* Header with Title and Collapse Button */}
       <div className="flex h-16 items-center justify-between px-4">
         <span className="text-2xl font-bold text-gray-200">SWPPP-Tip</span>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 px-2">
         <ul className="space-y-2">
           {navigation.map((item) => (
@@ -98,9 +95,19 @@ const Sidebar = () => {
       <div className="px-2 py-2 pb-4">
         <ul className="space-y-2">
           <li>
-            <button onClick={() => switchOrganization('new-organization-id')}>
-              Switch to New Organization
-            </button>
+          <Link
+                to={routes.switch()}
+                className={classNames(
+                  'group relative flex items-center rounded-xl px-2 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 shadow-lg justify-start'
+                )}
+              >
+                <BuildingOfficeIcon
+                  className="h-6 w-6 text-gray-400 group-hover:text-gray-200"
+                  aria-hidden="true"
+                />
+
+                <span className="ml-3 text-gray-200">Switch Orgs.</span>
+              </Link>
           </li>
           {actions.map((action) => (
             <li key={action.name}>
