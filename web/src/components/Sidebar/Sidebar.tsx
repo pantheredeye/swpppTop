@@ -12,10 +12,11 @@ import {
   UserIcon,
 } from '@heroicons/react/24/outline'
 
-import { Link } from '@redwoodjs/router'
+import { Link, navigate } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
 import { useOrganization } from 'src/context/OrganizationContext'
+import { useParams } from '@redwoodjs/router'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -28,17 +29,34 @@ const actions = [
 
 const Sidebar = () => {
   const { logOut, currentUser } = useAuth()
-  const { currentOrganization, switchOrganization } = useOrganization()
-  const orgId = useMemo(() => currentOrganization?.id || 'default-org-id', [currentOrganization]);
+  const { switchOrganization } = useOrganization()
+  const { organizationId } = useParams()
+
+  if (!organizationId) {
+    navigate('/')
+    return null
+  }
 
   const navigation = [
-    { name: 'Dashboard', href: `/org/${orgId}/dashboard`, icon: HomeIcon },
-    { name: 'Inspections', href: `/org/${orgId}/inspections`, icon: UsersIcon },
-    { name: 'Sites', href: `/org/${orgId}/sites`, icon: FolderIcon },
-    { name: 'BMPs', href: `/org/${orgId}/bmps`, icon: DocumentDuplicateIcon },
+    {
+      name: 'Dashboard',
+      href: `/org/${organizationId}/dashboard`,
+      icon: HomeIcon,
+    },
+    {
+      name: 'Inspections',
+      href: `/org/${organizationId}/inspections`,
+      icon: UsersIcon,
+    },
+    { name: 'Sites', href: `/org/${organizationId}/sites`, icon: FolderIcon },
+    {
+      name: 'BMPs',
+      href: `/org/${organizationId}/bmps`,
+      icon: DocumentDuplicateIcon,
+    },
     {
       name: 'Profile',
-      href: currentUser ? `/org/${orgId}/profile/${currentUser.id}` : '/profile',
+      href: `/org/${organizationId}/profile/${currentUser.id}`,
       icon: UserIcon,
     },
   ]
@@ -50,10 +68,7 @@ const Sidebar = () => {
     >
       {/* Header with Title and Collapse Button */}
       <div className="flex h-16 items-center justify-between px-4">
-
-          <span className="text-2xl font-bold text-gray-200">SWPPP-Tip</span>
-
-
+        <span className="text-2xl font-bold text-gray-200">SWPPP-Tip</span>
       </div>
 
       {/* Navigation */}
@@ -72,7 +87,7 @@ const Sidebar = () => {
                   aria-hidden="true"
                 />
 
-                  <span className="ml-3 text-gray-200">{item.name}</span>
+                <span className="ml-3 text-gray-200">{item.name}</span>
 
                 {/* {isCollapsed && (
                   <span className="absolute left-full ml-3 w-auto min-w-max whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-200 opacity-0 group-hover:opacity-100">
@@ -112,7 +127,7 @@ const Sidebar = () => {
                   aria-hidden="true"
                 />
 
-                  <span className="ml-3 text-gray-200">{action.name}</span>
+                <span className="ml-3 text-gray-200">{action.name}</span>
                 {/* {isCollapsed && (
                   <span className="absolute left-full ml-3 w-auto min-w-max whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-200 opacity-0 group-hover:opacity-100">
                     {action.name}
