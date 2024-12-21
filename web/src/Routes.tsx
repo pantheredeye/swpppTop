@@ -6,18 +6,6 @@ import { useAuth } from './auth'
 import AuthenticatedLayout from './layouts/AuthenticatedLayout/AuthenticatedLayout'
 import { OrganizationProvider } from './context/OrganizationContext'
 
-// EXAMPLE: redirect function
-
-// const redirectToDashboard = (user) => {
-//   const defaultOrg = user.defaultOrganizationId || user.organizationIds[0]
-
-//   if (!defaultOrg) {
-//     throw new Error('No organization found.')
-//   }
-
-//   navigate(`/org/${defaultOrg}/dashboard`)
-// }
-
 const Routes = () => {
 
   return (
