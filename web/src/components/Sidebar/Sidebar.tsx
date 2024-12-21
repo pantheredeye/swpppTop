@@ -14,7 +14,6 @@ import {
 import { Link, navigate, routes } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
-import { useOrganization } from 'src/context/OrganizationContext'
 import { useParams } from '@redwoodjs/router'
 
 function classNames(...classes) {
@@ -28,7 +27,6 @@ const actions = [
 
 const Sidebar = () => {
   const { logOut, currentUser } = useAuth()
-  const { switchOrganization } = useOrganization()
   const { organizationId } = useParams()
 
   if (!organizationId) {
@@ -106,7 +104,7 @@ const Sidebar = () => {
                   aria-hidden="true"
                 />
 
-                <span className="ml-3 text-gray-200">Switch Orgs.</span>
+                <span className="ml-3 text-gray-200">Switch Orgs</span>
               </Link>
           </li>
           {actions.map((action) => (
