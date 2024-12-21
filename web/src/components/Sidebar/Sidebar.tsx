@@ -88,12 +88,6 @@ const Sidebar = () => {
                 />
 
                 <span className="ml-3 text-gray-200">{item.name}</span>
-
-                {/* {isCollapsed && (
-                  <span className="absolute left-full ml-3 w-auto min-w-max whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-200 opacity-0 group-hover:opacity-100">
-                    {item.name}
-                  </span>
-                )} */}
               </Link>
             </li>
           ))}
@@ -128,11 +122,7 @@ const Sidebar = () => {
                 />
 
                 <span className="ml-3 text-gray-200">{action.name}</span>
-                {/* {isCollapsed && (
-                  <span className="absolute left-full ml-3 w-auto min-w-max whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-200 opacity-0 group-hover:opacity-100">
-                    {action.name}
-                  </span>
-                )} */}
+
               </button>
             </li>
           ))}

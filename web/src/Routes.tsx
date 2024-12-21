@@ -10,6 +10,7 @@ const Routes = () => {
 
   return (
     <Router useAuth={useAuth}>
+      <Route path="/switch" page={SwitchPage} name="switch" />
       <Set wrap={MainLayout}>
         <Route path="/" page={HomePage} name="home" />
         <Route path="/login" page={LoginPage} name="login" />
