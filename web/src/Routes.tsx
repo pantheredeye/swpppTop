@@ -7,10 +7,8 @@ import AuthenticatedLayout from './layouts/AuthenticatedLayout/AuthenticatedLayo
 import { OrganizationProvider } from './context/OrganizationContext'
 
 const Routes = () => {
-
   return (
     <Router useAuth={useAuth}>
-      <Route path="/switch" page={SwitchPage} name="switch" />
       <Set wrap={MainLayout}>
         <Route path="/" page={HomePage} name="home" />
         <Route path="/login" page={LoginPage} name="login" />
@@ -28,6 +26,10 @@ const Routes = () => {
         <Route path="/org/{organizationId}/new-inspection" page={NewInspectionPage} name="newInspection" />
         <Route path="/org/{organizationId}/new-site" page={NewSitePage} name="newSite" />
         <Route path="/org/{organizationId}/standard-bmp-settings" page={StandardBMPSettingsPage} name="standardBmpSettings" />
+
+        <Route path="/create-organization" page={CreateOrganizationPage} name="createOrganization" />
+        <Route path="/request-invite" page={RequestInvitePage} name="requestInvite" />
+        <Route path="/switch" page={SwitchPage} name="switch" />
       </PrivateSet>
 
       <Route notfound page={NotFoundPage} />
