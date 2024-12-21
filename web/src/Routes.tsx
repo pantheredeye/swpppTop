@@ -4,6 +4,7 @@ import MainLayout from 'src/layouts/MainLayout/MainLayout'
 
 import { useAuth } from './auth'
 import AuthenticatedLayout from './layouts/AuthenticatedLayout/AuthenticatedLayout'
+import { OrganizationProvider } from './context/OrganizationContext'
 
 // EXAMPLE: redirect function
 
@@ -18,6 +19,7 @@ import AuthenticatedLayout from './layouts/AuthenticatedLayout/AuthenticatedLayo
 // }
 
 const Routes = () => {
+
   return (
     <Router useAuth={useAuth}>
       <Set wrap={MainLayout}>
@@ -27,7 +29,7 @@ const Routes = () => {
         <Route path="/forgot-password" page={ForgotPasswordPage} name="forgotPassword" />
         <Route path="/reset-password" page={ResetPasswordPage} name="resetPassword" />
       </Set>
-      <PrivateSet unauthenticated="login" wrap={AuthenticatedLayout}>
+      <PrivateSet unauthenticated="login" wrap={[OrganizationProvider, AuthenticatedLayout]}>
         <Route path="/org/{organizationId}/dashboard" page={DashboardPage} name="dashboard" />
         <Route path="/org/{organizationId}/profile/{id}" page={ProfilePage} name="profile" />
         <Route path="/org/{organizationId}/view-inspection/{id}" page={ViewInspectionPage} name="viewInspection" />

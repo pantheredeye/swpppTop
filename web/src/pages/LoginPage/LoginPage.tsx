@@ -19,8 +19,6 @@ import { getCurrentUser } from 'src/lib/auth'
 const LoginPage = () => {
   const { isAuthenticated, logIn, currentUser } = useAuth()
   const formMethods = useForm()
-  console.log(isAuthenticated)
-  console.log("currentUser " + currentUser)
 
   useEffect(() => {
     if (isAuthenticated) {

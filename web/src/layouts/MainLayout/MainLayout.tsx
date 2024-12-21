@@ -6,8 +6,6 @@ const MainLayout = ({ children }) => {
   const { isAuthenticated, currentUser, logOut } = useAuth()
   const location = useLocation()
 
-  console.log(isAuthenticated)
-  console.log("currentUser " + currentUser)
   return (
     <div className="flex min-h-screen flex-col  bg-gray-900 text-gray-900">
       <header className="flex items-center justify-between  bg-gray-900 px-6 py-4 text-white shadow">
