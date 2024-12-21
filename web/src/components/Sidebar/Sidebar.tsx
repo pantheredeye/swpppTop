@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useMemo } from 'react'
 
 import {
   HomeIcon,
@@ -31,15 +31,20 @@ const Sidebar = () => {
   const { logOut, currentUser } = useAuth()
   const { currentOrganization, switchOrganization } = useOrganization()
 
+  if (!currentOrganization) {
+    alert('Organization not found, contact administrator')
+  }
+
+  const orgId = useMemo(() => currentOrganization?.id || 'default-org-id', [currentOrganization]);
 
   const navigation = [
-    { name: 'Dashboard', href: `/org/${currentOrganization}/dashboard`, icon: HomeIcon },
-    { name: 'Inspections', href: `/org/${currentOrganization}/inspections`, icon: UsersIcon },
-    { name: 'Sites', href: `/org/${currentOrganization}/sites`, icon: FolderIcon },
-    { name: 'BMPs', href: `/org/${currentOrganization}/bmps`, icon: DocumentDuplicateIcon },
+    { name: 'Dashboard', href: `/org/${orgId}/dashboard`, icon: HomeIcon },
+    { name: 'Inspections', href: `/org/${orgId}/inspections`, icon: UsersIcon },
+    { name: 'Sites', href: `/org/${orgId}/sites`, icon: FolderIcon },
+    { name: 'BMPs', href: `/org/${orgId}/bmps`, icon: DocumentDuplicateIcon },
     {
       name: 'Profile',
-      href: currentUser ? `/org/${currentOrganization}/profile/${currentUser.id}` : '/profile',
+      href: currentUser ? `/org/${orgId}/profile/${currentUser.id}` : '/profile',
       icon: UserIcon,
     },
   ]
