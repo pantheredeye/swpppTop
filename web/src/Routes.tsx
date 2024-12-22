@@ -27,9 +27,9 @@ const Routes = () => {
         <Route path="/org/{organizationId}/new-site" page={NewSitePage} name="newSite" />
         <Route path="/org/{organizationId}/standard-bmp-settings" page={StandardBMPSettingsPage} name="standardBmpSettings" />
 
-        <Route path="/create-organization" page={CreateOrganizationPage} name="createOrganization" />
-        <Route path="/request-invite" page={RequestInvitePage} name="requestInvite" />
-        <Route path="/switch" page={SwitchPage} name="switch" />
+        <Route path="/org/{organizationId}/create-organization" page={CreateOrganizationPage} name="createOrganization" />
+        <Route path="/org/{organizationId}/request-invite" page={RequestInvitePage} name="requestInvite" />
+        <Route path="/org/{organizationId}/switch" page={SwitchPage} name="switch" />
       </PrivateSet>
 
       <Route notfound page={NotFoundPage} />

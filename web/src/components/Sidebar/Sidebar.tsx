@@ -1,4 +1,4 @@
-import { useState, useContext, useMemo } from 'react'
+import { useState, useContext, useMemo, useEffect } from 'react'
 
 import {
   HomeIcon,
@@ -29,9 +29,15 @@ const Sidebar = () => {
   const { logOut, currentUser } = useAuth()
   const { organizationId } = useParams()
 
+  // Use useEffect to handle the redirect
+  useEffect(() => {
+    if (!organizationId) {
+      navigate('/')
+    }
+  }, [organizationId])
+
   if (!organizationId) {
-    navigate('/')
-    return null
+    return null // Return nothing while redirecting
   }
 
   const navigation = [
@@ -94,7 +100,7 @@ const Sidebar = () => {
         <ul className="space-y-2">
           <li>
             <Link
-              to={routes.switch()}
+              to={routes.switch({ organizationId })}
               className={classNames(
                 'group relative flex items-center rounded-xl px-2 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 shadow-lg justify-start'
               )}
