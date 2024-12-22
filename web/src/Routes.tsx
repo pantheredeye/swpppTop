@@ -3,8 +3,8 @@ import { Router, Route, Set, PrivateSet, navigate } from '@redwoodjs/router'
 import MainLayout from 'src/layouts/MainLayout/MainLayout'
 
 import { useAuth } from './auth'
-import AuthenticatedLayout from './layouts/AuthenticatedLayout/AuthenticatedLayout'
 import { OrganizationProvider } from './context/OrganizationContext'
+import AuthenticatedLayout from './layouts/AuthenticatedLayout/AuthenticatedLayout'
 
 const Routes = () => {
   return (

@@ -1,5 +1,5 @@
 // import { Link, routes } from '@redwoodjs/router'
-import { Metadata } from "@redwoodjs/web";
+import { Metadata } from '@redwoodjs/web'
 
 const CreateOrganizationPage = () => {
   return (
@@ -11,7 +11,7 @@ const CreateOrganizationPage = () => {
 
       <h1>CreateOrganizationPage</h1>
       <p>
-        Find me in{" "}
+        Find me in{' '}
         <code>
           ./web/src/pages/CreateOrganizationPage/CreateOrganizationPage.tsx
         </code>
@@ -21,7 +21,7 @@ const CreateOrganizationPage = () => {
           `<Link to={routes.createOrganization()}>CreateOrganization</Link>`
       */}
     </>
-  );
-};
+  )
+}
 
-export default CreateOrganizationPage;
+export default CreateOrganizationPage

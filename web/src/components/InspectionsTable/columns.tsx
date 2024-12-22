@@ -4,6 +4,8 @@ import { ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal } from 'lucide-react'
 
 import { navigate, routes } from '@redwoodjs/router'
+
+import { useAuth } from 'src/auth'
 import { Button } from 'src/components/ui/Button'
 import {
   DropdownMenu,
@@ -15,7 +17,6 @@ import {
 } from 'src/components/ui/DropdownMenu'
 
 import ExportPDFButton from '../ExportPDFButton/ExportPDFButton'
-import { useAuth } from 'src/auth'
 export type Inspection = {
   id: number
   site: {
@@ -80,7 +81,12 @@ export const columns: ColumnDef<Inspection>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() =>
-                navigate(routes.viewInspection({ organizationId: useAuth().currentUser.defaultOrganizationId , id: String(inspection.id) }))
+                navigate(
+                  routes.viewInspection({
+                    organizationId: useAuth().currentUser.defaultOrganizationId,
+                    id: String(inspection.id),
+                  })
+                )
               }
             >
               View inspection

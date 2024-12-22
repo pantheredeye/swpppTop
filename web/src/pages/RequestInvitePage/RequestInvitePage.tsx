@@ -1,5 +1,5 @@
 // import { Link, routes } from '@redwoodjs/router'
-import { Metadata } from "@redwoodjs/web";
+import { Metadata } from '@redwoodjs/web'
 
 const RequestInvitePage = () => {
   return (
@@ -8,7 +8,7 @@ const RequestInvitePage = () => {
 
       <h1>RequestInvitePage</h1>
       <p>
-        Find me in{" "}
+        Find me in{' '}
         <code>./web/src/pages/RequestInvitePage/RequestInvitePage.tsx</code>
       </p>
       {/*
@@ -16,7 +16,7 @@ const RequestInvitePage = () => {
           `<Link to={routes.requestInvite()}>RequestInvite</Link>`
       */}
     </>
-  );
-};
+  )
+}
 
-export default RequestInvitePage;
+export default RequestInvitePage

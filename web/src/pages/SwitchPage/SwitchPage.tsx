@@ -1,10 +1,17 @@
 import { useState } from 'react'
+
 import { navigate, Link, routes } from '@redwoodjs/router'
-import { useOrganization } from 'src/context/OrganizationContext'
 import { Metadata } from '@redwoodjs/web'
 
+import { useOrganization } from 'src/context/OrganizationContext'
+
 const SwitchPage = () => {
-  const { availableOrganizations, currentOrganization, switchOrganization, loading } = useOrganization()
+  const {
+    availableOrganizations,
+    currentOrganization,
+    switchOrganization,
+    loading,
+  } = useOrganization()
   const [switchingOrgId, setSwitchingOrgId] = useState<string | null>(null)
 
   const handleSwitchOrg = async (orgId: string) => {
@@ -31,7 +38,10 @@ const SwitchPage = () => {
 
   return (
     <>
-      <Metadata title="Switch Organizations" description="Switch between your organizations" />
+      <Metadata
+        title="Switch Organizations"
+        description="Switch between your organizations"
+      />
 
       <div className="min-h-screen bg-gray-800 p-6">
         <div className="mx-auto max-w-3xl">
@@ -66,20 +76,23 @@ const SwitchPage = () => {
                     </div>
                     <button
                       onClick={() => handleSwitchOrg(org.id)}
-                      disabled={org.id === currentOrganization?.id || org.status !== 'ACTIVE'}
+                      disabled={
+                        org.id === currentOrganization?.id ||
+                        org.status !== 'ACTIVE'
+                      }
                       className={`rounded-lg px-4 py-2 text-sm font-medium ${
                         org.id === currentOrganization?.id
                           ? 'bg-gray-700 text-gray-400'
                           : org.status === 'ACTIVE'
-                          ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-                          : 'bg-gray-700 text-gray-400'
+                            ? 'bg-indigo-600 text-white hover:bg-indigo-500'
+                            : 'bg-gray-700 text-gray-400'
                       }`}
                     >
                       {org.id === currentOrganization?.id
                         ? 'Current'
                         : switchingOrgId === org.id
-                        ? 'Switching...'
-                        : 'Switch'}
+                          ? 'Switching...'
+                          : 'Switch'}
                     </button>
                   </div>
                 </div>

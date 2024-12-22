@@ -56,13 +56,14 @@ export const userOrganizations: QueryResolvers['userOrganizations'] = () => {
   })
 }
 
-export const setDefaultOrganization: MutationResolvers['setDefaultOrganization'] = async ({ id }) => {
-  const { currentUser } = context
-  return db.user.update({
-    where: { id: currentUser.id },
-    data: { defaultOrganizationId: id },
-  })
-}
+export const setDefaultOrganization: MutationResolvers['setDefaultOrganization'] =
+  async ({ id }) => {
+    const { currentUser } = context
+    return db.user.update({
+      where: { id: currentUser.id },
+      data: { defaultOrganizationId: id },
+    })
+  }
 
 export const Organization: OrganizationRelationResolvers = {
   users: (_obj, { root }) => {

@@ -22,7 +22,9 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(routes.dashboard({ organizationId: currentUser.defaultOrganizationId }))
+      navigate(
+        routes.dashboard({ organizationId: currentUser.defaultOrganizationId })
+      )
     }
   }, [isAuthenticated])
 
@@ -44,7 +46,9 @@ const LoginPage = () => {
       toast.error(response.error)
     } else {
       toast.success('Welcome back!')
-      navigate(routes.dashboard({ organizationId: currentUser.defaultOrganizationId }))
+      navigate(
+        routes.dashboard({ organizationId: currentUser.defaultOrganizationId })
+      )
     }
   }
 

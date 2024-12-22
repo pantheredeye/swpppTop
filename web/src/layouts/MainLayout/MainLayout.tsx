@@ -16,7 +16,12 @@ const MainLayout = ({ children }) => {
           </Link>
           {isAuthenticated ? (
             <>
-              <Link to={routes.dashboard({ organizationId: currentUser.defaultOrganizationId })} className="px-4">
+              <Link
+                to={routes.dashboard({
+                  organizationId: currentUser.defaultOrganizationId,
+                })}
+                className="px-4"
+              >
                 Dashboard
               </Link>
 

@@ -126,76 +126,76 @@ export const handler = async (
     // If this returns anything else, it will be returned by the
     // `signUp()` function in the form of: `{ message: 'String here' }`.
 
-
     handler: ({ username, hashedPassword, salt }) => {
-      return db.$transaction(async (tx) => {
-        try {
-          const personalOrg = await tx.organization.create({
-            data: {
-              name: `Personal Organization`, // Base name
-              settings: {
-                userId: 'PENDING', // Placeholder to track unique creation
-                creationType: 'USER_SIGNUP'
+      return db.$transaction(
+        async (tx) => {
+          try {
+            const personalOrg = await tx.organization.create({
+              data: {
+                name: `Personal Organization`, // Base name
+                settings: {
+                  userId: 'PENDING', // Placeholder to track unique creation
+                  creationType: 'USER_SIGNUP',
+                },
+                status: 'ACTIVE',
               },
-              status: 'ACTIVE'
-            }
-          });
+            })
 
-          const user = await tx.user.create({
-            data: {
-              email: username,
-              hashedPassword: hashedPassword,
-              salt: salt,
-              defaultOrganizationId: personalOrg.id, // Direct connection
-              isActive: true,
-              lastLoginAt: new Date()
-            }
-          });
-
-          await tx.organization.update({
-            where: { id: personalOrg.id },
-            data: {
-              name: `Personal Organization (${user.id})`,
-              settings: {
-                userId: user.id, // Update with actual user ID
-                creationType: 'USER_SIGNUP'
-              }
-            }
-          });
-
-          const fullAccessPermission = await tx.permission.findUnique({
-            where: {
-              name_scope: {
-                name: 'FULL_ACCESS',
-                scope: 'ORGANIZATION'
-              }
-            }
-          });
-
-          const ownerRole = await tx.membershipRole.create({
-            data: {
-              name: 'OWNER',
-              organizationId: personalOrg.id,
-              permissionId: fullAccessPermission?.id
-            }
-          });
-
-          await tx.membership.create({
-            data: {
-              userId: user.id,
-              organizationId: personalOrg.id,
-              roles: {
-                connect: { id: ownerRole.id }
+            const user = await tx.user.create({
+              data: {
+                email: username,
+                hashedPassword: hashedPassword,
+                salt: salt,
+                defaultOrganizationId: personalOrg.id, // Direct connection
+                isActive: true,
+                lastLoginAt: new Date(),
               },
-              status: 'ACTIVE',
-              invitationChannel: 'INTERNAL',
-              joinedAt: new Date()
+            })
+
+            await tx.organization.update({
+              where: { id: personalOrg.id },
+              data: {
+                name: `Personal Organization (${user.id})`,
+                settings: {
+                  userId: user.id, // Update with actual user ID
+                  creationType: 'USER_SIGNUP',
+                },
+              },
+            })
+
+            const fullAccessPermission = await tx.permission.findUnique({
+              where: {
+                name_scope: {
+                  name: 'FULL_ACCESS',
+                  scope: 'ORGANIZATION',
+                },
+              },
+            })
+
+            const ownerRole = await tx.membershipRole.create({
+              data: {
+                name: 'OWNER',
+                organizationId: personalOrg.id,
+                permissionId: fullAccessPermission?.id,
+              },
+            })
+
+            await tx.membership.create({
+              data: {
+                userId: user.id,
+                organizationId: personalOrg.id,
+                roles: {
+                  connect: { id: ownerRole.id },
+                },
+                status: 'ACTIVE',
+                invitationChannel: 'INTERNAL',
+                joinedAt: new Date(),
+              },
+            })
+            return {
+              ...user,
+              defaultOrganizationId: personalOrg.id,
             }
-          });
-          return {
-            ...user,
-            defaultOrganizationId: personalOrg.id
-          }
           } catch (error) {
             console.error('User registration failed:', error)
             if (error.code === 'P2002') {

@@ -12,9 +12,9 @@ import {
 } from '@heroicons/react/24/outline'
 
 import { Link, navigate, routes } from '@redwoodjs/router'
+import { useParams } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
-import { useParams } from '@redwoodjs/router'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -93,19 +93,19 @@ const Sidebar = () => {
       <div className="px-2 py-2 pb-4">
         <ul className="space-y-2">
           <li>
-          <Link
-                to={routes.switch()}
-                className={classNames(
-                  'group relative flex items-center rounded-xl px-2 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 shadow-lg justify-start'
-                )}
-              >
-                <BuildingOfficeIcon
-                  className="h-6 w-6 text-gray-400 group-hover:text-gray-200"
-                  aria-hidden="true"
-                />
+            <Link
+              to={routes.switch()}
+              className={classNames(
+                'group relative flex items-center rounded-xl px-2 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 shadow-lg justify-start'
+              )}
+            >
+              <BuildingOfficeIcon
+                className="h-6 w-6 text-gray-400 group-hover:text-gray-200"
+                aria-hidden="true"
+              />
 
-                <span className="ml-3 text-gray-200">Switch Orgs</span>
-              </Link>
+              <span className="ml-3 text-gray-200">Switch Orgs</span>
+            </Link>
           </li>
           {actions.map((action) => (
             <li key={action.name}>
@@ -127,7 +127,6 @@ const Sidebar = () => {
                 />
 
                 <span className="ml-3 text-gray-200">{action.name}</span>
-
               </button>
             </li>
           ))}

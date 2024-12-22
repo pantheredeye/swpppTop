@@ -10,11 +10,11 @@ export default async () => {
         {
           name: 'FULL_ACCESS',
           scope: 'ORGANIZATION',
-          description: 'Complete access to personal organization'
-        }
+          description: 'Complete access to personal organization',
+        },
         // Other standard permissions...
       ],
-      skipDuplicates: true
+      skipDuplicates: true,
     })
 
     //     // Seed data for Standard BMPs

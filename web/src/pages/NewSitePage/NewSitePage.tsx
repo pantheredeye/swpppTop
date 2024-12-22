@@ -14,6 +14,7 @@ import {
 import { navigate, routes } from '@redwoodjs/router'
 import { useMutation, useQuery } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
+
 import { useAuth } from 'src/auth'
 
 // const GET_STANDARD_BMPS_NEW_SITE = gql`
@@ -107,7 +108,11 @@ const NewSitePage = () => {
       },
     })
     toast.success('Site created')
-    navigate(routes.dashboard({ organizationId: useAuth().currentUser.defaultOrganizationId }))
+    navigate(
+      routes.dashboard({
+        organizationId: useAuth().currentUser.defaultOrganizationId,
+      })
+    )
   }
 
   return (

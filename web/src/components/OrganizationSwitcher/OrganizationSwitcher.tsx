@@ -2,7 +2,8 @@
 import { useOrganization } from 'src/context/OrganizationContext'
 
 const OrganizationSwitcher = () => {
-  const { currentOrganization, availableOrganizations, switchOrganization } = useOrganization()
+  const { currentOrganization, availableOrganizations, switchOrganization } =
+    useOrganization()
 
   return (
     <select
@@ -19,4 +20,4 @@ const OrganizationSwitcher = () => {
   )
 }
 
-export default OrganizationSwitcher;
+export default OrganizationSwitcher

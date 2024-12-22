@@ -10,9 +10,9 @@ import type {
   TypedDocumentNode,
 } from '@redwoodjs/web'
 
+import { useAuth } from 'src/auth'
 import { columns } from 'src/components/SitesTable/columns'
 import DataTable from 'src/components/SitesTable/SitesTable'
-import { useAuth } from 'src/auth'
 
 export const QUERY: TypedDocumentNode<
   FindSitesListQuery,
@@ -42,7 +42,9 @@ export const Success = ({
   return (
     <div className="container mx-auto py-10">
       <Link
-        to={routes.newSite({ organizationId: useAuth().currentUser.defaultOrganizationId })}
+        to={routes.newSite({
+          organizationId: useAuth().currentUser.defaultOrganizationId,
+        })}
         className="flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 font-medium text-white shadow-lg hover:bg-indigo-500 focus:outline-none"
       >
         Add Site

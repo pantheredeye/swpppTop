@@ -14,7 +14,7 @@ const App = () => (
     <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
       <AuthProvider>
         <RedwoodApolloProvider useAuth={useAuth}>
-            <Routes />
+          <Routes />
         </RedwoodApolloProvider>
       </AuthProvider>
     </RedwoodProvider>

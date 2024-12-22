@@ -1,14 +1,14 @@
-import { render } from "@redwoodjs/testing/web";
+import { render } from '@redwoodjs/testing/web'
 
-import OrganizationSwitcher from "./OrganizationSwitcher";
+import OrganizationSwitcher from './OrganizationSwitcher'
 
 //   Improve this test with help from the Redwood Testing Doc:
 //    https://redwoodjs.com/docs/testing#testing-components
 
-describe("OrganizationSwitcher", () => {
-  it("renders successfully", () => {
+describe('OrganizationSwitcher', () => {
+  it('renders successfully', () => {
     expect(() => {
-      render(<OrganizationSwitcher />);
-    }).not.toThrow();
-  });
-});
+      render(<OrganizationSwitcher />)
+    }).not.toThrow()
+  })
+})

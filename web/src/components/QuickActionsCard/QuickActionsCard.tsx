@@ -25,14 +25,18 @@ const QuickActionsCard = () => {
       </h3>
       <div className="space-y-2">
         <Link
-          to={routes.newInspection({ organizationId: useAuth().currentUser.defaultOrganizationId })}
+          to={routes.newInspection({
+            organizationId: useAuth().currentUser.defaultOrganizationId,
+          })}
           className="flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 font-medium text-white shadow-lg hover:bg-indigo-500 focus:outline-none"
         >
           New Inspection
         </Link>
 
         <Link
-          to={routes.newSite({ organizationId: useAuth().currentUser.defaultOrganizationId })}
+          to={routes.newSite({
+            organizationId: useAuth().currentUser.defaultOrganizationId,
+          })}
           className="flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 font-medium text-white shadow-lg hover:bg-indigo-500 focus:outline-none"
         >
           Add Site

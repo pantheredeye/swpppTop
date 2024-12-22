@@ -1,4 +1,3 @@
-
 import type {
   CellSuccessProps,
   CellFailureProps,
@@ -44,9 +43,7 @@ export const Failure = ({ error }: CellFailureProps) => (
   </div>
 )
 
-export const Success = ({
-  inspectionBmps,
-}) => {
+export const Success = ({ inspectionBmps }) => {
   return (
     <>
       <div className="mt-4 space-y-4">
