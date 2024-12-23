@@ -1,11 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { navigate, Link, routes } from '@redwoodjs/router'
+import { navigate, Link, routes, useParams } from '@redwoodjs/router'
 import { Metadata } from '@redwoodjs/web'
 
 import { useOrganization } from 'src/context/OrganizationContext'
 
 const SwitchPage = () => {
+
+  const { organizationId } = useParams()
+
+  // Use useEffect to handle the redirect
+  useEffect(() => {
+    if (!organizationId) {
+      navigate('/')
+    }
+  }, [organizationId])
+
+  if (!organizationId) {
+    return null // Return nothing while redirecting
+  }
+
+
   const {
     availableOrganizations,
     currentOrganization,
@@ -108,20 +123,20 @@ const SwitchPage = () => {
             {/* Action Buttons */}
             <div className="mt-8 flex justify-between border-t border-gray-700 pt-6">
               <Link
-                to={routes.requestInvite()}
+                to={routes.requestInvite({organizationId})}
                 className="rounded-lg border border-gray-600 bg-transparent px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-800"
               >
                 Request to Join
               </Link>
               <div className="space-x-4">
                 <Link
-                  to={routes.dashboard()}
+                  to={routes.dashboard({organizationId})}
                   className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-600"
                 >
                   Cancel
                 </Link>
                 <Link
-                  to={routes.createOrganization()}
+                  to={routes.createOrganization({organizationId})}
                   className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
                 >
                   Create New Organization
