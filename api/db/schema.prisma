@@ -87,6 +87,7 @@ model Membership {
   @@unique([userId, organizationId])
   @@unique([invitationId, organizationId])
   @@index([organizationId])
+  @@index([userId])
 }
 
 model MembershipRole {
