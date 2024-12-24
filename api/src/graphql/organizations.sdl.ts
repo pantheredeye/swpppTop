@@ -19,6 +19,11 @@ export const schema = gql`
     status: OrganizationStatus!
   }
 
+type UserOrganization {
+  id: String!
+  name: String!
+}
+
   enum OrganizationStatus {
     ACTIVE
     SUSPENDED
@@ -29,7 +34,7 @@ export const schema = gql`
   type Query {
     organizations: [Organization!]! @requireAuth
     organization(id: String!): Organization @requireAuth
-    userOrganizations: [Organization!]! @requireAuth
+    userOrganizations: [UserOrganization!]! @requireAuth
   }
 
   input CreateOrganizationInput {

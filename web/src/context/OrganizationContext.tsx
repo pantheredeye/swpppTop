@@ -35,10 +35,9 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const GET_USER_ORGANIZATIONS = gql`
     query GetUserOrganizations {
-      organizations {
+      userOrganizations {
         id
         name
-        status
       }
     }
   `

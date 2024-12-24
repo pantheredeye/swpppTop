@@ -5,6 +5,7 @@ import type {
 } from 'types/graphql'
 
 import { db } from 'src/lib/db'
+import { AuthenticationError } from '@redwoodjs/graphql-server'
 
 export const organizations: QueryResolvers['organizations'] = () => {
   return db.organization.findMany()
@@ -14,6 +15,46 @@ export const organization: QueryResolvers['organization'] = ({ id }) => {
   return db.organization.findUnique({
     where: { id },
   })
+}
+
+
+export const userOrganizations: QueryResolvers['userOrganizations'] = async () => {
+  const currentUser = context.currentUser
+  if (!currentUser) {
+    throw new AuthenticationError('You must be logged in')
+  }
+
+  const userWithOrgs = await db.user.findUnique({
+    where: {
+      id: currentUser.id,
+      isActive: true,
+      deletedAt: null,
+    },
+    select: {
+      memberships: {
+        where: {
+          status: 'ACTIVE',
+          deletedAt: null,
+          organization: {
+            status: 'ACTIVE',
+            deletedAt: null,
+          },
+        },
+        select: {
+          organization: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  })
+
+  return (
+    userWithOrgs?.memberships?.map((membership) => membership.organization) || []
+  )
 }
 
 export const createOrganization: MutationResolvers['createOrganization'] = ({
@@ -42,37 +83,6 @@ export const deleteOrganization: MutationResolvers['deleteOrganization'] = ({
   })
 }
 
-export const userOrganizations = async ({ context }) => {
-  const userWithOrgs = await db.user.findUnique({
-    where: {
-      id: context.currentUser.id,
-      isActive: true,
-      deletedAt: null
-    },
-    select: {
-      memberships: {
-        where: {
-          status: 'ACTIVE',
-          deletedAt: null,
-          organization: {
-            status: 'ACTIVE',
-            deletedAt: null
-          }
-        },
-        select: {
-          organization: {
-            select: {
-              id: true,
-              name: true
-            }
-          }
-        }
-      }
-    }
-  })
-
-  return userWithOrgs?.memberships?.map(membership => membership.organization) || []
-}
 export const setDefaultOrganization: MutationResolvers['setDefaultOrganization'] =
   async ({ id }) => {
     const { currentUser } = context
