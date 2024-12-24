@@ -48,12 +48,12 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     console.log('data', data)
-    if (data?.organizations) {
-      setAvailableOrganizations(data.organizations)
+    if (data?.userOrganizations) {
+      setAvailableOrganizations(data.userOrganizations)
 
       // Set default organization
       const defaultOrgId = currentUser?.defaultOrganizationId
-      const defaultOrg = data.organizations.find(
+      const defaultOrg = availableOrganizations.find(
         (org) => org.id === defaultOrgId
       )
 
