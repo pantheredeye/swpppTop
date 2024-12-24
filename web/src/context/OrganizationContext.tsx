@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
 import { navigate } from '@redwoodjs/router'
-import { useMutation, useQuery } from '@redwoodjs/web'
+import { useQuery } from '@redwoodjs/web'
 
 import { useAuth } from 'src/auth'
 interface Organization {
@@ -43,9 +43,12 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   `
 
-  const { data, error: queryError } = useQuery(GET_USER_ORGANIZATIONS)
+  const { data, error: queryError } = useQuery(GET_USER_ORGANIZATIONS, {
+    fetchPolicy: 'cache-first',
+  })
 
   useEffect(() => {
+    console.log('data', data)
     if (data?.organizations) {
       setAvailableOrganizations(data.organizations)
 

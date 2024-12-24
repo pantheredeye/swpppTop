@@ -155,7 +155,7 @@ export const handler = async (
             await tx.organization.update({
               where: { id: personalOrg.id },
               data: {
-                name: `Personal Organization (${user.id})`,
+                name: `Personal Organization`,
                 settings: {
                   userId: user.id, // Update with actual user ID
                   creationType: 'USER_SIGNUP',
