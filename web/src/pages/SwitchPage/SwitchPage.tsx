@@ -9,7 +9,6 @@ const SwitchPage = () => {
 
   const { organizationId } = useParams()
 
-  // Use useEffect to handle the redirect
   useEffect(() => {
     if (!organizationId) {
       navigate('/')
@@ -17,9 +16,8 @@ const SwitchPage = () => {
   }, [organizationId])
 
   if (!organizationId) {
-    return null // Return nothing while redirecting
+    return null
   }
-
 
   const {
     availableOrganizations,

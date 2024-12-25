@@ -17,53 +17,117 @@ export const organization: QueryResolvers['organization'] = ({ id }) => {
   })
 }
 
+export const userOrganizations: QueryResolvers['userOrganizations'] =
+  async () => {
+    const currentUser = context.currentUser
+    if (!currentUser) {
+      throw new AuthenticationError('You must be logged in')
+    }
 
-export const userOrganizations: QueryResolvers['userOrganizations'] = async () => {
-  const currentUser = context.currentUser
-  if (!currentUser) {
-    throw new AuthenticationError('You must be logged in')
-  }
-
-  const userWithOrgs = await db.user.findUnique({
-    where: {
-      id: currentUser.id,
-      isActive: true,
-      deletedAt: null,
-    },
-    select: {
-      memberships: {
-        where: {
-          status: 'ACTIVE',
-          deletedAt: null,
-          organization: {
+    const userWithOrgs = await db.user.findUnique({
+      where: {
+        id: currentUser.id,
+        isActive: true,
+        deletedAt: null,
+      },
+      select: {
+        memberships: {
+          where: {
             status: 'ACTIVE',
             deletedAt: null,
+            organization: {
+              status: 'ACTIVE',
+              deletedAt: null,
+            },
           },
-        },
-        select: {
-          organization: {
-            select: {
-              id: true,
-              name: true,
+          select: {
+            organization: {
+              select: {
+                id: true,
+                name: true,
+              },
             },
           },
         },
       },
-    },
-  })
+    })
 
-  return (
-    userWithOrgs?.memberships?.map((membership) => membership.organization) || []
-  )
-}
+    return (
+      userWithOrgs?.memberships?.map((membership) => membership.organization) ||
+      []
+    )
+  }
 
-export const createOrganization: MutationResolvers['createOrganization'] = ({
-  input,
-}) => {
-  return db.organization.create({
-    data: input,
-  })
-}
+  export const createOrganization: MutationResolvers['createOrganization'] = async ({
+    input,
+  }) => {
+    const { currentUser } = context
+
+    const organization = await db.$transaction(async (tx) => {
+      // Create the organization
+      const org = await tx.organization.create({
+        data: {
+          name: input.name,
+          status: 'ACTIVE',
+          settings: input.settings || {},
+        },
+      })
+
+      // Get the FULL_ACCESS permission
+      const fullAccessPermission = await tx.permission.findFirst({
+        where: {
+          name: 'FULL_ACCESS',
+          scope: 'ORGANIZATION',
+        },
+      })
+
+      if (!fullAccessPermission) {
+        throw new Error('Required FULL_ACCESS permission not found')
+      }
+
+      // Create owner role
+      const ownerRole = await tx.membershipRole.create({
+        data: {
+          name: 'OWNER',
+          organizationId: org.id,
+          permissionId: fullAccessPermission.id,
+        },
+      })
+
+      // Create membership
+      await tx.membership.create({
+        data: {
+          userId: currentUser.id,
+          organizationId: org.id,
+          roles: {
+            connect: { id: ownerRole.id },
+          },
+          status: 'ACTIVE',
+          invitationChannel: 'INTERNAL',
+          joinedAt: new Date(),
+        },
+      })
+
+      // Return the complete organization with relationships
+      return await tx.organization.findUnique({
+        where: { id: org.id },
+        include: {
+          membershipRole: true,
+          users: {
+            include: {
+              roles: true,
+            },
+          },
+        },
+      })
+    })
+
+    if (!organization) {
+      throw new Error('Failed to create organization')
+    }
+
+    return organization
+  }
 
 export const updateOrganization: MutationResolvers['updateOrganization'] = ({
   id,

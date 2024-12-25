@@ -16,32 +16,48 @@ const CREATE_ORGANIZATION = gql`
 
 const CreateOrganizationPage = () => {
   const [name, setName] = useState('')
-  const { switchOrganization } = useOrganization()
+  const { switchOrganization, refreshOrganizations } = useOrganization()
   const [loading, setLoading] = useState(false)
 
-  const [createOrganization] = useMutation(CREATE_ORGANIZATION, {
-    onCompleted: async (data) => {
-      setLoading(true)
-      try {
-        await switchOrganization(data.createOrganization.id)
-        toast.success('Organization created successfully')
-        // Redirect to the org settings page for further setup
-        navigate(routes.organizationSettings({
-          organizationId: data.createOrganization.id,
-          tab: 'roles' // Optional: direct to roles setup
-        }))
-      } catch (error) {
-        console.error('Failed to switch organization:', error)
-        toast.error('Organization created but failed to switch context')
-      } finally {
-        setLoading(false)
+  const CREATE_ORGANIZATION = gql`
+  mutation CreateOrganization($input: CreateOrganizationInput!) {
+    createOrganization(input: $input) {
+      id
+      name
+      users {
+        id
+        roles {
+          id
+          name
+        }
       }
-    },
-    onError: (error) => {
-      toast.error(error.message)
+    }
+  }
+`
+
+const [createOrganization] = useMutation(CREATE_ORGANIZATION, {
+  onCompleted: async (data) => {
+    setLoading(true)
+    try {
+      await refreshOrganizations() // Refresh the organizations list
+      await switchOrganization(data.createOrganization.organization.id)
+      toast.success('Organization created successfully')
+      navigate(routes.organizationSettings({
+        organizationId: data.createOrganization.organization.id,
+        tab: 'roles'
+      }))
+    } catch (error) {
+      console.error('Failed to switch organization:', error)
+      toast.error('Organization created but failed to switch context')
+    } finally {
       setLoading(false)
-    },
-  })
+    }
+  },
+  onError: (error) => {
+    toast.error(error.message)
+    setLoading(false)
+  },
+})
 
   const handleSubmit = async (e) => {
     e.preventDefault()

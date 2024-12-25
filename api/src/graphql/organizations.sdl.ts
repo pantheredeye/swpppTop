@@ -36,14 +36,10 @@ type UserOrganization {
     organization(id: String!): Organization @requireAuth
     userOrganizations: [UserOrganization!]! @requireAuth
   }
-
   input CreateOrganizationInput {
     name: String!
     settings: JSON
-    billingEmail: String
-    stripeCustomerId: String
-    deletedAt: DateTime
-    status: OrganizationStatus!
+    status: OrganizationStatus
   }
 
   input UpdateOrganizationInput {
@@ -56,8 +52,8 @@ type UserOrganization {
   }
 
   type Mutation {
-    createOrganization(input: CreateOrganizationInput!): Organization!
-      @requireAuth
+    createOrganization(input: CreateOrganizationInput!): Organization! @requireAuth
+
     updateOrganization(
       id: String!
       input: UpdateOrganizationInput!
