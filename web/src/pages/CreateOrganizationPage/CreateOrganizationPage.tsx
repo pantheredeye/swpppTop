@@ -26,17 +26,18 @@ const CreateOrganizationPage = () => {
       }
     }
   `
+// TODO Handle Duplicate Organization / Other Errors - Notify User
 
   const [createOrg] = useMutation(CREATE_ORGANIZATION, {
     onCompleted: async (data) => {
       setLoading(true)
       try {
         await refreshOrganizations()
-        await switchOrganization(data.createOrganization.organization.id)
+        await switchOrganization(data.createOrganization.id, false)
         toast.success('Organization created successfully')
         navigate(
           routes.organizationSettings({
-            organizationId: data.createOrganization.organization.id,
+            organizationId: data.createOrganization.id,
             tab: 'roles',
           })
         )
