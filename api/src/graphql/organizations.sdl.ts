@@ -22,6 +22,7 @@ export const schema = gql`
 type UserOrganization {
   id: String!
   name: String!
+  status: String!
 }
 
   enum OrganizationStatus {

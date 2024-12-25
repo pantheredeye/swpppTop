@@ -25,6 +25,7 @@ const GET_USER_ORGANIZATIONS = gql`
     userOrganizations {
       id
       name
+      status
     }
   }
 `

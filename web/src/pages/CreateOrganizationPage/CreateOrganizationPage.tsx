@@ -20,7 +20,7 @@ const CreateOrganizationPage = () => {
   const [loading, setLoading] = useState(false)
 
   const CREATE_ORGANIZATION = gql`
-  mutation CreateOrganization($input: CreateOrganizationInput!) {
+  mutation CreateOrg($input: CreateOrganizationInput!) {
     createOrganization(input: $input) {
       id
       name
@@ -35,7 +35,7 @@ const CreateOrganizationPage = () => {
   }
 `
 
-const [createOrganization] = useMutation(CREATE_ORGANIZATION, {
+const [createOrg] = useMutation(CREATE_ORGANIZATION, {
   onCompleted: async (data) => {
     setLoading(true)
     try {
@@ -64,7 +64,7 @@ const [createOrganization] = useMutation(CREATE_ORGANIZATION, {
     if (!name.trim()) return
 
     setLoading(true)
-    await createOrganization({
+    await createOrg({
       variables: {
         input: {
           name: name.trim(),

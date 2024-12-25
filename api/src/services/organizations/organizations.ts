@@ -45,6 +45,7 @@ export const userOrganizations: QueryResolvers['userOrganizations'] =
               select: {
                 id: true,
                 name: true,
+                status: true,
               },
             },
           },
@@ -52,6 +53,7 @@ export const userOrganizations: QueryResolvers['userOrganizations'] =
       },
     })
 
+    console.log('userWithOrgs:', JSON.stringify(userWithOrgs, null, 2))
     return (
       userWithOrgs?.memberships?.map((membership) => membership.organization) ||
       []
