@@ -42,7 +42,7 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   `
 
-  const { data, error: queryError } = useQuery(GET_USER_ORGANIZATIONS, {
+  const { data, error: queryError, refetch } = useQuery(GET_USER_ORGANIZATIONS, {
     fetchPolicy: 'cache-first',
   })
 
@@ -72,11 +72,22 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const switchOrganization = async (organizationId: string) => {
     try {
-      const newOrg = availableOrganizations.find(
+      // First attempt to find in cached organizations
+      let newOrg = availableOrganizations.find(
         (org) => org.id === organizationId
       )
+
+      // If not found, refetch and try again
       if (!newOrg) {
-        throw new Error('Organization not found')
+        const { data } = await refetch()
+        setAvailableOrganizations(data.userOrganizations)
+        newOrg = data.userOrganizations.find(
+          (org) => org.id === organizationId
+        )
+
+        if (!newOrg) {
+          throw new Error('Organization not found even after refetch')
+        }
       }
 
       setCurrentOrganization(newOrg)
