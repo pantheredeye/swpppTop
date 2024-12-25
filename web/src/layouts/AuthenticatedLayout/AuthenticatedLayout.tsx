@@ -1,4 +1,4 @@
-import { useState, Fragment, ReactNode, useEffect } from 'react'
+import { useState, Fragment, ReactNode } from 'react'
 
 import {
   Dialog,
@@ -8,9 +8,7 @@ import {
 } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
-import { navigate } from '@redwoodjs/router'
 
-import { useAuth } from 'src/auth'
 import Sidebar from 'src/components/Sidebar'
 
 interface AuthenticatedLayoutProps {
