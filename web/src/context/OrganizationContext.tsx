@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-
 import { navigate } from '@redwoodjs/router'
 import { useQuery } from '@redwoodjs/web'
-
 import { useAuth } from 'src/auth'
 
 interface Organization {
@@ -14,7 +12,10 @@ interface Organization {
 interface OrganizationContextType {
   currentOrganization: Organization | null
   availableOrganizations: Organization[]
-  switchOrganization: (organizationId: string) => Promise<void>
+  switchOrganization: (
+    organizationId: string,
+    redirect?: boolean
+  ) => Promise<{ success: boolean }>
   loading: boolean
   error: Error | null
   refreshOrganizations: () => Promise<void>
@@ -94,7 +95,10 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(false)
   }, [data, queryError, currentUser])
 
-  const switchOrganization = async (organizationId: string) => {
+  const switchOrganization = async (
+    organizationId: string,
+    redirect: boolean = true
+  ) => {
     try {
       let newOrg = availableOrganizations.find(
         (org) => org.id === organizationId
@@ -111,7 +115,12 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setCurrentOrganization(newOrg)
       localStorage.setItem('currentOrganizationId', organizationId)
-      navigate(`/org/${organizationId}/dashboard`)
+
+      if (redirect) {
+        navigate(`/org/${organizationId}/dashboard`)
+      }
+
+      return { success: true }
     } catch (err) {
       const error =
         err instanceof Error ? err : new Error('Failed to switch organization')

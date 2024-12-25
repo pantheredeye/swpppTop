@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { navigate, Link, routes, useParams } from '@redwoodjs/router'
 import { Metadata } from '@redwoodjs/web'
 import { useOrganization } from 'src/context/OrganizationContext'
+import { toast } from '@redwoodjs/web/toast'
 
 const SwitchPage = () => {
   const { organizationId } = useParams()
@@ -23,7 +24,11 @@ const SwitchPage = () => {
     if (orgId === currentOrganization?.id) return
     try {
       setSwitchingOrgId(orgId)
-      await switchOrganization(orgId)
+      const { success } = await switchOrganization(orgId, false)
+      // TODO: Fix Toast & Handle Switching more elegantly
+      // if (success) {
+      //   toast.success('Organization switched successfully')
+      // }
     } catch (error) {
       console.error('Failed to switch organization:', error)
     } finally {
