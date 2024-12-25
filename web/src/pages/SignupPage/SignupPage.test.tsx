@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@redwoodjs/testing/web'
+import { render, screen } from '@redwoodjs/testing/web'
 
 import SignupPage from './SignupPage'
 

@@ -1,4 +1,4 @@
-import { useState, useContext, useMemo, useEffect } from 'react'
+import {  useEffect } from 'react'
 
 import {
   HomeIcon,

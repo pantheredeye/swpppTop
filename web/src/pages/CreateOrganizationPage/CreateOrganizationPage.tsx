@@ -1,18 +1,10 @@
 import { useState } from 'react'
+
 import { navigate, routes } from '@redwoodjs/router'
 import { Metadata, useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
-import { useOrganization } from 'src/context/OrganizationContext'
 
-const CREATE_ORGANIZATION = gql`
-  mutation CreateOrganization($input: CreateOrganizationInput!) {
-    createOrganization(input: $input) {
-      id
-      name
-      status
-    }
-  }
-`
+import { useOrganization } from 'src/context/OrganizationContext'
 
 const CreateOrganizationPage = () => {
   const [name, setName] = useState('')
@@ -20,44 +12,46 @@ const CreateOrganizationPage = () => {
   const [loading, setLoading] = useState(false)
 
   const CREATE_ORGANIZATION = gql`
-  mutation CreateOrg($input: CreateOrganizationInput!) {
-    createOrganization(input: $input) {
-      id
-      name
-      users {
+    mutation CreateOrganization($input: CreateOrganizationInput!) {
+      createOrganization(input: $input) {
         id
-        roles {
+        name
+        users {
           id
-          name
+          roles {
+            id
+            name
+          }
         }
       }
     }
-  }
-`
+  `
 
-const [createOrg] = useMutation(CREATE_ORGANIZATION, {
-  onCompleted: async (data) => {
-    setLoading(true)
-    try {
-      await refreshOrganizations() // Refresh the organizations list
-      await switchOrganization(data.createOrganization.organization.id)
-      toast.success('Organization created successfully')
-      navigate(routes.organizationSettings({
-        organizationId: data.createOrganization.organization.id,
-        tab: 'roles'
-      }))
-    } catch (error) {
-      console.error('Failed to switch organization:', error)
-      toast.error('Organization created but failed to switch context')
-    } finally {
+  const [createOrg] = useMutation(CREATE_ORGANIZATION, {
+    onCompleted: async (data) => {
+      setLoading(true)
+      try {
+        await refreshOrganizations()
+        await switchOrganization(data.createOrganization.organization.id)
+        toast.success('Organization created successfully')
+        navigate(
+          routes.organizationSettings({
+            organizationId: data.createOrganization.organization.id,
+            tab: 'roles',
+          })
+        )
+      } catch (error) {
+        console.error('Failed to switch organization:', error)
+        toast.error('Organization created but failed to switch context')
+      } finally {
+        setLoading(false)
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message)
       setLoading(false)
-    }
-  },
-  onError: (error) => {
-    toast.error(error.message)
-    setLoading(false)
-  },
-})
+    },
+  })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -68,7 +62,7 @@ const [createOrg] = useMutation(CREATE_ORGANIZATION, {
       variables: {
         input: {
           name: name.trim(),
-          status: 'ACTIVE'
+          status: 'ACTIVE',
         },
       },
     })
@@ -124,7 +118,7 @@ const [createOrg] = useMutation(CREATE_ORGANIZATION, {
                   className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
                   disabled={loading || !name.trim()}
                 >
-                  {loading ? 'Creating...' : 'Create Organization'}
+                  {loading ? 'Creating... please wait' : 'Create Organization'}
                 </button>
               </div>
             </form>

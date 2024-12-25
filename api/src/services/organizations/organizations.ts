@@ -4,8 +4,9 @@ import type {
   OrganizationRelationResolvers,
 } from 'types/graphql'
 
-import { db } from 'src/lib/db'
 import { AuthenticationError } from '@redwoodjs/graphql-server'
+
+import { db } from 'src/lib/db'
 
 export const organizations: QueryResolvers['organizations'] = () => {
   return db.organization.findMany()
@@ -60,9 +61,8 @@ export const userOrganizations: QueryResolvers['userOrganizations'] =
     )
   }
 
-  export const createOrganization: MutationResolvers['createOrganization'] = async ({
-    input,
-  }) => {
+export const createOrganization: MutationResolvers['createOrganization'] =
+  async ({ input }) => {
     const { currentUser } = context
 
     const organization = await db.$transaction(async (tx) => {

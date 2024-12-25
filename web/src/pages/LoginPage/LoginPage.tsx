@@ -14,7 +14,6 @@ import { toast, Toaster } from '@redwoodjs/web/toast'
 
 import { useAuth } from 'src/auth'
 import Button from 'src/components/Button/Button'
-import { getCurrentUser } from 'src/lib/auth'
 
 const LoginPage = () => {
   const { isAuthenticated, logIn, currentUser } = useAuth()

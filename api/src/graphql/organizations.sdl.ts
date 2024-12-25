@@ -19,11 +19,11 @@ export const schema = gql`
     status: OrganizationStatus!
   }
 
-type UserOrganization {
-  id: String!
-  name: String!
-  status: String!
-}
+  type UserOrganization {
+    id: String!
+    name: String!
+    status: String!
+  }
 
   enum OrganizationStatus {
     ACTIVE
@@ -53,7 +53,8 @@ type UserOrganization {
   }
 
   type Mutation {
-    createOrganization(input: CreateOrganizationInput!): Organization! @requireAuth
+    createOrganization(input: CreateOrganizationInput!): Organization!
+      @requireAuth
 
     updateOrganization(
       id: String!

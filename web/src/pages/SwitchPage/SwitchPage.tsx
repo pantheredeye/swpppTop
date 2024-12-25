@@ -1,24 +1,10 @@
 import { useEffect, useState } from 'react'
-
 import { navigate, Link, routes, useParams } from '@redwoodjs/router'
 import { Metadata } from '@redwoodjs/web'
-
 import { useOrganization } from 'src/context/OrganizationContext'
 
 const SwitchPage = () => {
-
   const { organizationId } = useParams()
-
-  useEffect(() => {
-    if (!organizationId) {
-      navigate('/')
-    }
-  }, [organizationId])
-
-  if (!organizationId) {
-    return null
-  }
-
   const {
     availableOrganizations,
     currentOrganization,
@@ -26,6 +12,12 @@ const SwitchPage = () => {
     loading,
   } = useOrganization()
   const [switchingOrgId, setSwitchingOrgId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!organizationId) {
+      navigate('/')
+    }
+  }, [organizationId])
 
   const handleSwitchOrg = async (orgId: string) => {
     if (orgId === currentOrganization?.id) return
@@ -39,7 +31,7 @@ const SwitchPage = () => {
     }
   }
 
-  if (loading) {
+  if (!organizationId || loading) {
     return (
       <div className="min-h-screen bg-gray-800 p-6">
         <div className="mx-auto max-w-3xl text-center text-gray-200">
@@ -118,23 +110,22 @@ const SwitchPage = () => {
               )}
             </div>
 
-            {/* Action Buttons */}
             <div className="mt-8 flex justify-between border-t border-gray-700 pt-6">
               <Link
-                to={routes.requestInvite({organizationId})}
+                to={routes.requestInvite({ organizationId })}
                 className="rounded-lg border border-gray-600 bg-transparent px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-800"
               >
                 Request to Join
               </Link>
               <div className="space-x-4">
                 <Link
-                  to={routes.dashboard({organizationId})}
+                  to={routes.dashboard({ organizationId })}
                   className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-600"
                 >
                   Cancel
                 </Link>
                 <Link
-                  to={routes.createOrganization({organizationId})}
+                  to={routes.createOrganization({ organizationId })}
                   className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
                 >
                   Create New Organization

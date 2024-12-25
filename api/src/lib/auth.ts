@@ -12,15 +12,6 @@ import { db } from './db'
  */
 export const cookieName = 'session_%port%'
 
-interface CurrentUser {
-  id: string
-  organizationIds: string[]
-  globalSettings: {
-    defaultOrganizationId?: string
-    [key: string]: any // To allow for other global settings if needed
-  }
-}
-
 /**
  * The session object sent in as the first argument to getCurrentUser() will
  * have a single key `id` containing the unique ID of the logged in user

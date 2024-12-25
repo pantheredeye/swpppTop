@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
+
 import { navigate } from '@redwoodjs/router'
 import { useQuery } from '@redwoodjs/web'
+
 import { useAuth } from 'src/auth'
 
 interface Organization {
@@ -42,7 +44,11 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<Error | null>(null)
 
   const { currentUser } = useAuth()
-  const { data, error: queryError, refetch } = useQuery(GET_USER_ORGANIZATIONS, {
+  const {
+    data,
+    error: queryError,
+    refetch,
+  } = useQuery(GET_USER_ORGANIZATIONS, {
     fetchPolicy: 'cache-first',
   })
 
@@ -55,7 +61,11 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       return []
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to refresh organizations'))
+      setError(
+        err instanceof Error
+          ? err
+          : new Error('Failed to refresh organizations')
+      )
       return []
     }
   }
@@ -69,9 +79,7 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
       const targetOrgId = defaultOrgId || storedOrgId
 
       if (targetOrgId) {
-        const org = data.userOrganizations.find(
-          (org) => org.id === targetOrgId
-        )
+        const org = data.userOrganizations.find((org) => org.id === targetOrgId)
         if (org) {
           setCurrentOrganization(org)
           localStorage.setItem('currentOrganizationId', org.id)
@@ -105,7 +113,8 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.setItem('currentOrganizationId', organizationId)
       navigate(`/org/${organizationId}/dashboard`)
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to switch organization')
+      const error =
+        err instanceof Error ? err : new Error('Failed to switch organization')
       setError(error)
       throw error
     }

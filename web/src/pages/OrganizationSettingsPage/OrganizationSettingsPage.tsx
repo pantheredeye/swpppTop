@@ -1,5 +1,5 @@
 // import { Link, routes } from '@redwoodjs/router'
-import { Metadata } from "@redwoodjs/web";
+import { Metadata } from '@redwoodjs/web'
 
 const OrganizationSettingsPage = () => {
   return (
@@ -11,7 +11,7 @@ const OrganizationSettingsPage = () => {
 
       <h1>OrganizationSettingsPage</h1>
       <p>
-        Find me in{" "}
+        Find me in{' '}
         <code>
           ./web/src/pages/OrganizationSettingsPage/OrganizationSettingsPage.tsx
         </code>
@@ -21,7 +21,7 @@ const OrganizationSettingsPage = () => {
           `<Link to={routes.organizationSettings()}>OrganizationSettings</Link>`
       */}
     </>
-  );
-};
+  )
+}
 
-export default OrganizationSettingsPage;
+export default OrganizationSettingsPage
