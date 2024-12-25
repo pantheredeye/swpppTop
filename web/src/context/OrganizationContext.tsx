@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-
 import { navigate } from '@redwoodjs/router'
 import { useQuery } from '@redwoodjs/web'
-
 import { useAuth } from 'src/auth'
+
 interface Organization {
   id: string
   name: string
@@ -16,9 +15,19 @@ interface OrganizationContextType {
   switchOrganization: (organizationId: string) => Promise<void>
   loading: boolean
   error: Error | null
+  refreshOrganizations: () => Promise<void>
 }
 
 const OrganizationContext = createContext<OrganizationContextType | null>(null)
+
+const GET_USER_ORGANIZATIONS = gql`
+  query GetUserOrganizations {
+    userOrganizations {
+      id
+      name
+    }
+  }
+`
 
 export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -32,34 +41,40 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<Error | null>(null)
 
   const { currentUser } = useAuth()
-
-  const GET_USER_ORGANIZATIONS = gql`
-    query GetUserOrganizations {
-      userOrganizations {
-        id
-        name
-      }
-    }
-  `
-
   const { data, error: queryError, refetch } = useQuery(GET_USER_ORGANIZATIONS, {
     fetchPolicy: 'cache-first',
   })
 
+  const refreshOrganizations = async () => {
+    try {
+      const { data: refreshedData } = await refetch()
+      if (refreshedData?.userOrganizations) {
+        setAvailableOrganizations(refreshedData.userOrganizations)
+        return refreshedData.userOrganizations
+      }
+      return []
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to refresh organizations'))
+      return []
+    }
+  }
+
   useEffect(() => {
-    console.log('data', data)
     if (data?.userOrganizations) {
       setAvailableOrganizations(data.userOrganizations)
 
-      // Set default organization
       const defaultOrgId = currentUser?.defaultOrganizationId
-      const defaultOrg = availableOrganizations.find(
-        (org) => org.id === defaultOrgId
-      )
+      const storedOrgId = localStorage.getItem('currentOrganizationId')
+      const targetOrgId = defaultOrgId || storedOrgId
 
-      if (defaultOrg) {
-        setCurrentOrganization(defaultOrg)
-        localStorage.setItem('currentOrganizationId', defaultOrg.id)
+      if (targetOrgId) {
+        const org = data.userOrganizations.find(
+          (org) => org.id === targetOrgId
+        )
+        if (org) {
+          setCurrentOrganization(org)
+          localStorage.setItem('currentOrganizationId', org.id)
+        }
       }
     }
 
@@ -72,21 +87,16 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const switchOrganization = async (organizationId: string) => {
     try {
-      // First attempt to find in cached organizations
       let newOrg = availableOrganizations.find(
         (org) => org.id === organizationId
       )
 
-      // If not found, refetch and try again
       if (!newOrg) {
-        const { data } = await refetch()
-        setAvailableOrganizations(data.userOrganizations)
-        newOrg = data.userOrganizations.find(
-          (org) => org.id === organizationId
-        )
+        const refreshedOrgs = await refreshOrganizations()
+        newOrg = refreshedOrgs.find((org) => org.id === organizationId)
 
         if (!newOrg) {
-          throw new Error('Organization not found even after refetch')
+          throw new Error('Organization not found even after refresh')
         }
       }
 
@@ -94,8 +104,9 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.setItem('currentOrganizationId', organizationId)
       navigate(`/org/${organizationId}/dashboard`)
     } catch (err) {
-      setError(err as Error)
-      throw err
+      const error = err instanceof Error ? err : new Error('Failed to switch organization')
+      setError(error)
+      throw error
     }
   }
 
@@ -107,6 +118,7 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
         switchOrganization,
         loading,
         error,
+        refreshOrganizations,
       }}
     >
       {children}
