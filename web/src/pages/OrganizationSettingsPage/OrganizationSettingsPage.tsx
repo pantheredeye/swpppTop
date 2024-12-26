@@ -1,26 +1,32 @@
-// import { Link, routes } from '@redwoodjs/router'
+// web/src/pages/OrganizationSettingsPage/OrganizationSettingsPage.jsx
+import { useParams } from '@redwoodjs/router'
 import { Metadata } from '@redwoodjs/web'
+import OrganizationSettingsLayout from 'src/layouts/OrganizationSettingsLayout'
+import GeneralSettings from 'src/components/OrganizationSettings/GeneralSettings'
+import RolesSettings from 'src/components/OrganizationSettings/RolesSettings'
+import MembersSettings from 'src/components/OrganizationSettings/MembersSettings'
 
 const OrganizationSettingsPage = () => {
-  return (
-    <>
-      <Metadata
-        title="OrganizationSettings"
-        description="OrganizationSettings page"
-      />
+  const { organizationId, tab = 'general' } = useParams()
 
-      <h1>OrganizationSettingsPage</h1>
-      <p>
-        Find me in{' '}
-        <code>
-          ./web/src/pages/OrganizationSettingsPage/OrganizationSettingsPage.tsx
-        </code>
-      </p>
-      {/*
-          My default route is named `organizationSettings`, link to me with:
-          `<Link to={routes.organizationSettings()}>OrganizationSettings</Link>`
-      */}
-    </>
+  const renderTabContent = () => {
+    switch (tab) {
+      case 'general':
+        return <GeneralSettings />
+      case 'roles':
+        return <RolesSettings />
+      case 'members':
+        return <MembersSettings />
+      default:
+        return <GeneralSettings />
+    }
+  }
+
+  return (
+    <OrganizationSettingsLayout>
+      <Metadata title="Organization Settings" />
+      {renderTabContent()}
+    </OrganizationSettingsLayout>
   )
 }
 
