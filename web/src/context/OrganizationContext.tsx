@@ -30,6 +30,7 @@ const GET_USER_ORGANIZATIONS = gql`
       id
       name
       status
+      type
     }
   }
 `

@@ -63,7 +63,7 @@ export const schema = gql`
       id: String!
       input: UpdateOrganizationInput!
     ): Organization! @requireAuth
-    deleteOrganization(id: String!): Organization! @requireAuth(roles: ["OWNER"])
+    deleteOrganization(id: String!): Organization! @requireAuth
     setDefaultOrganization(id: String!): User! @requireAuth
   }
 `

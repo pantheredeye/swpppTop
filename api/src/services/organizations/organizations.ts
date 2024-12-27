@@ -47,6 +47,7 @@ export const userOrganizations: QueryResolvers['userOrganizations'] =
                 id: true,
                 name: true,
                 status: true,
+                type: true,
               },
             },
           },

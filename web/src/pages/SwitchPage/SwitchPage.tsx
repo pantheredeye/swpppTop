@@ -24,7 +24,7 @@ const SwitchPage = () => {
     if (orgId === currentOrganization?.id) return
     try {
       setSwitchingOrgId(orgId)
-      const { success } = await switchOrganization(orgId, false)
+      const { success } = await switchOrganization(orgId)
       // TODO: Fix Toast & Handle Switching more elegantly
       // if (success) {
       //   toast.success('Organization switched successfully')

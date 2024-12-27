@@ -63,7 +63,7 @@ const Sidebar = () => {
       icon: UserIcon,
     },
     {
-      name: 'Organizations',
+      name: 'Organization Settings',
       href: `/org/${organizationId}/organization-settings`,
       icon: UserIcon,
     },
