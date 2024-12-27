@@ -160,6 +160,7 @@ export const handler = async (
                   userId: user.id, // Update with actual user ID
                   creationType: 'USER_SIGNUP',
                 },
+                type: 'PERSONAL',
               },
             })
 

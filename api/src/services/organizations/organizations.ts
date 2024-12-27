@@ -72,7 +72,7 @@ export const createOrganization: MutationResolvers['createOrganization'] =
           name: input.name,
           status: 'ACTIVE',
           settings: input.settings || {},
-          type: input.type || 'PERSONAL',
+          type: input.type || 'OTHER',
         },
       })
 

@@ -4,6 +4,7 @@ import { useQuery } from '@redwoodjs/web'
 import { useAuth } from 'src/auth'
 
 interface Organization {
+  type: string
   id: string
   name: string
   status: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED' | 'PENDING'

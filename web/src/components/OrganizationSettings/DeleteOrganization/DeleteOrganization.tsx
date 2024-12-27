@@ -76,6 +76,7 @@ const DeleteOrganization = () => {
         <h3 className="text-lg font-semibold text-red-400">Danger Zone</h3>
         <p className="mt-2 text-sm text-gray-300">
           Once you delete an organization, there is no going back. Please be certain.
+          Your personal organization cannot be deleted unless your entire user profile is deleted.
         </p>
 
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
