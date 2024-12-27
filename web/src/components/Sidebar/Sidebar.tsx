@@ -62,6 +62,11 @@ const Sidebar = () => {
       href: `/org/${organizationId}/profile/${currentUser.id}`,
       icon: UserIcon,
     },
+    {
+      name: 'Organizations',
+      href: `/org/${organizationId}/organization-settings`,
+      icon: UserIcon,
+    },
   ]
   return (
     <div
