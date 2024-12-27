@@ -5,6 +5,7 @@ import OrganizationSettingsLayout from 'src/layouts/OrganizationSettingsLayout'
 import GeneralSettings from 'src/components/OrganizationSettings/GeneralSettings'
 import RolesSettings from 'src/components/OrganizationSettings/RolesSettings'
 import MembersSettings from 'src/components/OrganizationSettings/MembersSettings'
+import DeleteOrganization from 'src/components/OrganizationSettings/DeleteOrganization'
 
 const OrganizationSettingsPage = () => {
   const { organizationId, tab = 'general' } = useParams()
@@ -17,6 +18,8 @@ const OrganizationSettingsPage = () => {
         return <RolesSettings />
       case 'members':
         return <MembersSettings />
+        case 'delete':
+          return <DeleteOrganization />
       default:
         return <GeneralSettings />
     }

@@ -36,6 +36,7 @@ model Organization {
   id                     String                   @id @default(cuid())
   name                   String
   createdAt              DateTime                 @default(now())
+  type                   String                   @default("OTHER")
   users                  Membership[]
   sites                  Site[]
   settings               Json? // Stores settings specific to the organization
@@ -58,6 +59,11 @@ enum OrganizationStatus {
   SUSPENDED
   ARCHIVED
   PENDING
+}
+
+enum OrganizationType {
+  PERSONAL
+  OTHER
 }
 
 model Membership {

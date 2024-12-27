@@ -3,6 +3,7 @@ export const schema = gql`
     id: String!
     name: String!
     createdAt: DateTime!
+    type: String!
     users: [Membership]!
     sites: [Site]!
     settings: JSON
@@ -23,6 +24,7 @@ export const schema = gql`
     id: String!
     name: String!
     status: String!
+    type: String
   }
 
   enum OrganizationStatus {
@@ -41,6 +43,7 @@ export const schema = gql`
     name: String!
     settings: JSON
     status: OrganizationStatus
+    type: String
   }
 
   input UpdateOrganizationInput {
@@ -60,7 +63,8 @@ export const schema = gql`
       id: String!
       input: UpdateOrganizationInput!
     ): Organization! @requireAuth
-    deleteOrganization(id: String!): Organization! @requireAuth
+    deleteOrganization(id: String!): Organization! @requireAuth(roles: ["OWNER"])
     setDefaultOrganization(id: String!): User! @requireAuth
   }
 `
+// deleteOrganization(id: String!): Organization! @requireAuth(roles: ["OWNER"])

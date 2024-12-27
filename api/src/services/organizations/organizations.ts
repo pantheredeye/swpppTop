@@ -72,6 +72,7 @@ export const createOrganization: MutationResolvers['createOrganization'] =
           name: input.name,
           status: 'ACTIVE',
           settings: input.settings || {},
+          type: input.type || 'PERSONAL',
         },
       })
 
@@ -141,14 +142,68 @@ export const updateOrganization: MutationResolvers['updateOrganization'] = ({
   })
 }
 
-export const deleteOrganization: MutationResolvers['deleteOrganization'] = ({
+export const deleteOrganization: MutationResolvers['deleteOrganization'] = async ({
   id,
 }) => {
-  return db.organization.delete({
-    where: { id },
+  const { currentUser } = context
+
+  // Check if user has permission to delete the organization
+  const membership = await db.membership.findFirst({
+    where: {
+      organizationId: id,
+      userId: currentUser.id,
+      roles: {
+        some: {
+          name: 'OWNER'
+        }
+      },
+      status: 'ACTIVE',
+      deletedAt: null
+    },
+    include: {
+      organization: true
+    }
+  })
+
+  if (!membership) {
+    throw new Error('You must be an owner to delete this organization')
+  }
+
+  // Check if this is the user's personal organization
+  if (membership.organization.type === 'PERSONAL') {
+    throw new Error('Personal organizations cannot be deleted')
+  }
+
+  return await db.$transaction(async (tx) => {
+    // Delete the organization
+    const deletedOrg = await tx.organization.delete({
+      where: { id },
+    })
+
+    // If this was the user's default organization, set their personal org as default
+    if (currentUser.defaultOrganizationId === id) {
+      const personalOrg = await tx.organization.findFirst({
+        where: {
+          users: {
+            some: {
+              id: currentUser.id
+            }
+          },
+          type: 'PERSONAL'
+        }
+      })
+
+      if (personalOrg) {
+        await tx.user.update({
+          where: { id: currentUser.id },
+          data: { defaultOrganizationId: personalOrg.id }
+        })
+      }
+    }
+
+    return deletedOrg
   })
 }
-
 export const setDefaultOrganization: MutationResolvers['setDefaultOrganization'] =
   async ({ id }) => {
     const { currentUser } = context

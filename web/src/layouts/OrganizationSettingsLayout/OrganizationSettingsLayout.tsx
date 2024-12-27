@@ -15,6 +15,7 @@ const OrganizationSettingLayout = ({
     { id: 'general', label: 'General' },
     { id: 'roles', label: 'Roles & Permissions' },
     { id: 'members', label: 'Members' },
+    { id: 'delete', label: 'Delete Organization' },
   ]
 
   const handleTabChange = (tabId) => {
