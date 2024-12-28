@@ -6,6 +6,7 @@ import { useAuth } from './auth'
 import { OrganizationProvider } from './context/OrganizationContext'
 import AuthenticatedLayout from './layouts/AuthenticatedLayout/AuthenticatedLayout'
 
+// TODO: Handle /org gracefully -> /org/personalid/dashboard
 const Routes = () => {
   return (
     <Router useAuth={useAuth}>
