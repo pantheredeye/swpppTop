@@ -1,25 +1,22 @@
 export const schema = gql`
   type Permission {
     id: String!
-    name: String!
-    description: String
-    scope: PermissionScope!
+    action: Action!
+    subject: String!
     conditions: JSON
-    membershipRole: [MembershipRole]!
+    description: String
     organization: Organization
     organizationId: String
-    deletedAt: DateTime
-    resourceType: String
-    resourceId: String
-    deactivatedBy: String
-    deactivationReason: String
+    rolePermissions: [RolePermission]!
+    createdAt: DateTime!
+    updatedAt: DateTime!
   }
 
-  enum PermissionScope {
-    ORGANIZATION
-    SITE
-    GLOBAL
-    CROSS_ORGANIZATIONAL
+  enum Action {
+    CREATE
+    READ
+    WRITE
+    DELETE
   }
 
   type Query {
@@ -28,29 +25,19 @@ export const schema = gql`
   }
 
   input CreatePermissionInput {
-    name: String!
-    description: String
-    scope: PermissionScope!
+    action: Action!
+    subject: String!
     conditions: JSON
+    description: String
     organizationId: String
-    deletedAt: DateTime
-    resourceType: String
-    resourceId: String
-    deactivatedBy: String
-    deactivationReason: String
   }
 
   input UpdatePermissionInput {
-    name: String
-    description: String
-    scope: PermissionScope
+    action: Action
+    subject: String
     conditions: JSON
+    description: String
     organizationId: String
-    deletedAt: DateTime
-    resourceType: String
-    resourceId: String
-    deactivatedBy: String
-    deactivationReason: String
   }
 
   type Mutation {
@@ -59,4 +46,4 @@ export const schema = gql`
       @requireAuth
     deletePermission(id: String!): Permission! @requireAuth
   }
-`
+`;

@@ -18,6 +18,7 @@ export const schema = gql`
     permission: [Permission]!
     deletedAt: DateTime
     status: OrganizationStatus!
+    membershipRoles: MembershipRole
   }
 
   type UserOrganization {

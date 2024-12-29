@@ -5,8 +5,10 @@ export const schema = gql`
     membership: [Membership]!
     organization: Organization!
     organizationId: String!
-    permission: Permission
-    permissionId: String
+    permissions: [RolePermission]!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    PendingMembershipRole: [PendingMembershipRole]!
   }
 
   type Query {
@@ -17,13 +19,11 @@ export const schema = gql`
   input CreateMembershipRoleInput {
     name: String!
     organizationId: String!
-    permissionId: String
   }
 
   input UpdateMembershipRoleInput {
     name: String
     organizationId: String
-    permissionId: String
   }
 
   type Mutation {
@@ -35,4 +35,4 @@ export const schema = gql`
     ): MembershipRole! @requireAuth
     deleteMembershipRole(id: String!): MembershipRole! @requireAuth
   }
-`
+`;

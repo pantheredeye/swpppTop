@@ -15,7 +15,7 @@ const OrganizationSettingsPage = () => {
       case 'general':
         return <GeneralSettings />
       case 'roles':
-        return <RolesSettings />
+        return <RolesSettings organizationId={organizationId} />
       case 'members':
         return <MembersSettings />
         case 'delete':

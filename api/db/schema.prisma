@@ -44,7 +44,7 @@ model Organization {
   stripeCustomerId       String?
   inspection             Inspection[]
   event                  Event[]
-  membershipRole         MembershipRole[]
+  membershipRoles        MembershipRole[]
   media                  Media[]
   inspectionEventDetails InspectionEventDetails[]
   assignment             Assignment[]
@@ -67,28 +67,29 @@ enum OrganizationType {
 }
 
 model Membership {
-  id                  String            @id @default(cuid())
-  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId              String
-  organization        Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId      String
-  deletedAt           DateTime?
-  roles               MembershipRole[]
-  settings            Json? // Per-organization user-specific settings
-  invitationId        String?           @default(dbgenerated("concat('manual-join-', gen_random_uuid())"))
-  invitedEmail        String?
-  invitationExpiresAt DateTime?
-  invitedAt           DateTime?
-  joinedAt            DateTime?
-  invitationAttempts  Int               @default(0)
-  lastInvitationSent  DateTime?
-  invitationChannel   InvitationChannel
-  assignment          Assignment[]
-  event               Event[]
-  media               Media[]
-  auditLog            AuditLog[]
-  status              MembershipStatus  @default(ACTIVE)
-  deactivationReason  String?
+  id                    String                  @id @default(cuid())
+  user                  User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+  organization          Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  deletedAt             DateTime?
+  roles                 MembershipRole[]
+  settings              Json? // Per-organization user-specific settings
+  invitationId          String?                 @default(dbgenerated("concat('manual-join-', gen_random_uuid())"))
+  invitedEmail          String?
+  invitationExpiresAt   DateTime?
+  invitedAt             DateTime?
+  joinedAt              DateTime?
+  invitationAttempts    Int                     @default(0)
+  lastInvitationSent    DateTime?
+  invitationChannel     InvitationChannel
+  assignment            Assignment[]
+  event                 Event[]
+  media                 Media[]
+  auditLog              AuditLog[]
+  status                MembershipStatus        @default(ACTIVE)
+  deactivationReason    String?
+  PendingMembershipRole PendingMembershipRole[]
 
   @@unique([userId, organizationId])
   @@unique([invitationId, organizationId])
@@ -96,36 +97,63 @@ model Membership {
   @@index([userId])
 }
 
+model Permission {
+  id              String           @id @default(cuid())
+  action          Action
+  subject         String // CASL subject (e.g., 'User', 'Organization')
+  conditions      Json? // CASL conditions for fine-grained control
+  description     String?
+  organization    Organization?    @relation(fields: [organizationId], references: [id])
+  organizationId  String?
+  rolePermissions RolePermission[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([action, subject, organizationId])
+  @@index([organizationId])
+}
+
 model MembershipRole {
-  id             String       @id @default(cuid())
-  name           String
-  membership     Membership[]
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String
-  permission     Permission?  @relation(fields: [permissionId], references: [id])
-  permissionId   String?
+  id                    String                  @id @default(cuid())
+  name                  String
+  membership            Membership[]
+  organization          Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  permissions           RolePermission[]
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  PendingMembershipRole PendingMembershipRole[]
 
   @@unique([name, organizationId])
   @@index([organizationId])
 }
 
-model Permission {
-  id                 String           @id @default(cuid())
-  name               String
-  description        String?
-  scope              PermissionScope
-  conditions         Json? // Optional JSON to specify dynamic conditions (e.g., `{ "resourceId": "xyz" }`)
-  membershipRole     MembershipRole[]
-  organization       Organization?    @relation(fields: [organizationId], references: [id])
-  organizationId     String?
-  deletedAt          DateTime?
-  resourceType       String? // Specify the type of resource, e.g., Site, Organization
-  resourceId         String? // Specific ID for granular control
-  deactivatedBy      String?
-  deactivationReason String?
+model RolePermission {
+  id           String         @id @default(cuid())
+  role         MembershipRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId       String
+  permission   Permission     @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  permissionId String
+  fields       String[] // CASL's field control
+  inverted     Boolean        @default(false) // For CASL's 'cannot' rules
+  createdAt    DateTime       @default(now())
 
-  @@unique([name, scope])
-  @@index([organizationId])
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model PendingMembershipRole {
+  id           String         @id @default(cuid())
+  membership   Membership     @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  membershipId String
+  role         MembershipRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId       String
+  createdAt    DateTime       @default(now())
+  expiresAt    DateTime?
+
+  @@unique([membershipId, roleId])
+  @@index([membershipId])
 }
 
 enum PermissionScope {
@@ -133,6 +161,13 @@ enum PermissionScope {
   SITE
   GLOBAL
   CROSS_ORGANIZATIONAL
+}
+
+enum Action {
+  CREATE
+  READ
+  WRITE
+  DELETE
 }
 
 enum InvitationChannel {
