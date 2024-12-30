@@ -1,15 +1,21 @@
-import type { Prisma } from '@prisma/client'
 import { db } from 'api/src/lib/db'
+import { PermissionScope, Action } from '@prisma/client'
 
-type Action = 'CREATE' | 'READ' | 'WRITE' | 'DELETE'
+type StandardRole = {
+  name: string
+  description: string
+  allPermissions?: boolean
+  allowedActions?: Action[]
+  excludeSubjects?: string[]
+}
+
 const subjects = [
   'User', 'Organization', 'Membership', 'Site', 'Assignment',
   'Event', 'Media', 'Inspection', 'InspectionEventDetails'
 ]
 const actions: Action[] = ['CREATE', 'READ', 'WRITE', 'DELETE']
 
-
-const standardRoles = [
+const standardRoles: StandardRole[] = [
   {
     name: 'OWNER',
     description: 'Full access to organization',
@@ -35,16 +41,27 @@ const standardRoles = [
 
 export default async () => {
   try {
-    // Create global permissions
+    // First create a special "SYSTEM" organization for global templates
+    const systemOrg = await db.organization.upsert({
+      where: { name: 'SYSTEM' },
+      create: {
+        name: 'SYSTEM',
+        type: 'OTHER',
+        status: 'ACTIVE'
+      },
+      update: {}
+    })
+
+    // Create global permissions using the SYSTEM organization
     const permissions = await Promise.all(
       subjects.flatMap(subject =>
-        Object.values(actions).map(action =>
+        actions.map(action =>
           db.permission.upsert({
             where: {
               action_subject_organizationId_scope: {
                 action,
                 subject,
-                organizationId: null,
+                organizationId: systemOrg.id,
                 scope: 'GLOBAL'
               }
             },
@@ -52,15 +69,18 @@ export default async () => {
               action,
               subject,
               scope: 'GLOBAL',
+              organizationId: systemOrg.id,
               description: `${action} access to ${subject}`
             },
-            update: {}
+            update: {
+              description: `${action} access to ${subject}`
+            }
           })
         )
       )
     )
 
-    // Create standard roles
+    // Create global role templates
     await Promise.all(
       standardRoles.map(async role => {
         const rolePermissions = permissions.filter(permission => {
@@ -69,29 +89,40 @@ export default async () => {
           return role.allowedActions?.includes(permission.action) ?? true
         })
 
-        await db.membershipRole.upsert({
+        return db.membershipRole.upsert({
           where: {
             name_organizationId: {
               name: role.name,
-              organizationId: null
+              organizationId: systemOrg.id
             }
           },
           create: {
             name: role.name,
             scope: 'GLOBAL',
-            organizationId: null,
+            organizationId: systemOrg.id,
             permissions: {
               create: rolePermissions.map(permission => ({
-                permission: { connect: { id: permission.id } },
+                permissionId: permission.id,
                 fields: ['*'],
                 inverted: false
               }))
             }
           },
-          update: {}
+          update: {
+            permissions: {
+              deleteMany: {},
+              create: rolePermissions.map(permission => ({
+                permissionId: permission.id,
+                fields: ['*'],
+                inverted: false
+              }))
+            }
+          }
         })
       })
     )
+
+    console.log('Seeding completed successfully')
   } catch (error) {
     console.error('Error seeding database:', error)
     throw error
