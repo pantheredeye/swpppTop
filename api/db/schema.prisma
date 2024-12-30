@@ -118,6 +118,7 @@ model Permission {
 model MembershipRole {
   id                    String                  @id @default(cuid())
   name                  String
+  scope                 PermissionScope         @default(ORGANIZATION)
   membership            Membership[]
   organization          Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId        String
@@ -158,13 +159,6 @@ model PendingMembershipRole {
   @@index([membershipId])
 }
 
-enum PermissionScope {
-  ORGANIZATION
-  SITE
-  GLOBAL
-  CROSS_ORGANIZATIONAL
-}
-
 enum Action {
   CREATE
   READ
@@ -184,6 +178,12 @@ enum MembershipStatus {
   ACTIVE
   SUSPENDED
   PENDING
+}
+
+enum PermissionScope {
+  GLOBAL
+  ORGANIZATION
+  CUSTOM
 }
 
 model Site {
