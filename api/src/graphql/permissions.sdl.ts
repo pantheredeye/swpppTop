@@ -7,6 +7,7 @@ export const schema = gql`
     description: String
     organization: Organization
     organizationId: String
+    scope: PermissionScope!
     rolePermissions: [RolePermission]!
     createdAt: DateTime!
     updatedAt: DateTime!
@@ -17,6 +18,12 @@ export const schema = gql`
     READ
     WRITE
     DELETE
+  }
+
+  enum PermissionScope {
+    GLOBAL
+    ORGANIZATION
+    CUSTOM
   }
 
   type Query {
@@ -30,6 +37,7 @@ export const schema = gql`
     conditions: JSON
     description: String
     organizationId: String
+    scope: PermissionScope!
   }
 
   input UpdatePermissionInput {
@@ -38,6 +46,7 @@ export const schema = gql`
     conditions: JSON
     description: String
     organizationId: String
+    scope: PermissionScope
   }
 
   type Mutation {

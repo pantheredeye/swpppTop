@@ -6,15 +6,15 @@ export const standard = defineScenario<Prisma.MembershipRoleCreateArgs>({
     one: {
       data: {
         name: "String",
-        updatedAt: "2024-12-29T19:42:42.185Z",
-        organization: { create: { name: "String" } },
+        updatedAt: "2024-12-30T15:40:07.886Z",
+        organization: { create: { name: "String1866" } },
       },
     },
     two: {
       data: {
         name: "String",
-        updatedAt: "2024-12-29T19:42:42.185Z",
-        organization: { create: { name: "String" } },
+        updatedAt: "2024-12-30T15:40:07.886Z",
+        organization: { create: { name: "String9296769" } },
       },
     },
   },

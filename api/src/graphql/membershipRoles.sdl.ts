@@ -2,6 +2,7 @@ export const schema = gql`
   type MembershipRole {
     id: String!
     name: String!
+    scope: PermissionScope!
     membership: [Membership]!
     organization: Organization!
     organizationId: String!
@@ -11,6 +12,12 @@ export const schema = gql`
     PendingMembershipRole: [PendingMembershipRole]!
   }
 
+  enum PermissionScope {
+    GLOBAL
+    ORGANIZATION
+    CUSTOM
+  }
+
   type Query {
     membershipRoles: [MembershipRole!]! @requireAuth
     membershipRole(id: String!): MembershipRole @requireAuth
@@ -18,11 +25,13 @@ export const schema = gql`
 
   input CreateMembershipRoleInput {
     name: String!
+    scope: PermissionScope!
     organizationId: String!
   }
 
   input UpdateMembershipRoleInput {
     name: String
+    scope: PermissionScope
     organizationId: String
   }
 

@@ -2,69 +2,101 @@ import type { Prisma } from '@prisma/client'
 import { db } from 'api/src/lib/db'
 
 type Action = 'CREATE' | 'READ' | 'WRITE' | 'DELETE'
+const subjects = [
+  'User', 'Organization', 'Membership', 'Site', 'Assignment',
+  'Event', 'Media', 'Inspection', 'InspectionEventDetails'
+]
+const actions: Action[] = ['CREATE', 'READ', 'WRITE', 'DELETE']
+
+
+const standardRoles = [
+  {
+    name: 'OWNER',
+    description: 'Full access to organization',
+    allPermissions: true
+  },
+  {
+    name: 'ADMIN',
+    description: 'Manage organization settings and members',
+    excludeSubjects: ['Billing']
+  },
+  {
+    name: 'USER',
+    description: 'Standard user access',
+    allowedActions: ['READ', 'WRITE'],
+    excludeSubjects: ['Organization', 'Membership']
+  },
+  {
+    name: 'VIEWER',
+    description: 'Read-only access',
+    allowedActions: ['READ']
+  }
+]
+
 export default async () => {
   try {
-    // Define base permissions
-    const subjects = ['User', 'Organization', 'Membership', 'Site']
-    const actions: Action[] = ['CREATE', 'READ', 'WRITE', 'DELETE']
-
-    console.log('Creating global permissions...')
     // Create global permissions
-    for (const subject of subjects) {
-      for (const action of actions) {
-        await db.permission.upsert({
-          where: {
-            action_subject_organizationId_scope: {
+    const permissions = await Promise.all(
+      subjects.flatMap(subject =>
+        Object.values(actions).map(action =>
+          db.permission.upsert({
+            where: {
+              action_subject_organizationId_scope: {
+                action,
+                subject,
+                organizationId: null,
+                scope: 'GLOBAL'
+              }
+            },
+            create: {
               action,
               subject,
-              organizationId: null,
-              scope: 'GLOBAL'
+              scope: 'GLOBAL',
+              description: `${action} access to ${subject}`
+            },
+            update: {}
+          })
+        )
+      )
+    )
+
+    // Create standard roles
+    await Promise.all(
+      standardRoles.map(async role => {
+        const rolePermissions = permissions.filter(permission => {
+          if (role.allPermissions) return true
+          if (role.excludeSubjects?.includes(permission.subject)) return false
+          return role.allowedActions?.includes(permission.action) ?? true
+        })
+
+        await db.membershipRole.upsert({
+          where: {
+            name_organizationId: {
+              name: role.name,
+              organizationId: null
             }
           },
           create: {
-            action,
-            subject,
-            organizationId: null,
+            name: role.name,
             scope: 'GLOBAL',
-            description: `Full ${action} access to ${subject}`
+            organizationId: null,
+            permissions: {
+              create: rolePermissions.map(permission => ({
+                permission: { connect: { id: permission.id } },
+                fields: ['*'],
+                inverted: false
+              }))
+            }
           },
           update: {}
         })
-      }
-    }
-
-    // Create global owner role
-    console.log('Creating global owner role...')
-    const globalPermissions = await db.permission.findMany({
-      where: { scope: 'GLOBAL' }
-    })
-
-    await db.membershipRole.upsert({
-      where: {
-        name_organizationId: {
-          name: 'OWNER',
-          organizationId: null
-        }
-      },
-      create: {
-        name: 'OWNER',
-        organizationId: null,
-        permissions: {
-          create: globalPermissions.map(permission => ({
-            permission: { connect: { id: permission.id } },
-            fields: ['*'],
-            inverted: false
-          }))
-        }
-      },
-      update: {}
-    })
+      })
+    )
   } catch (error) {
     console.error('Error seeding database:', error)
     throw error
   }
 }
-
     //     // Seed data for Standard BMPs
     //     const standardBMPs: Prisma.BmpCreateInput[] = [
     //       {

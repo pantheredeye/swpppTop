@@ -7,14 +7,14 @@ export const standard = defineScenario<Prisma.PermissionCreateArgs>({
       data: {
         action: "CREATE",
         subject: "String",
-        updatedAt: "2024-12-29T19:43:28.912Z",
+        updatedAt: "2024-12-30T15:39:53.844Z",
       },
     },
     two: {
       data: {
         action: "CREATE",
         subject: "String",
-        updatedAt: "2024-12-29T19:43:28.912Z",
+        updatedAt: "2024-12-30T15:39:53.844Z",
       },
     },
   },

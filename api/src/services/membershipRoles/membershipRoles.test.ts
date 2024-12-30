@@ -43,7 +43,7 @@ describe("membershipRoles", () => {
       input: {
         name: "String",
         organizationId: scenario.membershipRole.two.organizationId,
-        updatedAt: "2024-12-29T19:42:42.167Z",
+        updatedAt: "2024-12-30T15:40:07.870Z",
       },
     });
 
@@ -51,7 +51,7 @@ describe("membershipRoles", () => {
     expect(result.organizationId).toEqual(
       scenario.membershipRole.two.organizationId,
     );
-    expect(result.updatedAt).toEqual(new Date("2024-12-29T19:42:42.167Z"));
+    expect(result.updatedAt).toEqual(new Date("2024-12-30T15:40:07.870Z"));
   });
 
   scenario("updates a membershipRole", async (scenario: StandardScenario) => {
