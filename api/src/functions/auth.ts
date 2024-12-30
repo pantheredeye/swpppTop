@@ -5,6 +5,7 @@ import type { DbAuthHandlerOptions, UserType } from '@redwoodjs/auth-dbauth-api'
 
 import { cookieName } from 'src/lib/auth'
 import { db } from 'src/lib/db'
+import { Action } from 'types/graphql'
 
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -126,79 +127,134 @@ export const handler = async (
     // If this returns anything else, it will be returned by the
     // `signUp()` function in the form of: `{ message: 'String here' }`.
 
-    handler: ({ username, hashedPassword, salt }) => {
+    handler: async ({ username, hashedPassword, salt }) => {
+      const templateOrg = await db.organization.findUnique({
+        where: { name: 'TEMPLATE_ORGANIZATION' },
+        include: {
+          permission: true,
+        },
+      });
+
+      if (!templateOrg) {
+        throw new Error('Template organization not found');
+      }
+
+      if (!templateOrg.permission.length) {
+        throw new Error('No permissions found in template organization');
+      }
       return db.$transaction(
         async (tx) => {
           try {
+            // First create the organization since it's needed for the user
             const personalOrg = await tx.organization.create({
               data: {
-                name: `Personal Organization`, // Base name
+                name: username,
                 settings: {
-                  userId: 'PENDING', // Placeholder to track unique creation
+                  userId: 'PENDING',
                   creationType: 'USER_SIGNUP',
                 },
                 status: 'ACTIVE',
-              },
-            })
-
-            const user = await tx.user.create({
-              data: {
-                email: username,
-                hashedPassword: hashedPassword,
-                salt: salt,
-                defaultOrganizationId: personalOrg.id, // Direct connection
-                isActive: true,
-                lastLoginAt: new Date(),
-              },
-            })
-
-            await tx.organization.update({
-              where: { id: personalOrg.id },
-              data: {
-                name: `Personal Organization`,
-                settings: {
-                  userId: user.id, // Update with actual user ID
-                  creationType: 'USER_SIGNUP',
-                },
                 type: 'PERSONAL',
               },
             })
 
-            const fullAccessPermission = await tx.permission.findUnique({
-              where: {
-                name_scope: {
-                  name: 'FULL_ACCESS',
-                  scope: 'ORGANIZATION',
+            // Create user with the required organization relationship
+            const user = await tx.user.create({
+              data: {
+                email: username,
+                hashedPassword,
+                salt,
+                isActive: true,
+                lastLoginAt: new Date(),
+                defaultOrganization: {
+                  connect: {
+                    id: personalOrg.id,
+                  },
                 },
               },
             })
 
-            const ownerRole = await tx.membershipRole.create({
+            // Update organization with the user ID
+            await tx.organization.update({
+              where: { id: personalOrg.id },
               data: {
-                name: 'OWNER',
-                organizationId: personalOrg.id,
-                permissionId: fullAccessPermission?.id,
-              },
-            })
-
-            await tx.membership.create({
-              data: {
-                userId: user.id,
-                organizationId: personalOrg.id,
-                roles: {
-                  connect: { id: ownerRole.id },
+                settings: {
+                  userId: user.id,
+                  creationType: 'USER_SIGNUP',
                 },
-                status: 'ACTIVE',
-                invitationChannel: 'INTERNAL',
-                joinedAt: new Date(),
               },
             })
-            return {
-              ...user,
-              defaultOrganizationId: personalOrg.id,
+            console.log('Debug info:', {
+              userId: user.id,
+              organizationId: personalOrg.id,
+              timestamp: new Date().toISOString(),
+            })
+            const userExists = await tx.user.findUnique({
+              where: { id: user.id },
+            });
+
+            const orgExists = await tx.organization.findUnique({
+              where: { id: personalOrg.id },
+            });
+
+            if (!userExists || !orgExists) {
+              throw new Error('User or organization not found before permission setup');
             }
+            // Clone template permissions and create membership in a single query
+            await tx.$executeRaw`
+            WITH template_org AS (
+              SELECT id FROM "Organization" WHERE name = 'TEMPLATE_ORGANIZATION'
+            ),
+            inserted_permissions AS (
+              INSERT INTO "Permission" (id, action, subject, "organizationId", description, "createdAt", "updatedAt")
+              SELECT gen_random_uuid(), action, subject, ${personalOrg.id}, description, NOW(), NOW()
+              FROM "Permission"
+              WHERE "organizationId" = (SELECT id FROM template_org)
+              RETURNING id, action, subject
+            ),
+            inserted_role AS (
+              INSERT INTO "MembershipRole" (id, name, "organizationId", "createdAt", "updatedAt")
+              VALUES (gen_random_uuid(), 'OWNER', ${personalOrg.id}, NOW(), NOW())
+              RETURNING id
+            ),
+            role_permissions AS (
+              INSERT INTO "RolePermission" (id, "roleId", "permissionId", fields, inverted, "createdAt")
+              SELECT
+                gen_random_uuid(),
+                (SELECT id FROM inserted_role),
+                ip.id,
+                ARRAY['*']::text[],
+                false,
+                NOW()
+              FROM inserted_permissions ip
+            ),
+            membership_insert AS (
+              INSERT INTO "Membership" (
+                id,
+                "userId",
+                "organizationId",
+                status,
+                "invitationChannel",
+                "joinedAt"
+              )
+              VALUES (
+                gen_random_uuid(),
+                ${user.id},
+                ${personalOrg.id},
+                'ACTIVE',
+                'INTERNAL',
+                NOW()
+              )
+              RETURNING id
+            )
+            INSERT INTO "_MembershipToMembershipRole" ("A", "B")
+            SELECT
+              (SELECT id FROM membership_insert),
+              (SELECT id FROM inserted_role);
+          `
+            return { ...user, defaultOrganizationId: personalOrg.id }
           } catch (error) {
-            console.error('User registration failed:', error)
+            console.error('Error in user registration:', error)
             if (error.code === 'P2002') {
               throw new Error('An account with this email already exists')
             }
@@ -206,15 +262,10 @@ export const handler = async (
           }
         },
         {
+          timeout: 5000,
           isolationLevel: 'Serializable',
         }
       )
-    },
-    // Include any format checks for password here. Return `true` if the
-    // password is valid, otherwise throw a `PasswordValidationError`.
-    // Import the error along with `DbAuthHandler` from `@redwoodjs/api` above.
-    passwordValidation: (_password) => {
-      return true
     },
 
     errors: {

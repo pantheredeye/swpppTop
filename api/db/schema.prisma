@@ -34,7 +34,7 @@ model User {
 
 model Organization {
   id                     String                   @id @default(cuid())
-  name                   String
+  name                   String                   @unique
   createdAt              DateTime                 @default(now())
   type                   String                   @default("OTHER")
   users                  Membership[]
@@ -100,17 +100,19 @@ model Membership {
 model Permission {
   id              String           @id @default(cuid())
   action          Action
-  subject         String // CASL subject (e.g., 'User', 'Organization')
-  conditions      Json? // CASL conditions for fine-grained control
+  subject         String
+  conditions      Json?
   description     String?
   organization    Organization?    @relation(fields: [organizationId], references: [id])
   organizationId  String?
+  scope           PermissionScope  @default(ORGANIZATION)
   rolePermissions RolePermission[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
-  @@unique([action, subject, organizationId])
+  @@unique([action, subject, organizationId, scope])
   @@index([organizationId])
+  @@index([scope])
 }
 
 model MembershipRole {

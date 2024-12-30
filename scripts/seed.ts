@@ -1,21 +1,89 @@
 import type { Prisma } from '@prisma/client'
 import { db } from 'api/src/lib/db'
 
-import { hashPassword } from '@redwoodjs/auth-dbauth-api'
+
+type Action = 'CREATE' | 'READ' | 'WRITE' | 'DELETE'
 
 export default async () => {
-  try {
-    await db.permission.createMany({
-      data: [
-        {
-          name: 'FULL_ACCESS',
-          scope: 'ORGANIZATION',
-          description: 'Complete access to personal organization',
+    try {
+      console.log('Creating template organization...')
+      // Create template organization
+      const templateOrg = await db.organization.upsert({
+        where: { name: 'TEMPLATE_ORGANIZATION' },
+        update: {},
+        create: {
+          name: 'TEMPLATE_ORGANIZATION',
+          status: 'ACTIVE',
+          type: 'SYSTEM',
+          settings: {
+            isTemplate: true,
+            creationType: 'SYSTEM'
+          }
+        }
+      })
+      console.log('Template organization created:', templateOrg)
+
+      // Define base permissions
+      const subjects = ['User', 'Organization', 'Membership', 'Site']
+      const actions: Action[] = ['CREATE', 'READ', 'WRITE', 'DELETE']
+
+      console.log('Creating template permissions...')
+      // Create permissions for template organization
+      for (const subject of subjects) {
+        for (const action of actions) {
+          await db.permission.upsert({
+            where: {
+              action_subject_organizationId: {
+                action,
+                subject,
+                organizationId: templateOrg.id
+              }
+            },
+            create: {
+              action,
+              subject,
+              organizationId: templateOrg.id,
+              description: `Full ${action} access to ${subject}`
+            },
+            update: {}
+          })
+        }
+      }
+      console.log('Template permissions created')
+
+      // Create template owner role
+      console.log('Creating template owner role...')
+      const templatePermissions = await db.permission.findMany({
+        where: { organizationId: templateOrg.id }
+      })
+
+      await db.membershipRole.upsert({
+        where: {
+          name_organizationId: {
+            name: 'OWNER',
+            organizationId: templateOrg.id
+          }
         },
-        // Other standard permissions...
-      ],
-      skipDuplicates: true,
-    })
+        create: {
+          name: 'OWNER',
+          organizationId: templateOrg.id,
+          permissions: {
+            create: templatePermissions.map(permission => ({
+              permission: { connect: { id: permission.id } },
+              fields: ['*'],
+              inverted: false
+            }))
+          }
+        },
+        update: {}
+      })
+      console.log('Template owner role created')
+
+      console.log('Seeding completed successfully')
+    } catch (error) {
+      console.error('Error seeding database:', error)
+      throw error
+    }
 
     //     // Seed data for Standard BMPs
     //     const standardBMPs: Prisma.BmpCreateInput[] = [
@@ -178,8 +246,4 @@ export default async () => {
 
     //     await Promise.all(sites.map((site) => db.site.create({ data: site })))
 
-    console.log('Seeding completed successfully')
-  } catch (error) {
-    console.error('Error seeding database:', error)
   }
-}

@@ -27,7 +27,7 @@ const GET_ORGANIZATION = gql`
 `
 
 const RolesSettings = ({ organizationId }) => {
-  const { data, loading, error } = useQuery(GET_ORGANIZATION, {
+  const { data } = useQuery(GET_ORGANIZATION, {
     variables: { id: organizationId },
   })
 
