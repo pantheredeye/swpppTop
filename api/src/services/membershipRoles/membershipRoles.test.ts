@@ -38,20 +38,12 @@ describe("membershipRoles", () => {
     },
   );
 
-  scenario("creates a membershipRole", async (scenario: StandardScenario) => {
+  scenario("creates a membershipRole", async () => {
     const result = await createMembershipRole({
-      input: {
-        name: "String",
-        organizationId: scenario.membershipRole.two.organizationId,
-        updatedAt: "2024-12-30T15:40:07.870Z",
-      },
+      input: { name: "String" },
     });
 
     expect(result.name).toEqual("String");
-    expect(result.organizationId).toEqual(
-      scenario.membershipRole.two.organizationId,
-    );
-    expect(result.updatedAt).toEqual(new Date("2024-12-30T15:40:07.870Z"));
   });
 
   scenario("updates a membershipRole", async (scenario: StandardScenario) => {

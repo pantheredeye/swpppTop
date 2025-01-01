@@ -36,13 +36,13 @@ describe("permissions", () => {
       input: {
         action: "CREATE",
         subject: "String",
-        updatedAt: "2024-12-30T15:39:53.827Z",
+        updatedAt: "2024-12-31T21:25:28.638Z",
       },
     });
 
     expect(result.action).toEqual("CREATE");
     expect(result.subject).toEqual("String");
-    expect(result.updatedAt).toEqual(new Date("2024-12-30T15:39:53.827Z"));
+    expect(result.updatedAt).toEqual(new Date("2024-12-31T21:25:28.638Z"));
   });
 
   scenario("updates a permission", async (scenario: StandardScenario) => {

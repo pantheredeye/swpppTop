@@ -5,7 +5,7 @@ import type { DbAuthHandlerOptions, UserType } from '@redwoodjs/auth-dbauth-api'
 
 import { cookieName } from 'src/lib/auth'
 import { db } from 'src/lib/db'
-import { Action } from 'types/graphql'
+import { copyGlobalRoleToOrganization } from 'src/services/membershipRoles_bak/membershipRoles'
 
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -121,73 +121,72 @@ export const handler = async (
     // If you want the user to be immediately logged in, return the user that
     // was created.
     //
-    // If this handler throws an error, it will be returned by the `signUp()`
+    // If this handler throws an error, it will be returned by the `sxignUp()`
     // function in the form of: `{ error: 'Error message' }`.
     //
     // If this returns anything else, it will be returned by the
     // `signUp()` function in the form of: `{ message: 'String here' }`.
     handler: async ({ username, hashedPassword, salt }) => {
-      return db.$transaction(async (tx) => {
-        try {
-          const personalOrg = await tx.organization.create({
-            data: {
-              name: username,
-              settings: { creationType: 'USER_SIGNUP' },
-              status: 'ACTIVE',
-              type: 'PERSONAL',
-            },
-          })
+      return db.$transaction(
+        async (tx) => {
+          try {
+        // 1. Create personal organization
+        const personalOrg = await tx.organization.create({
+          data: {
+            name: username,
+            settings: { creationType: 'USER_SIGNUP' },
+            status: 'ACTIVE',
+            type: 'PERSONAL',
+          },
+        })
 
-          const user = await tx.user.create({
-            data: {
-              email: username,
-              hashedPassword,
-              salt,
-              isActive: true,
-              lastLoginAt: new Date(),
-              defaultOrganization: {
-                connect: { id: personalOrg.id }
-              }
-            },
-          })
 
-          const globalOwnerRole = await tx.membershipRole.findFirst({
-            where: {
-              name: 'OWNER',
-              scope: 'GLOBAL',
-              organizationId: null
+        // 2. Create user
+        const user = await tx.user.create({
+          data: {
+            email: username,
+            hashedPassword,
+            salt,
+            isActive: true,
+            lastLoginAt: new Date(),
+            defaultOrganization: {
+              connect: { id: personalOrg.id }
             }
-          })
+          },
+        })
 
-          if (!globalOwnerRole) {
-            throw new Error('Global owner role not found')
-          }
+        // 3. Copy global OWNER role to personal organization
+        const ownerRole = await copyGlobalRoleToOrganization('OWNER', personalOrg.id, db)
 
-          await tx.membership.create({
-            data: {
-              userId: user.id,
-              organizationId: personalOrg.id,
-              status: 'ACTIVE',
-              invitationChannel: 'INTERNAL',
-              joinedAt: new Date(),
-              roles: {
-                connect: { id: globalOwnerRole.id }
-              }
+        // 4. Create membership with the new role
+        await tx.membership.create({
+          data: {
+            userId: user.id,
+            organizationId: personalOrg.id,
+            status: 'ACTIVE',
+            invitationChannel: 'INTERNAL',
+            joinedAt: new Date(),
+            roles: {
+              connect: { id: ownerRole.id }
             }
-          })
-
-          return { ...user, defaultOrganizationId: personalOrg.id }
-        } catch (error) {
-          console.error('Error in user registration:', error)
-          if (error.code === 'P2002') {
-            throw new Error('An account with this email already exists')
           }
-          throw error
+        })
+
+
+            return { ...user, defaultOrganizationId: personalOrg.id }
+          } catch (error) {
+            console.error('Error in user registration:', error)
+            if (error.code === 'P2002') {
+              throw new Error('An account with this email already exists')
+            }
+            throw error
+          }
+        },
+        {
+          timeout: 5000,
+          isolationLevel: 'Serializable',
         }
-      }, {
-        timeout: 5000,
-        isolationLevel: 'Serializable',
-      })
+      )
     },
 
     errors: {

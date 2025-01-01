@@ -73,32 +73,26 @@ model Permission {
   conditions      Json?
   description     String?
   organization    Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId  String?
-  scope           PermissionScope  @default(ORGANIZATION)
+  organizationId  String? // Null for system permissions
   rolePermissions RolePermission[]
+  isSystemDefined Boolean          @default(false)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
-  // Remove organizationId from unique constraint for GLOBAL scope
-  @@unique([action, subject, organizationId, scope])
-  @@index([organizationId])
-  @@index([scope])
+  @@unique([action, subject, organizationId])
 }
 
 model MembershipRole {
-  id                     String                  @id @default(cuid())
-  name                   String
-  scope                  PermissionScope         @default(ORGANIZATION)
-  memberships            Membership[]
-  organization           Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId         String
-  permissions            RolePermission[]
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
-  pendingMembershipRoles PendingMembershipRole[]
+  id                    String                  @id @default(cuid())
+  name                  String
+  organization          Organization?           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String? // Null for system roles
+  permissions           RolePermission[]
+  memberships           Membership[]
+  isSystemDefined       Boolean                 @default(false)
+  PendingMembershipRole PendingMembershipRole[]
 
   @@unique([name, organizationId])
-  @@index([organizationId])
 }
 
 model RolePermission {
@@ -180,6 +174,20 @@ enum MembershipStatus {
   SUSPENDED
   PENDING
 }
+
+// Template Nature of SYSTEM Roles:
+// SYSTEM roles are predefined, globally available for selection.
+// They act as a starting point for permissions and access within an organization.
+// Their scope is ORGANIZATION, ensuring they apply only to the organization they are assigned to.
+
+// Custom Roles:
+// Organization admins/owners can create custom roles.
+// Custom roles can also have a scope of ORGANIZATION or CUSTOM, based on your business logic.
+// These roles allow flexibility for organizations without affecting the SYSTEM roles.
+
+// Immutable SYSTEM Roles:
+// SYSTEM roles are non-editable to ensure consistency.
+// Their templates ensure that organizational admins don’t override global behavior.
 
 enum PermissionScope {
   GLOBAL
