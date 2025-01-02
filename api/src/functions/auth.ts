@@ -5,7 +5,7 @@ import type { DbAuthHandlerOptions, UserType } from '@redwoodjs/auth-dbauth-api'
 
 import { cookieName } from 'src/lib/auth'
 import { db } from 'src/lib/db'
-import { copyGlobalRoleToOrganization } from 'src/services/membershipRoles_bak/membershipRoles'
+import { assignSystemRoleToMembership } from 'src/services/membershipRoles/membershipRoles'
 
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -130,48 +130,43 @@ export const handler = async (
       return db.$transaction(
         async (tx) => {
           try {
-        // 1. Create personal organization
-        const personalOrg = await tx.organization.create({
-          data: {
-            name: username,
-            settings: { creationType: 'USER_SIGNUP' },
-            status: 'ACTIVE',
-            type: 'PERSONAL',
-          },
-        })
+            // 1. Create personal organization
+            const personalOrg = await tx.organization.create({
+              data: {
+                name: username,
+                settings: { creationType: 'USER_SIGNUP' },
+                status: 'ACTIVE',
+                type: 'PERSONAL',
+              },
+            })
 
+            // 2. Create user
+            const user = await tx.user.create({
+              data: {
+                email: username,
+                hashedPassword,
+                salt,
+                isActive: true,
+                lastLoginAt: new Date(),
+                defaultOrganization: {
+                  connect: { id: personalOrg.id }
+                }
+              },
+            })
 
-        // 2. Create user
-        const user = await tx.user.create({
-          data: {
-            email: username,
-            hashedPassword,
-            salt,
-            isActive: true,
-            lastLoginAt: new Date(),
-            defaultOrganization: {
-              connect: { id: personalOrg.id }
-            }
-          },
-        })
+            // 3. Create membership first
+            const membership = await tx.membership.create({
+              data: {
+                userId: user.id,
+                organizationId: personalOrg.id,
+                status: 'ACTIVE',
+                invitationChannel: 'INTERNAL',
+                joinedAt: new Date(),
+              }
+            })
 
-        // 3. Copy global OWNER role to personal organization
-        const ownerRole = await copyGlobalRoleToOrganization('OWNER', personalOrg.id, db)
-
-        // 4. Create membership with the new role
-        await tx.membership.create({
-          data: {
-            userId: user.id,
-            organizationId: personalOrg.id,
-            status: 'ACTIVE',
-            invitationChannel: 'INTERNAL',
-            joinedAt: new Date(),
-            roles: {
-              connect: { id: ownerRole.id }
-            }
-          }
-        })
-
+            // 4. Assign the system OWNER role to the membership
+            await assignSystemRoleToMembership(membership.id, 'OWNER', tx)
 
             return { ...user, defaultOrganizationId: personalOrg.id }
           } catch (error) {
@@ -188,7 +183,6 @@ export const handler = async (
         }
       )
     },
-
     errors: {
       // `field` will be either "username" or "password"
       fieldMissing: '${field} is required',

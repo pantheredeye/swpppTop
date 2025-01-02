@@ -18,7 +18,6 @@ export async function assignSystemRoleToMembership(
     where: {
       name: systemRoleName,
       isSystemDefined: true,
-      organizationId: null
     }
   })
 
@@ -42,7 +41,7 @@ export async function assignSystemRoleToMembership(
 export async function createCustomRole(
   organizationId: string,
   name: string,
-  permissions: { action: Action; subject: string; conditions?: Json }[]
+  permissions: { action: Action; subject: string; conditions?: Prisma.InputJsonValue}[]
 ) {
   return db.$transaction(async (tx) => {
     // Create custom permissions

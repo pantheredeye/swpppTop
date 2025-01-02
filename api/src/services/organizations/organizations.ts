@@ -74,6 +74,7 @@ export const userOrganizations: QueryResolvers['userOrganizations'] =
       []
     )
   }
+
   export const createOrganization: MutationResolvers['createOrganization'] =
   async ({ input }) => {
     const { currentUser } = context
@@ -85,7 +86,7 @@ export const userOrganizations: QueryResolvers['userOrganizations'] =
           name: input.name,
           type: input.type,
           status: input.status,
-          settings: input.settings || {}
+          settings: { creationType: 'USER_CREATION'}
         }
       })
 
@@ -108,6 +109,7 @@ export const userOrganizations: QueryResolvers['userOrganizations'] =
 
     return organization
   }
+
 export const updateOrganization: MutationResolvers['updateOrganization'] = ({
   id,
   input,

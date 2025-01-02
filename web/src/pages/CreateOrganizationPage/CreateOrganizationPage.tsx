@@ -64,6 +64,7 @@ const CreateOrganizationPage = () => {
         input: {
           name: name.trim(),
           status: 'ACTIVE',
+          type: 'OTHER'
         },
       },
     })
