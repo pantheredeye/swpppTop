@@ -1,4 +1,8 @@
-import type { FindOrgRolesQuery, FindOrgRolesQueryVariables } from "types/graphql";
+import type {
+  FindOrgRolesQuery,
+  FindOrgRolesQueryVariables,
+} from 'types/graphql'
+
 import { Shield, Copy, ChevronRight, Plus } from 'lucide-react'
 import {
   Card,
@@ -20,42 +24,46 @@ import type {
   CellSuccessProps,
   CellFailureProps,
   TypedDocumentNode,
-} from "@redwoodjs/web";
+} from '@redwoodjs/web'
 
 export const QUERY: TypedDocumentNode<
   FindOrgRolesQuery,
   FindOrgRolesQueryVariables
 > = gql`
-query FindOrgRoles($id: String!) {
-        organizationRoles: organization(id: $id) {
-          id
-          name
-          membershipRoles {
+  query FindOrgRolesQuery($id: String!) {
+    organizationRoles: organization(id: $id) {
+      id
+      name
+      membershipRoles {
+        id
+        name
+        isSystemDefined
+        permissions {
+          permission {
             id
-            name
-            isSystemDefined
-            permissions {
-              permission {
-                id
-                action
-                subject
-                description
-              }
-            }
+            action
+            subject
+            description
           }
         }
       }
-`;
+    }
+  }
+`
 
-export const Loading = () => <div>Loading...</div>;
+export const Loading = () => <div>Loading...</div>
 
-export const Empty = () => <div>Empty</div>;
+export const Empty = () => <div>Empty</div>
 
-export const Failure = ({ error }: CellFailureProps<FindOrgRolesQueryVariables>) => (
-  <div style={{ color: "red" }}>Error: {error?.message}</div>
-);
+export const Failure = ({
+  error,
+}: CellFailureProps<FindOrgRolesQueryVariables>) => (
+  <div style={{ color: 'red' }}>Error: {error?.message}</div>
+)
 
-export const Success = ({ organizationRoles }: CellSuccessProps<FindOrgRolesQuery, FindOrgRolesQueryVariables>) => {
+export const Success = ({
+  organizationRoles,
+}: CellSuccessProps<FindOrgRolesQuery, FindOrgRolesQueryVariables>) => {
   return (
     <div className="space-y-6">
       <Card className="bg-gray-900 shadow-xl">
@@ -66,7 +74,8 @@ export const Success = ({ organizationRoles }: CellSuccessProps<FindOrgRolesQuer
                 Roles & Permissions
               </CardTitle>
               <CardDescription className="mt-2 text-gray-400">
-                Manage access control with predefined system roles or create custom roles
+                Manage access control with predefined system roles or create
+                custom roles
               </CardDescription>
             </div>
             <Button
@@ -90,9 +99,14 @@ export const Success = ({ organizationRoles }: CellSuccessProps<FindOrgRolesQuer
                   <div className="flex items-center space-x-4">
                     <Shield className="h-5 w-5 text-indigo-400" />
                     <div className="flex items-center space-x-3">
-                      <span className="font-medium text-gray-200">{role.name}</span>
+                      <span className="font-medium text-gray-200">
+                        {role.name}
+                      </span>
                       {role.isSystemDefined && (
-                        <Badge variant="secondary" className="bg-gray-700 text-gray-300">
+                        <Badge
+                          variant="secondary"
+                          className="bg-gray-700 text-gray-300"
+                        >
                           System
                         </Badge>
                       )}
@@ -141,4 +155,4 @@ export const Success = ({ organizationRoles }: CellSuccessProps<FindOrgRolesQuer
       </Card>
     </div>
   )
-};
+}
