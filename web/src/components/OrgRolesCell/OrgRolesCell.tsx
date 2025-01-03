@@ -20,9 +20,6 @@ import { Badge } from 'src/components/ui/Badge'
 import { Button } from 'src/components/ui/Button'
 import {
   Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
   CardContent,
 } from 'src/components/ui/Card'
 
@@ -30,21 +27,22 @@ export const QUERY: TypedDocumentNode<
   FindOrgRolesQuery,
   FindOrgRolesQueryVariables
 > = gql`
-  query FindOrgRolesQuery($id: String!) {
-    organizationRoles: organization(id: $id) {
+  query FindOrgRolesQuery($isSystemDefined: Boolean, $id: String) {
+    organizationRoles: findMembershipRoles(
+      isSystemDefined: $isSystemDefined
+      organizationId: $id
+    ) {
       id
       name
-      membershipRoles {
+      isSystemDefined
+      permissions {
         id
-        name
-        isSystemDefined
-        permissions {
-          permission {
-            id
-            action
-            subject
-            description
-          }
+        permission {
+          action
+          conditions
+          description
+          id
+          subject
         }
       }
     }
@@ -66,31 +64,9 @@ export const Success = ({
 }: CellSuccessProps<FindOrgRolesQuery, FindOrgRolesQueryVariables>) => {
   console.log(organizationRoles)
   return (
-    <div className="space-y-6">
-      <Card className="bg-gray-900 shadow-xl">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl text-gray-100">
-                Roles & Permissions
-              </CardTitle>
-              <CardDescription className="mt-2 text-gray-400">
-                Manage access control with predefined system roles or create
-                custom roles
-              </CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              className="border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create Custom Role
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
+
           <Accordion type="single" collapsible className="space-y-4">
-            {organizationRoles.membershipRoles.map((role) => (
+            {organizationRoles.map((role) => (
               <AccordionItem
                 key={role.id}
                 value={role.id}
@@ -152,8 +128,6 @@ export const Success = ({
               </AccordionItem>
             ))}
           </Accordion>
-        </CardContent>
-      </Card>
-    </div>
+
   )
 }

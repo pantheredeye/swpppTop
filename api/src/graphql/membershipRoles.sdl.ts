@@ -10,9 +10,19 @@ export const schema = gql`
     PendingMembershipRole: [PendingMembershipRole]!
   }
 
+type FindMembershipRoles {
+    id: String!
+    name: String!
+    organization: Organization
+    organizationId: String
+    permissions: [RolePermission]!
+    isSystemDefined: Boolean!
+}
+
   type Query {
     membershipRoles: [MembershipRole!]! @requireAuth
     membershipRole(id: String!): MembershipRole @requireAuth
+    findMembershipRoles(isSystemDefined: Boolean, organizationId: String): [FindMembershipRoles!]! @requireAuth
   }
 
   input CreateMembershipRoleInput {

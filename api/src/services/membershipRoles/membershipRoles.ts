@@ -88,6 +88,25 @@ export const membershipRole: QueryResolvers['membershipRole'] = ({ id }) => {
   })
 }
 
+export const findMembershipRoles = ({ isSystemDefined, organizationId }) => {
+  return db.membershipRole.findMany({
+    where: {
+      OR: [
+        { isSystemDefined: isSystemDefined ?? true },
+        { organizationId: organizationId },
+      ],
+    },
+    select: {
+      id: true,
+      name: true,
+      organization: true,
+      organizationId: true,
+      permissions: true,
+      isSystemDefined: true,
+    },
+  })
+}
+
 export const createMembershipRole: MutationResolvers['createMembershipRole'] =
   ({ input }) => {
     return db.membershipRole.create({
