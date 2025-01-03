@@ -1,7 +1,7 @@
 import { render } from "@redwoodjs/testing/web";
 
-import { Loading, Empty, Failure, Success } from "./MembershipRoleCell";
-import { standard } from "./MembershipRoleCell.mock";
+import { Loading, Empty, Failure, Success } from "./MembershipCell";
+import { standard } from "./MembershipCell.mock";
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float and DateTime types.
@@ -9,7 +9,7 @@ import { standard } from "./MembershipRoleCell.mock";
 //        https://redwoodjs.com/docs/testing#testing-cells
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
-describe("MembershipRoleCell", () => {
+describe("MembershipCell", () => {
   it("renders Loading successfully", () => {
     expect(() => {
       render(<Loading />);
@@ -36,7 +36,7 @@ describe("MembershipRoleCell", () => {
 
   it("renders Success successfully", async () => {
     expect(() => {
-      render(<Success membershipRole={standard().membershipRole} />);
+      render(<Success membership={standard().membership} />);
     }).not.toThrow();
   });
 });

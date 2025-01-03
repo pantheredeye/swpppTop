@@ -64,6 +64,7 @@ export const Failure = ({
 export const Success = ({
   organizationRoles,
 }: CellSuccessProps<FindOrgRolesQuery, FindOrgRolesQueryVariables>) => {
+  console.log(organizationRoles)
   return (
     <div className="space-y-6">
       <Card className="bg-gray-900 shadow-xl">

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { Loading, Empty, Failure, Success } from "./FetchRolesCell";
-import { standard } from "./FetchRolesCell.mock";
+import { Loading, Empty, Failure, Success } from "./FindOrgRolesCell";
+import { standard } from "./FindOrgRolesCell.mock";
 
 const meta: Meta = {
   title: "Cells/FetchRolesCell",

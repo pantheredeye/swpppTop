@@ -1,4 +1,5 @@
 import { useQuery } from '@redwoodjs/web'
+import SitesCell from 'src/components/SitesCell'
 import {
   Card,
   CardHeader,
@@ -39,10 +40,6 @@ const RolesSettings = ({ organizationId }) => {
         <CardTitle>Roles & Permissions</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* We'll add the RolesManagement component here next */}
-        <pre>
-          {JSON.stringify(data?.organization?.membershipRoles, null, 2)}
-        </pre>
       </CardContent>
     </Card>
     </>

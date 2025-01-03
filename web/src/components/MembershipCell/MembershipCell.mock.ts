@@ -1,7 +1,7 @@
 // Define your own mock data here:
 export const standard = (/* vars, { ctx, req } */) => ({
-  membershipRole: {
-    __typename: "MembershipRole" as const,
+  membership: {
+    __typename: "Membership" as const,
     id: "42",
   },
 });
