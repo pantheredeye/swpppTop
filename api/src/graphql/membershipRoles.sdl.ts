@@ -36,4 +36,4 @@ export const schema = gql`
     ): MembershipRole! @requireAuth
     deleteMembershipRole(id: String!): MembershipRole! @requireAuth
   }
-`;
+`

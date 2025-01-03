@@ -1,5 +1,5 @@
-import { db } from 'api/src/lib/db'
 import { Action } from '@prisma/client'
+import { db } from 'api/src/lib/db'
 
 type StandardRole = {
   name: string
@@ -21,7 +21,7 @@ const subjects = [
   'Event',
   'Media',
   'Inspection',
-  'InspectionEventDetails'
+  'InspectionEventDetails',
 ]
 
 const systemRoles: StandardRole[] = [
@@ -31,8 +31,8 @@ const systemRoles: StandardRole[] = [
     isSystemDefined: true,
     permissions: {
       subjects: subjects,
-      actions: ['CREATE', 'READ', 'WRITE', 'DELETE']
-    }
+      actions: ['CREATE', 'READ', 'WRITE', 'DELETE'],
+    },
   },
   {
     name: 'ADMIN',
@@ -41,8 +41,8 @@ const systemRoles: StandardRole[] = [
     permissions: {
       subjects: subjects,
       actions: ['CREATE', 'READ', 'WRITE', 'DELETE'],
-      excludeSubjects: ['Billing']
-    }
+      excludeSubjects: ['Billing'],
+    },
   },
   {
     name: 'MEMBER',
@@ -51,8 +51,8 @@ const systemRoles: StandardRole[] = [
     permissions: {
       subjects: subjects,
       actions: ['READ', 'WRITE'],
-      excludeSubjects: ['Organization', 'Membership']
-    }
+      excludeSubjects: ['Organization', 'Membership'],
+    },
   },
   {
     name: 'VIEWER',
@@ -61,9 +61,9 @@ const systemRoles: StandardRole[] = [
     permissions: {
       subjects: subjects,
       actions: ['READ'],
-      excludeSubjects: ['Organization', 'Membership']
-    }
-  }
+      excludeSubjects: ['Organization', 'Membership'],
+    },
+  },
 ]
 
 // Helper function to process items in batches
@@ -91,20 +91,22 @@ export default async function seedRoles() {
       create: {
         name: 'SYSTEM',
         type: 'OTHER',
-        status: 'ACTIVE'
+        status: 'ACTIVE',
       },
-      update: {}
+      update: {},
     })
 
     // Create permission operations array
-    const permissionOps = systemRoles.flatMap(role =>
+    const permissionOps = systemRoles.flatMap((role) =>
       role.permissions.subjects
-        .filter(subject => !role.permissions.excludeSubjects?.includes(subject))
-        .flatMap(subject =>
-          role.permissions.actions.map(action => ({
+        .filter(
+          (subject) => !role.permissions.excludeSubjects?.includes(subject)
+        )
+        .flatMap((subject) =>
+          role.permissions.actions.map((action) => ({
             action,
             subject,
-            organizationId: systemOrg.id
+            organizationId: systemOrg.id,
           }))
         )
     )
@@ -119,20 +121,20 @@ export default async function seedRoles() {
             action_subject_organizationId: {
               action,
               subject,
-              organizationId
-            }
+              organizationId,
+            },
           },
           create: {
             action,
             subject,
             organizationId,
             isSystemDefined: true,
-            description: `${action} access to ${subject}`
+            description: `${action} access to ${subject}`,
           },
           update: {
             isSystemDefined: true,
-            description: `${action} access to ${subject}`
-          }
+            description: `${action} access to ${subject}`,
+          },
         })
       }
     )
@@ -140,10 +142,15 @@ export default async function seedRoles() {
     // Process roles one at a time
     for (const roleTemplate of systemRoles) {
       // Filter permissions for this role
-      const rolePermissions = createdPermissions.filter(permission => {
-        const isSubjectAllowed = roleTemplate.permissions.subjects.includes(permission.subject) &&
-          !roleTemplate.permissions.excludeSubjects?.includes(permission.subject)
-        const isActionAllowed = roleTemplate.permissions.actions.includes(permission.action)
+      const rolePermissions = createdPermissions.filter((permission) => {
+        const isSubjectAllowed =
+          roleTemplate.permissions.subjects.includes(permission.subject) &&
+          !roleTemplate.permissions.excludeSubjects?.includes(
+            permission.subject
+          )
+        const isActionAllowed = roleTemplate.permissions.actions.includes(
+          permission.action
+        )
         return isSubjectAllowed && isActionAllowed
       })
 
@@ -152,8 +159,8 @@ export default async function seedRoles() {
         where: {
           name_organizationId: {
             name: roleTemplate.name,
-            organizationId: systemOrg.id
-          }
+            organizationId: systemOrg.id,
+          },
         },
         create: {
           name: roleTemplate.name,
@@ -162,41 +169,37 @@ export default async function seedRoles() {
         },
         update: {
           isSystemDefined: true,
-        }
+        },
       })
 
       // Delete existing role permissions
       await db.rolePermission.deleteMany({
         where: {
-          roleId: role.id
-        }
+          roleId: role.id,
+        },
       })
 
       // Create new role permissions in batches
-      await processBatch(
-        rolePermissions,
-        5,
-        async (permission) => {
-          return db.rolePermission.upsert({
-            where: {
-              roleId_permissionId: {
-                roleId: role.id,
-                permissionId: permission.id
-              }
-            },
-            create: {
+      await processBatch(rolePermissions, 5, async (permission) => {
+        return db.rolePermission.upsert({
+          where: {
+            roleId_permissionId: {
               roleId: role.id,
               permissionId: permission.id,
-              fields: ['*'],
-              inverted: false
             },
-            update: {
-              fields: ['*'],
-              inverted: false
-            }
-          })
-        }
-      )
+          },
+          create: {
+            roleId: role.id,
+            permissionId: permission.id,
+            fields: ['*'],
+            inverted: false,
+          },
+          update: {
+            fields: ['*'],
+            inverted: false,
+          },
+        })
+      })
     }
 
     console.log('Successfully seeded system roles and permissions')

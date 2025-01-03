@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+
 import { navigate, Link, routes, useParams } from '@redwoodjs/router'
 import { Metadata } from '@redwoodjs/web'
-import { useOrganization } from 'src/context/OrganizationContext'
 import { toast } from '@redwoodjs/web/toast'
+
+import { useOrganization } from 'src/context/OrganizationContext'
 
 const SwitchPage = () => {
   const { organizationId } = useParams()

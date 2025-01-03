@@ -37,4 +37,4 @@ export const schema = gql`
     deletePendingMembershipRole(id: String!): PendingMembershipRole!
       @requireAuth
   }
-`;
+`

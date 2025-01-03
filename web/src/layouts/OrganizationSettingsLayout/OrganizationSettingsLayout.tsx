@@ -1,9 +1,10 @@
 import { useParams, navigate, routes } from '@redwoodjs/router'
+
 import { useOrganization } from 'src/context/OrganizationContext'
 
 type OrganizationSettingLayoutProps = {
-  children?: React.ReactNode;
-};
+  children?: React.ReactNode
+}
 
 const OrganizationSettingLayout = ({
   children,
@@ -64,5 +65,4 @@ const OrganizationSettingLayout = ({
   )
 }
 
-export default OrganizationSettingLayout;
-
+export default OrganizationSettingLayout

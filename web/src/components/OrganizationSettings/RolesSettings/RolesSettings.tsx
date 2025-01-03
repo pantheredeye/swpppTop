@@ -1,5 +1,5 @@
 import { useQuery } from '@redwoodjs/web'
-import SitesCell from 'src/components/SitesCell'
+import OrgRolesCell from 'src/components/OrgRolesCell'
 import {
   Card,
   CardHeader,
@@ -40,6 +40,7 @@ const RolesSettings = ({ organizationId }) => {
         <CardTitle>Roles & Permissions</CardTitle>
       </CardHeader>
       <CardContent>
+        <OrgRolesCell id={organizationId} />
       </CardContent>
     </Card>
     </>

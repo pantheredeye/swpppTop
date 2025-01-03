@@ -1,4 +1,3 @@
-
 import { useAuth } from 'src/auth'
 import QuickActionsCard from 'src/components/QuickActionsCard'
 import RecentActivityCard from 'src/components/RecentActivityCard'

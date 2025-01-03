@@ -1,11 +1,12 @@
-import type { Prisma, MembershipRole } from "@prisma/client";
-import type { ScenarioData } from "@redwoodjs/testing/api";
+import type { Prisma, MembershipRole } from '@prisma/client'
+
+import type { ScenarioData } from '@redwoodjs/testing/api'
 
 export const standard = defineScenario<Prisma.MembershipRoleCreateArgs>({
   membershipRole: {
-    one: { data: { name: "String" } },
-    two: { data: { name: "String" } },
+    one: { data: { name: 'String' } },
+    two: { data: { name: 'String' } },
   },
-});
+})
 
-export type StandardScenario = ScenarioData<MembershipRole, "membershipRole">;
+export type StandardScenario = ScenarioData<MembershipRole, 'membershipRole'>

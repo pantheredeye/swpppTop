@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
+
 import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
+
+import { Alert, AlertDescription } from 'src/components/ui/Alert'
+import { Button } from 'src/components/ui/Button'
 import {
   Dialog,
   DialogContent,
@@ -11,8 +15,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'src/components/ui/Dialog'
-import { Alert, AlertDescription } from 'src/components/ui/Alert'
-import { Button } from 'src/components/ui/Button'
 import { Input } from 'src/components/ui/Input'
 import { useOrganization } from 'src/context/OrganizationContext'
 
@@ -70,9 +72,9 @@ const DeleteOrganization = () => {
         <div className="rounded-lg bg-red-950/50 p-6">
           <h3 className="text-lg font-semibold text-red-400">Danger Zone</h3>
           <p className="mt-2 text-sm text-gray-300">
-            Your personal organization cannot be deleted unless your
-            entire user profile is deleted. Please contact support for
-            additional assistance.
+            Your personal organization cannot be deleted unless your entire user
+            profile is deleted. Please contact support for additional
+            assistance.
           </p>
         </div>
       </div>

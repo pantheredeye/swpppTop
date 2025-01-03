@@ -10,17 +10,17 @@
 //
 // See https://storybook.js.org/docs/react/writing-stories/args.
 
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from '@storybook/react'
 
-import DeleteOrganization from "./DeleteOrganization";
+import DeleteOrganization from './DeleteOrganization'
 
 const meta: Meta<typeof DeleteOrganization> = {
   component: DeleteOrganization,
-  tags: ["autodocs"],
-};
+  tags: ['autodocs'],
+}
 
-export default meta;
+export default meta
 
-type Story = StoryObj<typeof DeleteOrganization>;
+type Story = StoryObj<typeof DeleteOrganization>
 
-export const Primary: Story = {};
+export const Primary: Story = {}

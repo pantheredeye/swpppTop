@@ -149,8 +149,8 @@ export const handler = async (
                 isActive: true,
                 lastLoginAt: new Date(),
                 defaultOrganization: {
-                  connect: { id: personalOrg.id }
-                }
+                  connect: { id: personalOrg.id },
+                },
               },
             })
 
@@ -162,7 +162,7 @@ export const handler = async (
                 status: 'ACTIVE',
                 invitationChannel: 'INTERNAL',
                 joinedAt: new Date(),
-              }
+              },
             })
 
             // 4. Assign the system OWNER role to the membership

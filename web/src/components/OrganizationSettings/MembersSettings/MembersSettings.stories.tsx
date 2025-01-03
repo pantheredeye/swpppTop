@@ -10,17 +10,17 @@
 //
 // See https://storybook.js.org/docs/react/writing-stories/args.
 
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from '@storybook/react'
 
-import MembersSettings from "./MembersSettings";
+import MembersSettings from './MembersSettings'
 
 const meta: Meta<typeof MembersSettings> = {
   component: MembersSettings,
-  tags: ["autodocs"],
-};
+  tags: ['autodocs'],
+}
 
-export default meta;
+export default meta
 
-type Story = StoryObj<typeof MembersSettings>;
+type Story = StoryObj<typeof MembersSettings>
 
-export const Primary: Story = {};
+export const Primary: Story = {}

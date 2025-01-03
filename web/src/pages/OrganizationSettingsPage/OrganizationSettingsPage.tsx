@@ -1,11 +1,12 @@
 // web/src/pages/OrganizationSettingsPage/OrganizationSettingsPage.jsx
 import { useParams } from '@redwoodjs/router'
 import { Metadata } from '@redwoodjs/web'
-import OrganizationSettingsLayout from 'src/layouts/OrganizationSettingsLayout'
-import GeneralSettings from 'src/components/OrganizationSettings/GeneralSettings'
-import RolesSettings from 'src/components/OrganizationSettings/RolesSettings'
-import MembersSettings from 'src/components/OrganizationSettings/MembersSettings'
+
 import DeleteOrganization from 'src/components/OrganizationSettings/DeleteOrganization'
+import GeneralSettings from 'src/components/OrganizationSettings/GeneralSettings'
+import MembersSettings from 'src/components/OrganizationSettings/MembersSettings'
+import RolesSettings from 'src/components/OrganizationSettings/RolesSettings'
+import OrganizationSettingsLayout from 'src/layouts/OrganizationSettingsLayout'
 
 const OrganizationSettingsPage = () => {
   const { organizationId, tab = 'general' } = useParams()
@@ -18,8 +19,8 @@ const OrganizationSettingsPage = () => {
         return <RolesSettings organizationId={organizationId} />
       case 'members':
         return <MembersSettings />
-        case 'delete':
-          return <DeleteOrganization />
+      case 'delete':
+        return <DeleteOrganization />
       default:
         return <GeneralSettings />
     }

@@ -1,13 +1,13 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from '@storybook/react'
 
-import OrganizationSettingLayout from "./OrganizationSettingsLayout";
+import OrganizationSettingLayout from './OrganizationSettingsLayout'
 
 const meta: Meta<typeof OrganizationSettingLayout> = {
   component: OrganizationSettingLayout,
-};
+}
 
-export default meta;
+export default meta
 
-type Story = StoryObj<typeof OrganizationSettingLayout>;
+type Story = StoryObj<typeof OrganizationSettingLayout>
 
-export const Primary: Story = {};
+export const Primary: Story = {}

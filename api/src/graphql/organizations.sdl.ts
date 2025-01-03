@@ -74,5 +74,5 @@ export const schema = gql`
 
     setDefaultOrganization(id: String!): User! @requireAuth
   }
-`;
+`
 // deleteOrganization(id: String!): Organization! @requireAuth(roles: ["OWNER"])

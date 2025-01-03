@@ -4,8 +4,10 @@ import type {
   OrganizationRelationResolvers,
 } from 'types/graphql'
 
-import { db } from 'src/lib/db'
 import { AuthenticationError } from '@redwoodjs/graphql-server'
+
+import { db } from 'src/lib/db'
+
 import { assignSystemRoleToMembership } from '../membershipRoles/membershipRoles'
 
 export const organizations: QueryResolvers['organizations'] = () => {
@@ -75,7 +77,7 @@ export const userOrganizations: QueryResolvers['userOrganizations'] =
     )
   }
 
-  export const createOrganization: MutationResolvers['createOrganization'] =
+export const createOrganization: MutationResolvers['createOrganization'] =
   async ({ input }) => {
     const { currentUser } = context
 
@@ -86,8 +88,8 @@ export const userOrganizations: QueryResolvers['userOrganizations'] =
           name: input.name,
           type: input.type,
           status: input.status,
-          settings: { creationType: 'USER_CREATION'}
-        }
+          settings: { creationType: 'USER_CREATION' },
+        },
       })
 
       // 2. Create membership
@@ -97,8 +99,8 @@ export const userOrganizations: QueryResolvers['userOrganizations'] =
           organizationId: org.id,
           status: 'ACTIVE',
           invitationChannel: 'INTERNAL',
-          joinedAt: new Date()
-        }
+          joinedAt: new Date(),
+        },
       })
 
       // 3. Link the system OWNER role
@@ -119,7 +121,6 @@ export const updateOrganization: MutationResolvers['updateOrganization'] = ({
     where: { id },
   })
 }
-
 
 export const deleteOrganization: MutationResolvers['deleteOrganization'] =
   async ({ id }) => {
@@ -190,7 +191,6 @@ export const setDefaultOrganization: MutationResolvers['setDefaultOrganization']
       data: { defaultOrganizationId: id },
     })
   }
-
 
 export const Organization: OrganizationRelationResolvers = {
   users: (_obj, { root }) => {

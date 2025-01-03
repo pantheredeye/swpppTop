@@ -38,4 +38,4 @@ export const schema = gql`
     ): RolePermission! @requireAuth
     deleteRolePermission(id: String!): RolePermission! @requireAuth
   }
-`;
+`

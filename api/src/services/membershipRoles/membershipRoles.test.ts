@@ -1,4 +1,4 @@
-import type { MembershipRole } from "@prisma/client";
+import type { MembershipRole } from '@prisma/client'
 
 import {
   membershipRoles,
@@ -6,8 +6,8 @@ import {
   createMembershipRole,
   updateMembershipRole,
   deleteMembershipRole,
-} from "./membershipRoles";
-import type { StandardScenario } from "./membershipRoles.scenarios";
+} from './membershipRoles'
+import type { StandardScenario } from './membershipRoles.scenarios'
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float.
@@ -15,55 +15,53 @@ import type { StandardScenario } from "./membershipRoles.scenarios";
 //       https://redwoodjs.com/docs/testing#testing-services
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
-describe("membershipRoles", () => {
+describe('membershipRoles', () => {
   scenario(
-    "returns all membershipRoles",
+    'returns all membershipRoles',
     async (scenario: StandardScenario) => {
-      const result = await membershipRoles();
+      const result = await membershipRoles()
 
-      expect(result.length).toEqual(
-        Object.keys(scenario.membershipRole).length,
-      );
-    },
-  );
+      expect(result.length).toEqual(Object.keys(scenario.membershipRole).length)
+    }
+  )
 
   scenario(
-    "returns a single membershipRole",
+    'returns a single membershipRole',
     async (scenario: StandardScenario) => {
       const result = await membershipRole({
         id: scenario.membershipRole.one.id,
-      });
+      })
 
-      expect(result).toEqual(scenario.membershipRole.one);
-    },
-  );
+      expect(result).toEqual(scenario.membershipRole.one)
+    }
+  )
 
-  scenario("creates a membershipRole", async () => {
+  scenario('creates a membershipRole', async () => {
     const result = await createMembershipRole({
-      input: { name: "String" },
-    });
+      input: { name: 'String' },
+    })
 
-    expect(result.name).toEqual("String");
-  });
+    expect(result.name).toEqual('String')
+  })
 
-  scenario("updates a membershipRole", async (scenario: StandardScenario) => {
+  scenario('updates a membershipRole', async (scenario: StandardScenario) => {
     const original = (await membershipRole({
       id: scenario.membershipRole.one.id,
-    })) as MembershipRole;
+    })) as MembershipRole
     const result = await updateMembershipRole({
       id: original.id,
-      input: { name: "String2" },
-    });
+      input: { name: 'String2' },
+    })
 
-    expect(result.name).toEqual("String2");
-  });
+    expect(result.name).toEqual('String2')
+  })
 
-  scenario("deletes a membershipRole", async (scenario: StandardScenario) => {
+  scenario('deletes a membershipRole', async (scenario: StandardScenario) => {
     const original = (await deleteMembershipRole({
       id: scenario.membershipRole.one.id,
-    })) as MembershipRole;
-    const result = await membershipRole({ id: original.id });
+    })) as MembershipRole
+    const result = await membershipRole({ id: original.id })
 
-    expect(result).toEqual(null);
-  });
-});
+    expect(result).toEqual(null)
+  })
+})

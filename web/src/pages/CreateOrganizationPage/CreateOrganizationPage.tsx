@@ -26,7 +26,7 @@ const CreateOrganizationPage = () => {
       }
     }
   `
-// TODO Handle Duplicate Organization / Other Errors - Notify User
+  // TODO Handle Duplicate Organization / Other Errors - Notify User
 
   const [createOrg] = useMutation(CREATE_ORGANIZATION, {
     onCompleted: async (data) => {
@@ -64,7 +64,7 @@ const CreateOrganizationPage = () => {
         input: {
           name: name.trim(),
           status: 'ACTIVE',
-          type: 'OTHER'
+          type: 'OTHER',
         },
       },
     })

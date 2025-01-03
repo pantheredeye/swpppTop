@@ -49,4 +49,4 @@ export const schema = gql`
       @requireAuth
     deletePermission(id: String!): Permission! @requireAuth
   }
-`;
+`

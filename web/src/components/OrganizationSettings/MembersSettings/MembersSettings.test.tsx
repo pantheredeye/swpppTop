@@ -1,14 +1,14 @@
-import { render } from "@redwoodjs/testing/web";
+import { render } from '@redwoodjs/testing/web'
 
-import MembersSettings from "./MembersSettings";
+import MembersSettings from './MembersSettings'
 
 //   Improve this test with help from the Redwood Testing Doc:
 //    https://redwoodjs.com/docs/testing#testing-components
 
-describe("MembersSettings", () => {
-  it("renders successfully", () => {
+describe('MembersSettings', () => {
+  it('renders successfully', () => {
     expect(() => {
-      render(<MembersSettings />);
-    }).not.toThrow();
-  });
-});
+      render(<MembersSettings />)
+    }).not.toThrow()
+  })
+})

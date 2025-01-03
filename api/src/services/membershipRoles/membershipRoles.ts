@@ -1,13 +1,12 @@
+import type { Prisma } from '@prisma/client'
 import type {
   QueryResolvers,
   MutationResolvers,
   MembershipRoleRelationResolvers,
   Action,
-} from "types/graphql";
+} from 'types/graphql'
 
-import { db } from "src/lib/db";
-
-import type { Prisma } from "@prisma/client";
+import { db } from 'src/lib/db'
 
 export async function assignSystemRoleToMembership(
   membershipId: string,
@@ -18,7 +17,7 @@ export async function assignSystemRoleToMembership(
     where: {
       name: systemRoleName,
       isSystemDefined: true,
-    }
+    },
   })
 
   if (!systemRole) {
@@ -30,9 +29,9 @@ export async function assignSystemRoleToMembership(
     where: { id: membershipId },
     data: {
       roles: {
-        connect: { id: systemRole.id }
-      }
-    }
+        connect: { id: systemRole.id },
+      },
+    },
   })
 
   return systemRole
@@ -41,20 +40,24 @@ export async function assignSystemRoleToMembership(
 export async function createCustomRole(
   organizationId: string,
   name: string,
-  permissions: { action: Action; subject: string; conditions?: Prisma.InputJsonValue}[]
+  permissions: {
+    action: Action
+    subject: string
+    conditions?: Prisma.InputJsonValue
+  }[]
 ) {
   return db.$transaction(async (tx) => {
     // Create custom permissions
     const createdPermissions = await Promise.all(
-      permissions.map(p =>
+      permissions.map((p) =>
         tx.permission.create({
           data: {
             action: p.action,
             subject: p.subject,
             conditions: p.conditions,
             organizationId,
-            isSystemDefined: false
-          }
+            isSystemDefined: false,
+          },
         })
       )
     )
@@ -66,66 +69,66 @@ export async function createCustomRole(
         organizationId,
         isSystemDefined: false,
         permissions: {
-          create: createdPermissions.map(p => ({
-            permissionId: p.id
-          }))
-        }
-      }
+          create: createdPermissions.map((p) => ({
+            permissionId: p.id,
+          })),
+        },
+      },
     })
   })
 }
 
-export const membershipRoles: QueryResolvers["membershipRoles"] = () => {
-  return db.membershipRole.findMany();
-};
+export const membershipRoles: QueryResolvers['membershipRoles'] = () => {
+  return db.membershipRole.findMany()
+}
 
-export const membershipRole: QueryResolvers["membershipRole"] = ({ id }) => {
+export const membershipRole: QueryResolvers['membershipRole'] = ({ id }) => {
   return db.membershipRole.findUnique({
     where: { id },
-  });
-};
+  })
+}
 
-export const createMembershipRole: MutationResolvers["createMembershipRole"] =
+export const createMembershipRole: MutationResolvers['createMembershipRole'] =
   ({ input }) => {
     return db.membershipRole.create({
       data: input,
-    });
-  };
+    })
+  }
 
-export const updateMembershipRole: MutationResolvers["updateMembershipRole"] =
+export const updateMembershipRole: MutationResolvers['updateMembershipRole'] =
   ({ id, input }) => {
     return db.membershipRole.update({
       data: input,
       where: { id },
-    });
-  };
+    })
+  }
 
-export const deleteMembershipRole: MutationResolvers["deleteMembershipRole"] =
+export const deleteMembershipRole: MutationResolvers['deleteMembershipRole'] =
   ({ id }) => {
     return db.membershipRole.delete({
       where: { id },
-    });
-  };
+    })
+  }
 
 export const MembershipRole: MembershipRoleRelationResolvers = {
   organization: (_obj, { root }) => {
     return db.membershipRole
       .findUnique({ where: { id: root?.id } })
-      .organization();
+      .organization()
   },
   permissions: (_obj, { root }) => {
     return db.membershipRole
       .findUnique({ where: { id: root?.id } })
-      .permissions();
+      .permissions()
   },
   memberships: (_obj, { root }) => {
     return db.membershipRole
       .findUnique({ where: { id: root?.id } })
-      .memberships();
+      .memberships()
   },
   PendingMembershipRole: (_obj, { root }) => {
     return db.membershipRole
       .findUnique({ where: { id: root?.id } })
-      .PendingMembershipRole();
+      .PendingMembershipRole()
   },
-};
+}
