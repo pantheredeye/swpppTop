@@ -18,10 +18,6 @@ import {
 } from 'src/components/ui/Accordion'
 import { Badge } from 'src/components/ui/Badge'
 import { Button } from 'src/components/ui/Button'
-import {
-  Card,
-  CardContent,
-} from 'src/components/ui/Card'
 
 export const QUERY: TypedDocumentNode<
   FindOrgRolesQuery,
@@ -48,6 +44,49 @@ export const QUERY: TypedDocumentNode<
     }
   }
 `
+// Collapse by Role
+// Explore "Module" based grouping - by Subject not Action
+
+const PermissionAccordion = ({ permissions }) => {
+  const actionGroups = permissions.reduce((acc, perm) => {
+    const action = perm.permission.action;
+    const subject = perm.permission.subject;
+    if (!acc[action]) {
+      acc[action] = [];
+    }
+    acc[action].push(subject);
+    return acc;
+  }, {});
+
+  return (
+    <Accordion type="single" collapsible className="space-y-4">
+      {Object.keys(actionGroups).map((action) => (
+        <AccordionItem key={action} value={action} className="border border-gray-700 rounded-lg bg-gray-800">
+          <AccordionTrigger className="px-4 py-3 hover:bg-gray-750">
+            <div className="flex items-center space-x-4">
+              <Shield className="h-5 w-5 text-indigo-400" />
+              <span className="font-medium text-gray-200">{action} Permissions</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 py-3">
+            <ul className="space-y-2">
+              {actionGroups[action].map((subject, index) => (
+                <li key={index} className="flex items-center justify-between rounded-md bg-gray-750 px-3 py-2">
+                  <span className="text-sm font-medium text-gray-300">{subject}</span>
+                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-300">
+                    <Copy className="mr-2 h-4 w-4" />
+                    Clone Permission
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  );
+};
+
 
 export const Loading = () => <div>Loading...</div>
 
@@ -63,71 +102,21 @@ export const Success = ({
   organizationRoles,
 }: CellSuccessProps<FindOrgRolesQuery, FindOrgRolesQueryVariables>) => {
   console.log(organizationRoles)
-  return (
-
-          <Accordion type="single" collapsible className="space-y-4">
-            {organizationRoles.map((role) => (
-              <AccordionItem
-                key={role.id}
-                value={role.id}
-                className="border border-gray-700 rounded-lg bg-gray-800"
-              >
-                <AccordionTrigger className="px-4 py-3 hover:bg-gray-750">
-                  <div className="flex items-center space-x-4">
-                    <Shield className="h-5 w-5 text-indigo-400" />
-                    <div className="flex items-center space-x-3">
-                      <span className="font-medium text-gray-200">
-                        {role.name}
-                      </span>
-                      {role.isSystemDefined && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-gray-700 text-gray-300"
-                        >
-                          System
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-4 py-3">
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-400">
-                        {role.permissions.length} permissions assigned
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-gray-400 hover:text-gray-300"
-                      >
-                        <Copy className="mr-2 h-4 w-4" />
-                        Clone Role
-                      </Button>
-                    </div>
-                    <div className="space-y-2">
-                      {role.permissions.map((perm) => (
-                        <div
-                          key={perm.permission.id}
-                          className="flex items-center justify-between rounded-md bg-gray-750 px-3 py-2"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-300">
-                              {perm.permission.action}
-                            </span>
-                            <ChevronRight className="h-4 w-4 text-gray-600" />
-                            <span className="text-sm text-gray-400">
-                              {perm.permission.subject}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-
-  )
-}
+   return (
+    <div>
+      {organizationRoles.map((role) => (
+        <div key={role.id} className="border border-gray-700 rounded-lg bg-gray-800 mb-4">
+          <h3 className="px-4 py-3 font-medium text-gray-200">
+            {role.name}
+            {role.isSystemDefined && (
+              <Badge variant="secondary" className="bg-gray-700 text-gray-300 ml-2">
+                System
+              </Badge>
+            )}
+          </h3>
+          <PermissionAccordion permissions={role.permissions} />
+        </div>
+      ))}
+    </div>
+  );
+};

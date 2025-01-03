@@ -1,8 +1,9 @@
-import { Button } from 'src/components/ui/Button'
+import { Plus } from 'lucide-react'
 
 import { useQuery } from '@redwoodjs/web'
-import { Plus } from 'lucide-react'
+
 import OrgRolesCell from 'src/components/OrgRolesCell'
+import { Button } from 'src/components/ui/Button'
 import {
   Card,
   CardHeader,
@@ -11,36 +12,11 @@ import {
   CardDescription,
 } from 'src/components/ui/Card'
 
-const GET_ORGANIZATION = gql`
-  query GetOrganization($id: String!) {
-    organization(id: $id) {
-      id
-      name
-      membershipRoles {
-        id
-        name
-        permissions {
-          permission {
-            id
-            action
-            subject
-          }
-        }
-      }
-    }
-  }
-`
-
 const RolesSettings = ({ organizationId }) => {
-  const { data } = useQuery(GET_ORGANIZATION, {
-    variables: { id: organizationId },
-  })
-
-
   return (
-<div className="space-y-6">
+    <div className="space-y-6">
       <Card className="bg-gray-900 shadow-xl">
-      <CardHeader>
+        <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-2xl text-gray-100">
@@ -60,10 +36,10 @@ const RolesSettings = ({ organizationId }) => {
             </Button>
           </div>
         </CardHeader>
-      <CardContent>
-        <OrgRolesCell id={organizationId} isSystemDefined={true} />
-      </CardContent>
-    </Card>
+        <CardContent>
+          <OrgRolesCell id={organizationId} isSystemDefined={true} />
+        </CardContent>
+      </Card>
     </div>
   )
 }
