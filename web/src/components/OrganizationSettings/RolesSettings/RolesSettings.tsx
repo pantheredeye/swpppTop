@@ -1,7 +1,5 @@
 import { Plus } from 'lucide-react'
 
-import { useQuery } from '@redwoodjs/web'
-
 import OrgRolesCell from 'src/components/OrgRolesCell'
 import { Button } from 'src/components/ui/Button'
 import {

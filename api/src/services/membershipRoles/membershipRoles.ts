@@ -24,7 +24,6 @@ export async function assignSystemRoleToMembership(
     throw new Error(`System role "${systemRoleName}" not found`)
   }
 
-  // Simply connect the existing system role to the membership
   await tx.membership.update({
     where: { id: membershipId },
     data: {
@@ -88,7 +87,7 @@ export const membershipRole: QueryResolvers['membershipRole'] = ({ id }) => {
   })
 }
 
-export const findMembershipRoles = ({ isSystemDefined, organizationId }) => {
+export const findMembershipRoles: QueryResolvers['findMembershipRoles'] = ({ isSystemDefined, organizationId }) => {
   return db.membershipRole.findMany({
     where: {
       OR: [

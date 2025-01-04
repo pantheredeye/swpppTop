@@ -10,12 +10,23 @@ export const QUERY: TypedDocumentNode<
   OrgMembersQuery,
   OrgMembersQueryVariables
 > = gql`
-  query OrgMembersQuery {
-    orgMembers {
+  query OrgMembersQuery($id: String!) {
+    orgMembers: findOrgMembers (organizationId: $id) {
       id
+      user {
+        firstName
+        lastName
+        email
+      }
+      roles {
+        id
+        name
+      }
+      status
     }
   }
 `;
+
 
 export const Loading = () => <div>Loading...</div>;
 
@@ -26,11 +37,22 @@ export const Failure = ({ error }: CellFailureProps) => (
 );
 
 export const Success = ({ orgMembers }: CellSuccessProps<OrgMembersQuery>) => {
+  console.log(orgMembers)
   return (
-    <ul>
-      {orgMembers.map((item) => {
-        return <li key={item.id}>{JSON.stringify(item)}</li>;
-      })}
-    </ul>
+<div>
+      {orgMembers.map((member) => (
+        <div key={member.id} className="border border-gray-700 rounded-lg bg-gray-800 mb-4">
+          <h3 className="px-4 py-3 font-medium text-gray-200">
+            {member.user.email}
+            {/* {role.isSystemDefined && (
+              <Badge variant="secondary" className="bg-gray-700 text-gray-300 ml-2">
+                System
+              </Badge>
+            )} */}
+          </h3>
+          {/* <PermissionAccordion permissions={role.permissions} /> */}
+        </div>
+      ))}
+    </div>
   );
 };

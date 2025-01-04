@@ -163,7 +163,7 @@ export const deleteOrganization: MutationResolvers['deleteOrganization'] =
       if (currentUser.defaultOrganizationId === id) {
         const personalOrg = await db.organization.findFirst({
           where: {
-            users: {
+            members: {
               some: {
                 id: currentUser.id,
               },
@@ -194,7 +194,7 @@ export const setDefaultOrganization: MutationResolvers['setDefaultOrganization']
 
 export const Organization: OrganizationRelationResolvers = {
   users: (_obj, { root }) => {
-    return db.organization.findUnique({ where: { id: root?.id } }).users()
+    return db.organization.findUnique({ where: { id: root?.id } }).members()
   },
   sites: (_obj, { root }) => {
     return db.organization.findUnique({ where: { id: root?.id } }).sites()

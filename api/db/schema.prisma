@@ -37,7 +37,7 @@ model Organization {
   name                   String                   @unique
   createdAt              DateTime                 @default(now())
   type                   String                   @default("OTHER")
-  users                  Membership[]
+  members                Membership[]
   sites                  Site[]
   settings               Json? // Stores settings specific to the organization
   billingEmail           String?

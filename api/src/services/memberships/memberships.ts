@@ -16,6 +16,20 @@ export const membership: QueryResolvers['membership'] = ({ id }) => {
   })
 }
 
+export const findOrgMembers: QueryResolvers['findOrgMembers'] = ({ organizationId }) => {
+  return db.membership.findMany({
+    where: {
+        organizationId: organizationId ,
+    },
+    select: {
+      id: true,
+      user: true,
+      roles: true,
+      status: true
+    },
+  })
+}
+
 export const createMembership: MutationResolvers['createMembership'] = ({
   input,
 }) => {

@@ -24,6 +24,22 @@ export const schema = gql`
     deactivationReason: String
   }
 
+type Members {
+  id: String!
+    user: User!
+    deletedAt: DateTime
+    roles: [MembershipRole]!
+    settings: JSON
+    invitationId: String
+    invitedEmail: String
+    invitationExpiresAt: DateTime
+    invitedAt: DateTime
+    joinedAt: DateTime
+    lastInvitationSent: DateTime
+    status: MembershipStatus!
+    deactivationReason: String
+}
+
   enum InvitationChannel {
     EMAIL
     SLACK
@@ -41,6 +57,7 @@ export const schema = gql`
   type Query {
     memberships: [Membership!]! @requireAuth
     membership(id: String!): Membership @requireAuth
+    findOrgMembers(organizationId: String!): [Members!]! @requireAuth
   }
 
   input CreateMembershipInput {

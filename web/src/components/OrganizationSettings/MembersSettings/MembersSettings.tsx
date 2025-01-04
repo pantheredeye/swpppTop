@@ -37,7 +37,7 @@ const MembersSettings = ({ organizationId }) => {
           </div>
         </CardHeader>
         <CardContent>
-          <OrgMembersCell id={organizationId} isSystemDefined={true} />
+          <OrgMembersCell id={organizationId} />
         </CardContent>
       </Card>
     </div>

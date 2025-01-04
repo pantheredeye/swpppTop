@@ -4,7 +4,7 @@ export const schema = gql`
     name: String!
     createdAt: DateTime!
     type: String!
-    users: [Membership]!
+    members: [Membership]!
     sites: [Site]!
     settings: JSON
     billingEmail: String

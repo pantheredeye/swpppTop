@@ -16,7 +16,7 @@ const CreateOrganizationPage = () => {
       createOrganization(input: $input) {
         id
         name
-        users {
+        members {
           id
           roles {
             id
