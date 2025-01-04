@@ -26,6 +26,7 @@ export const schema = gql`
   type Query {
     users: [User!]! @requireAuth
     user(id: String!): User @requireAuth
+    searchUsers(organizationId: String!, searchTerm: String!): [User!]! @requireAuth
   }
 
   input CreateUserInput {
@@ -67,4 +68,4 @@ export const schema = gql`
     updateUser(id: String!, input: UpdateUserInput!): User! @requireAuth
     deleteUser(id: String!): User! @requireAuth
   }
-`
+`;

@@ -101,7 +101,6 @@ export const Failure = ({
 export const Success = ({
   organizationRoles,
 }: CellSuccessProps<FindOrgRolesQuery, FindOrgRolesQueryVariables>) => {
-  console.log(organizationRoles)
    return (
     <div>
       {organizationRoles.map((role) => (
