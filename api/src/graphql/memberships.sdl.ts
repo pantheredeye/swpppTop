@@ -41,19 +41,10 @@ export const schema = gql`
   }
 
   type InviteMemberResponse {
-    userId: String
-    organizationId: String
-    settings: JSON
-    invitationId: String
-    invitedEmail: String
-    invitationExpiresAt: DateTime
-    invitedAt: DateTime
-    invitationAttempts: Int
-    lastInvitationSent: DateTime
-    invitationChannel: InvitationChannel
-    status: MembershipStatus!
-  }
-
+  userId: String!
+  organizationId: String!
+  status: MembershipStatus!
+}
   enum InvitationChannel {
     EMAIL
     SLACK

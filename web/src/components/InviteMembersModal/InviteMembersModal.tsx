@@ -41,7 +41,7 @@ const SEARCH_USERS_QUERY = gql`
 `
 
 const FIND_ORG_ROLES_QUERY = gql`
-  query FindOrgRolesQuery($isSystemDefined: Boolean, $id: String) {
+  query FindOrgRolesQuery1($isSystemDefined: Boolean, $id: String) {
     organizationRoles: findMembershipRoles(
       isSystemDefined: $isSystemDefined
       organizationId: $id
@@ -52,11 +52,10 @@ const FIND_ORG_ROLES_QUERY = gql`
     }
   }
 `
-
 const InviteMembersModal = ({ organizationId }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState([])
-  const [selectedMember, setSelectedMember] = useState(null)
+  const [selectedMembers, setSelectedMembers] = useState([])
   const [selectedRole, setSelectedRole] = useState('')
   const {
     data: rolesData,
@@ -86,28 +85,42 @@ const InviteMembersModal = ({ organizationId }) => {
     try {
       const { data } = await refetch({ organizationId, searchTerm })
       if (data && data.searchUsers) {
-        setSearchResults(data.searchUsers) // Update searchResults with the fetched data
+        setSearchResults(data.searchUsers)
       }
     } catch (error) {
       console.error('Search failed:', error)
     }
   }
+
+  const handleMemberClick = (member) => {
+    setSelectedMembers((prev) =>
+      prev.some((m) => m.id === member.id)
+        ? prev.filter((m) => m.id !== member.id)
+        : [...prev, member]
+    )
+  }
+
   const handleInvite = async () => {
-    if (!selectedMember || !selectedRole) return;
+    if (selectedMembers.length === 0 || !selectedRole) return
 
     try {
-      await inviteMember({
-        variables: {
-          organizationId,
-          userId: selectedMember.id,
-          roleId: selectedRole,
-        },
-      });
+      await Promise.all(
+        selectedMembers.map((member) =>
+          inviteMember({
+            variables: {
+              organizationId,
+              userId: member.id,
+              roleId: selectedRole,
+            },
+          })
+        )
+      )
       // Handle success (e.g., show a success message or close the modal)
     } catch (error) {
-      console.error('Invite failed:', error);
+      console.error('Invite failed:', error)
     }
-  };
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -137,7 +150,15 @@ const InviteMembersModal = ({ organizationId }) => {
         {error && <p>Error: {error.message}</p>}
         <ul>
           {searchResults.map((member) => (
-            <li key={member.id} onClick={() => setSelectedMember(member)}>
+            <li
+              key={member.id}
+              onClick={() => handleMemberClick(member)}
+              style={{
+                backgroundColor: selectedMembers.some((m) => m.id === member.id)
+                  ? '#4ade80'
+                  : 'transparent',
+              }}
+            >
               {member.firstName} {member.lastName} ({member.email})
             </li>
           ))}
@@ -147,17 +168,11 @@ const InviteMembersModal = ({ organizationId }) => {
           onChange={(e) => setSelectedRole(e.target.value)}
         >
           <option value="">Select a role</option>
-          <select
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value)}
-          >
-            <option value="">Select a role</option>
-            {rolesData?.organizationRoles.map((role) => (
-              <option key={role.id} value={role.id}>
-                {role.name}
-              </option>
-            ))}
-          </select>
+          {rolesData?.organizationRoles.map((role) => (
+            <option key={role.id} value={role.id}>
+              {role.name}
+            </option>
+          ))}
         </select>
         <Button onClick={handleInvite}>Invite</Button>
       </DialogContent>

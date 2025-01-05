@@ -32,21 +32,47 @@ export const findOrgMembers: QueryResolvers['findOrgMembers'] = ({ organizationI
     },
   })
 }
-
 export const inviteMember: MutationResolvers['inviteMember'] = async ({ organizationId, userId, roleId }) => {
-  // Logic to invite a member
-  const membership = await db.membership.create({
-    data: {
-      userId,
-      organizationId,
-      roles: { connect: { id: roleId } },
-      status: 'INVITED',
-    },
-  });
+  try {
+    // First check if membership already exists
+    const existingMembership = await db.membership.findUnique({
+      where: {
+        userId_organizationId: {
+          userId,
+          organizationId,
+        },
+      },
+    });
 
-  return {
-    status: membership.status,
-  };
+    if (existingMembership) {
+      throw new Error('User is already a member of this organization');
+    }
+
+    const membership = await db.membership.create({
+      data: {
+        userId,
+        organizationId,
+        roles: {
+          connect: [{ id: roleId }],
+        },
+        status: 'INVITED',
+        invitationChannel: 'EMAIL',
+        invitedAt: new Date(),
+        invitationExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    return {
+      userId: membership.userId,
+      organizationId: membership.organizationId,
+      status: membership.status,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to invite member: ${error.message}`);
+    }
+    throw new Error('Failed to invite member');
+  }
 };
 
 export const createMembership: MutationResolvers['createMembership'] = ({

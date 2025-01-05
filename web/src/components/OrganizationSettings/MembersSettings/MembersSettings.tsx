@@ -1,8 +1,7 @@
 
-import { Plus } from 'lucide-react'
+import InviteMembersModal from 'src/components/InviteMembersModal/InviteMembersModal'
 
 import OrgMembersCell from 'src/components/OrgMembersCell'
-import { Button } from 'src/components/ui/Button'
 import {
   Card,
   CardHeader,
@@ -25,13 +24,7 @@ const MembersSettings = ({ organizationId }) => {
                 Manage members, invite and assign roles.
               </CardDescription>
             </div>
-            <Button
-              variant="outline"
-              className="border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Invite Members
-            </Button>
+<InviteMembersModal organizationId={organizationId} />
           </div>
         </CardHeader>
         <CardContent>
