@@ -24,8 +24,8 @@ export const schema = gql`
     deactivationReason: String
   }
 
-type Members {
-  id: String!
+  type Members {
+    id: String!
     user: User!
     deletedAt: DateTime
     roles: [MembershipRole]!
@@ -38,7 +38,21 @@ type Members {
     lastInvitationSent: DateTime
     status: MembershipStatus!
     deactivationReason: String
-}
+  }
+
+  type InviteMemberResponse {
+    userId: String
+    organizationId: String
+    settings: JSON
+    invitationId: String
+    invitedEmail: String
+    invitationExpiresAt: DateTime
+    invitedAt: DateTime
+    invitationAttempts: Int
+    lastInvitationSent: DateTime
+    invitationChannel: InvitationChannel
+    status: MembershipStatus!
+  }
 
   enum InvitationChannel {
     EMAIL
@@ -99,5 +113,10 @@ type Members {
     updateMembership(id: String!, input: UpdateMembershipInput!): Membership!
       @requireAuth
     deleteMembership(id: String!): Membership! @requireAuth
+    inviteMember(
+      organizationId: String!
+      userId: String!
+      roleId: String!
+    ): InviteMemberResponse! @requireAuth
   }
 `

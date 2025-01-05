@@ -25,10 +25,29 @@ export const findOrgMembers: QueryResolvers['findOrgMembers'] = ({ organizationI
       id: true,
       user: true,
       roles: true,
-      status: true
+      status: true,
+      invitedEmail: true,
+      invitedAt: true,
+      invitationExpiresAt: true
     },
   })
 }
+
+export const inviteMember: MutationResolvers['inviteMember'] = async ({ organizationId, userId, roleId }) => {
+  // Logic to invite a member
+  const membership = await db.membership.create({
+    data: {
+      userId,
+      organizationId,
+      roles: { connect: { id: roleId } },
+      status: 'INVITED',
+    },
+  });
+
+  return {
+    status: membership.status,
+  };
+};
 
 export const createMembership: MutationResolvers['createMembership'] = ({
   input,
