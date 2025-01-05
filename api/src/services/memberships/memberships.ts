@@ -56,7 +56,7 @@ export const inviteMember: MutationResolvers['inviteMember'] = async ({ organiza
           connect: [{ id: roleId }],
         },
         status: 'INVITED',
-        invitationChannel: 'EMAIL',
+        invitationChannel: 'INTERNAL',
         invitedAt: new Date(),
         invitationExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
