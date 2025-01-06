@@ -38,7 +38,6 @@ const LoginPage = () => {
       password: data.password,
     })
 
-    console.log(response)
     if (response.message) {
       toast(response.message)
     } else if (response.error) {
@@ -46,7 +45,7 @@ const LoginPage = () => {
     } else {
       toast.success('Welcome back!')
       navigate(
-        routes.dashboard({ organizationId: currentUser.defaultOrganizationId })
+        routes.dashboard({ organizationId: response.defaultOrganizationId })
       )
     }
   }
