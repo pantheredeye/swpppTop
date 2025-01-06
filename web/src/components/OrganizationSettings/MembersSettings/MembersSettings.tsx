@@ -1,4 +1,3 @@
-
 import InviteMembersModal from 'src/components/InviteMembersModal/InviteMembersModal'
 
 import OrgMembersCell from 'src/components/OrgMembersCell'
@@ -24,7 +23,7 @@ const MembersSettings = ({ organizationId }) => {
                 Manage members, invite and assign roles.
               </CardDescription>
             </div>
-<InviteMembersModal organizationId={organizationId} />
+            <InviteMembersModal organizationId={organizationId} />
           </div>
         </CardHeader>
         <CardContent>
