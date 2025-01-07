@@ -10,13 +10,17 @@ import './index.css'
 import './scaffold.css'
 import { ThemeProvider } from './context/ThemeProvider'
 
+import { UIProviders } from './context/UIProviders'
+
 const App = () => (
   <ThemeProvider defaultTheme="dark">
     <FatalErrorBoundary page={FatalErrorPage}>
       <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
         <AuthProvider>
           <RedwoodApolloProvider useAuth={useAuth}>
-            <Routes />
+            <UIProviders>
+              <Routes />
+            </UIProviders>
           </RedwoodApolloProvider>
         </AuthProvider>
       </RedwoodProvider>

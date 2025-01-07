@@ -1,128 +1,122 @@
-import { useState, Fragment, ReactNode } from 'react'
-
-import {
-  Dialog,
-  DialogPanel,
-  Transition,
-  TransitionChild,
-} from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-
+import { useState, ReactNode } from 'react'
+import { Sheet, SheetContent, SheetTrigger } from "src/components/ui/Sheet"
+import { Button } from "src/components/ui/Button"
+import { Menu, ChevronLeft } from "lucide-react"
 import Sidebar from 'src/components/Sidebar'
+import { Toast } from "src/components/ui/Toast"
+import { ScrollArea } from "src/components/ui/ScrollArea"
+import { useMediaQuery } from "src/lib/use-media-query"
 
 interface AuthenticatedLayoutProps {
   children: ReactNode
+  title?: string
 }
 
-const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  // const { currentUser } = useAuth()
+// Custom hook for handling sidebar state with persistence
+const useSidebarState = () => {
+  // Initialize from localStorage if available, otherwise default to true for desktop
+  const initialState = typeof window !== 'undefined'
+    ? localStorage.getItem('sidebarOpen') === 'true'
+    : true
 
-  // TODO: Uncomment when org.ids?.length is available
+  const [isOpen, setIsOpen] = useState(initialState)
 
-  // useEffect(() => {
-  //   if (currentUser?.defaultOrganizationId) {
-  //     navigate(`/org/${currentUser.defaultOrganizationId}/dashboard`)
-  //   } else if (currentUser?.organizationIds?.length) {
-  //     navigate(`/org/${currentUser.organizationIds[0]}/dashboard`)
-  //   }
-  // }, [currentUser])
+  const toggleSidebar = () => {
+    const newState = !isOpen
+    setIsOpen(newState)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sidebarOpen', String(newState))
+    }
+  }
+
+  return { isOpen, toggleSidebar }
+}
+
+const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
+  // Check if we're on mobile
+  const isMobile = useMediaQuery("(max-width: 1024px)")
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const { isOpen: desktopSidebarOpen, toggleSidebar } = useSidebarState()
 
   return (
-    <div className="flex min-h-screen bg-gray-900 font-sans text-gray-300">
-      {/* Mobile Sidebar */}
-      <Transition show={sidebarOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-50 lg:hidden"
-          onClose={() => setSidebarOpen(false)}
-        >
-          <TransitionChild
-            as={Fragment}
-            enter="transition-opacity ease-linear duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="transition-opacity ease-linear duration-300"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
+    <div className="flex min-h-screen font-sans text-gray-300">
+      {/* Mobile Sidebar using Sheet */}
+      <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+        <SheetTrigger asChild className="lg:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="p-4 text-gray-300 hover:text-gray-200 focus:outline-none"
           >
-            <div className="fixed inset-0 bg-gray-900 bg-opacity-80" />
-          </TransitionChild>
+            <span className="sr-only">Open sidebar</span>
+            <Menu className="h-6 w-6" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent
+          side="left"
+          className="w-[300px] p-0"
+        >
+          <ScrollArea className="h-full">
+            <Sidebar />
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
 
-          <div className="fixed inset-0 flex">
-            <TransitionChild
-              as={Fragment}
-              enter="transition ease-in-out duration-300 transform"
-              enterFrom="-translate-x-full"
-              enterTo="translate-x-0"
-              leave="transition ease-in-out duration-300 transform"
-              leaveFrom="translate-x-0"
-              leaveTo="-translate-x-full"
-            >
-              <DialogPanel className="relative flex w-full max-w-xs flex-1 bg-gray-900 shadow-lg">
-                <TransitionChild
-                  as={Fragment}
-                  enter="ease-in-out duration-300"
-                  enterFrom="opacity-0"
-                  enterTo="opacity-100"
-                  leave="ease-in-out duration-300"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                    <button
-                      type="button"
-                      className="text-gray-300 hover:text-gray-200 focus:outline-none"
-                      onClick={() => setSidebarOpen(false)}
-                    >
-                      <span className="sr-only">Close sidebar</span>
-                      <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                    </button>
-                  </div>
-                </TransitionChild>
-                <Sidebar />
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </Dialog>
-      </Transition>
-
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:w-64 lg:flex-col lg:shadow-lg">
-        <Sidebar />
+      {/* Desktop Sidebar - Collapsible */}
+      <div className={`hidden lg:flex lg:flex-col lg:shadow-lg transition-all duration-300 ${
+        desktopSidebarOpen ? 'lg:w-64' : 'lg:w-16'
+      }`}>
+        <div className="relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-[-12px] top-4 z-10 hidden lg:flex"
+            onClick={toggleSidebar}
+          >
+            <ChevronLeft className={`h-4 w-4 transition-transform ${
+              desktopSidebarOpen ? '' : 'rotate-180'
+            }`} />
+          </Button>
+          <ScrollArea className="h-screen">
+            <Sidebar collapsed={!desktopSidebarOpen} />
+          </ScrollArea>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 flex-col border-l border-gray-700">
-        {/* Mobile Sidebar Toggle */}
-        <div className="px-4 py-2 lg:hidden">
-          <button
-            type="button"
-            className="text-gray-300 hover:text-gray-200 focus:outline-none"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <span className="sr-only">Open sidebar</span>
-            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-          </button>
-        </div>
-
-        {/* Main Section */}
-        <main className="flex-grow py-10">
-          <div className="px-4 sm:px-6 lg:px-8">
-            {/* Example of a card/container following the style guide */}
-            <div className="rounded-xl bg-gray-800 p-3 shadow-lg">
-              {children}
-            </div>
+      <div className="flex flex-1 flex-col border-l">
+        {/* Header Section */}
+        <header className="sticky top-0 z-10 border-b bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75">
+          <div className="flex h-16 items-center gap-4 px-4">
+            {title && (
+              <h1 className="text-xl font-semibold text-gray-100">
+                {title}
+              </h1>
+            )}
           </div>
-        </main>
+        </header>
+
+        {/* Main Section with ScrollArea */}
+        <ScrollArea className="flex-grow">
+          <main className="py-6">
+            <div className="px-4 sm:px-6 lg:px-8">
+              <div className="rounded-xl p-3 shadow-lg">
+                {children}
+              </div>
+            </div>
+          </main>
+        </ScrollArea>
 
         {/* Footer */}
-        <footer className="bg-gray-900 py-4 text-center">
+        <footer className="border-t bg-gray-900 py-4 text-center">
           <p className="text-sm text-gray-500">
             &copy; 2024 SWPPP-TOP. All rights reserved.
           </p>
         </footer>
       </div>
+
+      {/* Global Toast Notifications */}
+      <Toast />
     </div>
   )
 }

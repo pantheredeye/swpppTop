@@ -1,36 +1,51 @@
 import { useEffect } from 'react'
-
-import {
-  HomeIcon,
-  UsersIcon,
-  FolderIcon,
-  DocumentDuplicateIcon,
-  BuildingOfficeIcon,
-  ArrowLeftEndOnRectangleIcon, // Logout icon
-  ArrowUturnLeftIcon, // Back icon
-  UserIcon,
-} from '@heroicons/react/24/outline'
-
 import { Link, navigate, routes } from '@redwoodjs/router'
 import { useParams } from '@redwoodjs/router'
-
 import { useAuth } from 'src/auth'
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle'
+import { Button } from "src/components/ui/Button"
+import { ScrollArea } from "src/components/ui/ScrollArea"
+import { Tooltip, TooltipContent, TooltipTrigger } from "src/components/ui/Tooltip"
+import {
+  Home,
+  Users,
+  FolderOpen,
+  FileText,
+  Building2,
+  LogOut,
+  ArrowLeft,
+  User,
+  Settings
+} from "lucide-react"
+import { cn } from "src/lib/utils"
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+// Define the props interface for the Sidebar
+interface SidebarProps {
+  collapsed?: boolean
 }
 
-const actions = [
-  { name: 'Back', action: 'back', icon: ArrowUturnLeftIcon },
-  { name: 'Logout', action: 'logout', icon: ArrowLeftEndOnRectangleIcon },
+// Helper function to create navigation items
+interface NavigationItem {
+  name: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+}
+
+interface ActionItem {
+  name: string
+  action: 'back' | 'logout'
+  icon: React.ComponentType<{ className?: string }>
+}
+
+const actions: ActionItem[] = [
+  { name: 'Back', action: 'back', icon: ArrowLeft },
+  { name: 'Logout', action: 'logout', icon: LogOut },
 ]
 
-const Sidebar = () => {
+const Sidebar = ({ collapsed = false }: SidebarProps) => {
   const { logOut, currentUser } = useAuth()
   const { organizationId } = useParams()
 
-  // Use useEffect to handle the redirect
   useEffect(() => {
     if (!organizationId) {
       navigate('/')
@@ -38,117 +53,159 @@ const Sidebar = () => {
   }, [organizationId])
 
   if (!organizationId) {
-    return null // Return nothing while redirecting
+    return null
   }
 
-  const navigation = [
+  const navigation: NavigationItem[] = [
     {
       name: 'Dashboard',
       href: `/org/${organizationId}/dashboard`,
-      icon: HomeIcon,
+      icon: Home,
     },
     {
       name: 'Inspections',
       href: `/org/${organizationId}/inspections`,
-      icon: UsersIcon,
+      icon: Users,
     },
-    { name: 'Sites', href: `/org/${organizationId}/sites`, icon: FolderIcon },
+    {
+      name: 'Sites',
+      href: `/org/${organizationId}/sites`,
+      icon: FolderOpen,
+    },
     {
       name: 'BMPs',
       href: `/org/${organizationId}/bmps`,
-      icon: DocumentDuplicateIcon,
+      icon: FileText,
     },
     {
       name: 'Profile',
       href: `/org/${organizationId}/profile/${currentUser.id}`,
-      icon: UserIcon,
+      icon: User,
     },
     {
       name: 'Organization Settings',
       href: `/org/${organizationId}/organization-settings`,
-      icon: UserIcon,
+      icon: Settings,
     },
   ]
+
+  const NavItem = ({ item }: { item: NavigationItem }) => {
+    const content = (
+      <Link
+        to={item.href}
+        className={cn(
+          "group flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-800 hover:text-gray-200",
+          "transition-all duration-200 ease-in-out",
+          "focus:bg-gray-800 focus:text-gray-200 focus:outline-none"
+        )}
+      >
+        <item.icon className={cn(
+          "h-5 w-5 text-gray-400 group-hover:text-gray-200",
+          collapsed ? "mx-auto" : "mr-3"
+        )} />
+        {!collapsed && <span>{item.name}</span>}
+      </Link>
+    )
+
+    return collapsed ? (
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>{content}</TooltipTrigger>
+        <TooltipContent side="right" className="bg-gray-800 text-gray-200">
+          {item.name}
+        </TooltipContent>
+      </Tooltip>
+    ) : (
+      content
+    )
+  }
+
+  const ActionButton = ({ action }: { action: ActionItem }) => {
+    const handleAction = () => {
+      if (action.action === 'back') {
+        window.history.back()
+      } else if (action.action === 'logout') {
+        logOut()
+      }
+    }
+
+    const content = (
+      <Button
+        variant="ghost"
+        onClick={handleAction}
+        className={cn(
+          "w-full group flex items-center rounded-lg px-3 py-2 text-sm font-medium",
+          "hover:bg-gray-800 hover:text-gray-200",
+          "focus:bg-gray-800 focus:text-gray-200",
+          "justify-start"
+        )}
+      >
+        <action.icon className={cn(
+          "h-5 w-5 text-gray-400 group-hover:text-gray-200",
+          collapsed ? "mx-auto" : "mr-3"
+        )} />
+        {!collapsed && <span>{action.name}</span>}
+      </Button>
+    )
+
+    return collapsed ? (
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>{content}</TooltipTrigger>
+        <TooltipContent side="right" className="bg-gray-800 text-gray-200">
+          {action.name}
+        </TooltipContent>
+      </Tooltip>
+    ) : (
+      content
+    )
+  }
+
   return (
     <div
-      className={classNames(
-        'flex flex-col transition-all duration-300 w-64 bg-gray-900 text-gray-300 shadow-inner'
+      className={cn(
+        "flex flex-col bg-gray-900 text-gray-300 shadow-inner",
+        collapsed ? "w-16" : "w-64",
+        "transition-all duration-300"
       )}
     >
-      <div className="flex h-16 items-center justify-between px-4">
-        <span className="text-2xl font-bold text-gray-200">SWPPP-Tip</span>
-
-      </div>
-      <div className="flex h-10 items-center justify-between px-4">
-
-      <ThemeToggle />
+      {/* Header */}
+      <div className="flex h-16 items-center px-4 justify-between">
+        {!collapsed && <span className="text-2xl font-bold text-gray-200">SWPPP-Tip</span>}
       </div>
 
-      <nav className="flex-1 px-2">
-        <ul className="space-y-2">
+      {/* Theme Toggle */}
+      <div className={cn(
+        "flex h-10 items-center px-4",
+        collapsed ? "justify-center" : "justify-between"
+      )}>
+        <ThemeToggle />
+      </div>
+
+      {/* Navigation */}
+      <ScrollArea className="flex-1 px-2">
+        <nav className="space-y-1 py-4">
           {navigation.map((item) => (
-            <li key={item.name}>
-              <Link
-                to={item.href}
-                className={classNames(
-                  'group relative flex items-center rounded-xl px-2 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 shadow-lg justify-start'
-                )}
-              >
-                <item.icon
-                  className="h-6 w-6 text-gray-400 group-hover:text-gray-200"
-                  aria-hidden="true"
-                />
-
-                <span className="ml-3 text-gray-200">{item.name}</span>
-              </Link>
-            </li>
+            <NavItem key={item.name} item={item} />
           ))}
-        </ul>
-      </nav>
+        </nav>
 
-      {/* Actions at the Bottom */}
-      <div className="px-2 py-2 pb-4">
-        <ul className="space-y-2">
-          <li>
-            <Link
-              to={routes.switch({ organizationId })}
-              className={classNames(
-                'group relative flex items-center rounded-xl px-2 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 shadow-lg justify-start'
-              )}
-            >
-              <BuildingOfficeIcon
-                className="h-6 w-6 text-gray-400 group-hover:text-gray-200"
-                aria-hidden="true"
-              />
+        {/* Organization Switcher */}
+        <div className="py-2">
+          <NavItem
+            item={{
+              name: "Switch Organizations",
+              href: routes.switch({ organizationId }),
+              icon: Building2
+            }}
+          />
+        </div>
 
-              <span className="ml-3 text-gray-200">Switch Orgs</span>
-            </Link>
-          </li>
+        {/* Actions */}
+        <div className="space-y-1 py-2">
           {actions.map((action) => (
-            <li key={action.name}>
-              <button
-                onClick={() => {
-                  if (action.action === 'back') {
-                    window.history.back()
-                  } else if (action.action === 'logout') {
-                    logOut()
-                  }
-                }}
-                className={classNames(
-                  'group relative flex w-full items-center rounded-xl px-2 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 shadow-lg justify-start'
-                )}
-              >
-                <action.icon
-                  className="h-6 w-6 text-gray-400 group-hover:text-gray-200"
-                  aria-hidden="true"
-                />
-
-                <span className="ml-3 text-gray-200">{action.name}</span>
-              </button>
-            </li>
+            <ActionButton key={action.name} action={action} />
           ))}
-        </ul>
-      </div>
+        </div>
+      </ScrollArea>
     </div>
   )
 }
