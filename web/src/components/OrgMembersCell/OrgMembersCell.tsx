@@ -39,12 +39,10 @@ export const Failure = ({ error }: CellFailureProps) => (
 )
 
 export const Success = ({ orgMembers }: CellSuccessProps<OrgMembersQuery>) => {
-  // Sort members alphabetically by email
   const sortedMembers = [...orgMembers].sort((a, b) =>
     a.user.email.localeCompare(b.user.email)
   );
 
-  // Helper function to get badge styling based on status
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
@@ -80,23 +78,53 @@ export const Success = ({ orgMembers }: CellSuccessProps<OrgMembersQuery>) => {
     <div>
       {sortedMembers.map((member) => (
         <div
-          key={member.id}
-          className={`border rounded-lg mb-4 p-4 ${
-            member.status === 'ACTIVE'
-              ? 'border-gray-700 bg-gray-800'
-              : 'border-gray-600 bg-gray-700 opacity-75'
-          }`}
+  key={member.id}
+  className={`border rounded-lg mb-4 p-4 ${
+    member.status === 'ACTIVE'
+      ? 'border-gray-700 bg-gray-800'
+      : 'border-gray-600 bg-gray-700 opacity-75'
+  }`}
+>
+  <div className="flex items-center justify-between">
+    <h3 className="font-medium text-gray-200">{member.user.email}</h3>
+    <div>{getStatusBadge(member.status)}</div>
+  </div>
+  {/* Display Roles */}
+  <div className="mt-2">
+    <span className="text-sm text-gray-400">Roles:</span>
+    <div className="flex flex-wrap gap-2 mt-1">
+      {member.roles.map((role) => (
+        <span
+          key={role.id}
+          className="bg-gray-600 text-gray-200 text-xs px-2 py-1 rounded-full"
         >
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium text-gray-200">{member.user.email}</h3>
-            <div>{getStatusBadge(member.status)}</div>
-          </div>
-          {member.status === 'INVITED' && (
-            <div className="mt-2 text-sm text-gray-400">
-              Invitation expires: {new Date(member.invitationExpiresAt).toLocaleDateString()}
-            </div>
-          )}
-        </div>
+          {role.name}
+        </span>
+      ))}
+    </div>
+  </div>
+  {/* Action Buttons */}
+  <div className="mt-4 flex gap-2">
+    <button
+      className="text-sm bg-gray-600 text-gray-200 px-3 py-1 rounded hover:bg-gray-500"
+      onClick={() => console.log('Edit roles for:', member.user.email)}
+    >
+      Edit Roles
+    </button>
+    <button
+      className="text-sm bg-red-600 text-gray-200 px-3 py-1 rounded hover:bg-red-500"
+      onClick={() => console.log('Revoke access for:', member.user.email)}
+    >
+      Revoke Access
+    </button>
+    <button
+      className="text-sm bg-yellow-600 text-gray-200 px-3 py-1 rounded hover:bg-yellow-500"
+      onClick={() => console.log('Suspend:', member.user.email)}
+    >
+      Suspend
+    </button>
+  </div>
+</div>
       ))}
     </div>
   );
