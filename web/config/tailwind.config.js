@@ -29,7 +29,6 @@ module.exports = {
       colors: {
         gray: {
           950: '#0a0a0a',
-          'dark-gray': '#2e2e2e',
         },
         accent: {
           DEFAULT: 'hsl(var(--accent))',
