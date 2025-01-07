@@ -32,6 +32,16 @@ export function ThemeProvider({
   })
 
   useEffect(() => {
+    // Check if user prefers dark mode
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
+    // If no theme is saved, use system preference
+    if (!localStorage.getItem('theme')) {
+      setTheme(prefersDark ? 'dark' : 'light')
+    }
+  }, [])
+
+  useEffect(() => {
     // Update the HTML class and save to localStorage when theme changes
     const root = window.document.documentElement
     root.classList.remove('light', 'dark')
