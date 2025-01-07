@@ -13,21 +13,20 @@ import {
 const RolesSettings = ({ organizationId }) => {
   return (
     <div className="space-y-6">
-      <Card className="bg-gray-900 shadow-xl">
+      <Card className="shadow-xl">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl text-gray-100">
+              <CardTitle className="text-2xl">
                 Roles & Permissions
               </CardTitle>
-              <CardDescription className="mt-2 text-gray-400">
+              <CardDescription className="mt-2">
                 Manage access control with predefined system roles or create
                 custom roles
               </CardDescription>
             </div>
             <Button
               variant="outline"
-              className="border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700"
             >
               <Plus className="mr-2 h-4 w-4" />
               Create Custom Role
