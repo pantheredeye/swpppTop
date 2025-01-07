@@ -12,15 +12,15 @@
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import RoleManagementModal from "./RoleManagementModal";
+import RoleManagementDialog from "./RoleManagementDialog";
 
-const meta: Meta<typeof RoleManagementModal> = {
-  component: RoleManagementModal,
+const meta: Meta<typeof RoleManagementDialog> = {
+  component: RoleManagementDialog,
   tags: ["autodocs"],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof RoleManagementModal>;
+type Story = StoryObj<typeof RoleManagementDialog>;
 
 export const Primary: Story = {};

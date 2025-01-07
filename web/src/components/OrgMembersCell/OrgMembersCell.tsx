@@ -1,10 +1,41 @@
 import type { OrgMembersQuery, OrgMembersQueryVariables } from 'types/graphql'
 
-import type {
+import {
   CellSuccessProps,
   CellFailureProps,
   TypedDocumentNode,
+  useMutation,
 } from '@redwoodjs/web'
+import { useState } from 'react'
+
+import { MoreHorizontal, UserCog } from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from 'src/components/ui/Card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from 'src/components/ui/DropdownMenu'
+import { Button } from 'src/components/ui/Button'
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'src/components/ui/Table'
+import { Badge } from 'src/components/ui/Badge'
+import { Dialog } from 'src/components/ui/Dialog'
+import RoleManagementDialog from '../RoleManagementDialog/RoleManagementDialog'
 
 export const QUERY: TypedDocumentNode<
   OrgMembersQuery,
@@ -30,6 +61,51 @@ export const QUERY: TypedDocumentNode<
   }
 `
 
+// GraphQL Mutation Definitions
+const REVOKE_ACCESS_MUTATION = gql`
+  mutation RevokeAccess($id: String!) {
+    revokeAccess(id: $id) {
+      id
+    }
+  }
+`
+
+const SUSPEND_MEMBER_MUTATION = gql`
+  mutation SuspendMember($id: String!, $status: MembershipStatus!) {
+    suspendMember(id: $id, status: $status) {
+      id
+      status
+    }
+  }
+`
+
+const UPDATE_MEMBER_ROLES_MUTATION = gql`
+  mutation UpdateMemberRoles($id: String!, $roles: [String!]!) {
+    updateMemberRoles(id: $id, roles: $roles) {
+      id
+      roles {
+        id
+        name
+      }
+    }
+  }
+`
+
+// Status badge configurations for consistent styling
+const STATUS_CONFIGS = {
+  ACTIVE: { variant: 'default', label: 'Active', className: 'bg-green-500 hover:bg-green-500/80' },
+  INVITED: { variant: 'secondary', label: 'Invited', className: 'bg-yellow-500 hover:bg-yellow-500/80' },
+  PENDING: { variant: 'outline', label: 'Pending', className: 'border-blue-500 text-blue-500' },
+  SUSPENDED: { variant: 'destructive', label: 'Suspended' }
+} as const; // Using 'as const' to make TypeScript understand these are literal types
+
+
+const availableRoles = [
+  { id: '1', name: 'OWNER' },
+  { id: '2', name: 'MEMBER' },
+  { id: '3', name: 'ADMIN' },
+]
+
 export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>Empty</div>
@@ -39,93 +115,163 @@ export const Failure = ({ error }: CellFailureProps) => (
 )
 
 export const Success = ({ orgMembers }: CellSuccessProps<OrgMembersQuery>) => {
-  const sortedMembers = [...orgMembers].sort((a, b) =>
-    a.user.email.localeCompare(b.user.email)
-  );
+  const [showRoleDialog, setShowRoleDialog] = useState(false)
+  const [selectedMember, setSelectedMember] = useState(null)
+  const [revokeAccess] = useMutation(REVOKE_ACCESS_MUTATION)
+  const [suspendMember] = useMutation(SUSPEND_MEMBER_MUTATION)
+  const [updateMemberRoles] = useMutation(UPDATE_MEMBER_ROLES_MUTATION)
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'ACTIVE':
-        return (
-          <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-            Active
-          </span>
-        );
-      case 'INVITED':
-        return (
-          <span className="bg-yellow-500 text-gray-800 text-xs px-2 py-1 rounded-full">
-            Invited
-          </span>
-        );
-      case 'PENDING':
-        return (
-          <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-            Pending
-          </span>
-        );
-      case 'SUSPENDED':
-        return (
-          <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-            Suspended
-          </span>
-        );
-      default:
-        return null;
+  // Action handlers with optimistic updates
+  const handleRevokeAccess = async (memberId) => {
+    try {
+      await revokeAccess({ variables: { id: memberId } })
+      // Add toast notification for success
+    } catch (error) {
+      // Add error handling with toast
+      console.error('Failed to revoke access:', error)
     }
-  };
+  }
+
+  const handleSuspendMember = async (memberId) => {
+    try {
+      await suspendMember({
+        variables: { id: memberId, status: 'SUSPENDED' },
+        optimisticResponse: {
+          suspendMember: {
+            id: memberId,
+            status: 'SUSPENDED',
+            __typename: 'Member',
+          },
+        },
+      })
+      // Add toast notification for success
+    } catch (error) {
+      // Add error handling with toast
+      console.error('Failed to suspend member:', error)
+    }
+  }
+
+  const handleUpdateRoles = async (memberId, roles) => {
+    try {
+      await updateMemberRoles({
+        variables: { id: memberId, roles },
+        optimisticResponse: {
+          updateMemberRoles: {
+            id: memberId,
+            roles: roles.map((roleId) => ({
+              id: roleId,
+              name: availableRoles.find((r) => r.id === roleId)?.name || '',
+              __typename: 'Role',
+            })),
+            __typename: 'Member',
+          },
+        },
+      })
+      setShowRoleDialog(false)
+      // Add toast notification for success
+    } catch (error) {
+      // Add error handling with toast
+      console.error('Failed to update roles:', error)
+    }
+  }
 
   return (
-    <div>
-      {sortedMembers.map((member) => (
-        <div
-  key={member.id}
-  className={`border rounded-lg mb-4 p-4 ${
-    member.status === 'ACTIVE'
-      ? 'border-gray-700 bg-gray-800'
-      : 'border-gray-600 bg-gray-700 opacity-75'
-  }`}
->
-  <div className="flex items-center justify-between">
-    <h3 className="font-medium text-gray-200">{member.user.email}</h3>
-    <div>{getStatusBadge(member.status)}</div>
-  </div>
-  {/* Display Roles */}
-  <div className="mt-2">
-    <span className="text-sm text-gray-400">Roles:</span>
-    <div className="flex flex-wrap gap-2 mt-1">
-      {member.roles.map((role) => (
-        <span
-          key={role.id}
-          className="bg-gray-600 text-gray-200 text-xs px-2 py-1 rounded-full"
-        >
-          {role.name}
-        </span>
-      ))}
-    </div>
-  </div>
-  {/* Action Buttons */}
-  <div className="mt-4 flex gap-2">
-    <button
-      className="text-sm bg-gray-600 text-gray-200 px-3 py-1 rounded hover:bg-gray-500"
-      onClick={() => console.log('Edit roles for:', member.user.email)}
-    >
-      Edit Roles
-    </button>
-    <button
-      className="text-sm bg-red-600 text-gray-200 px-3 py-1 rounded hover:bg-red-500"
-      onClick={() => console.log('Revoke access for:', member.user.email)}
-    >
-      Revoke Access
-    </button>
-    <button
-      className="text-sm bg-yellow-600 text-gray-200 px-3 py-1 rounded hover:bg-yellow-500"
-      onClick={() => console.log('Suspend:', member.user.email)}
-    >
-      Suspend
-    </button>
-  </div>
-</div>
-      ))}
-    </div>
-  );
-};
+    <Card>
+      <CardHeader>
+        <CardTitle>Organization Members</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Member</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Roles</TableHead>
+              <TableHead>Joined</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {orgMembers.map((member) => (
+              <TableRow key={member.id}>
+                <TableCell>
+                  <div className="flex flex-col">
+                    <span className="font-medium">
+                      {member.user.firstName} {member.user.lastName}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {member.user.email}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={STATUS_CONFIGS[member.status].variant}>
+                    {STATUS_CONFIGS[member.status].label}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    {member.roles.map((role) => (
+                      <Badge key={role.id} variant="outline">
+                        {role.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {new Date(member.invitedAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedMember(member)
+                          setShowRoleDialog(true)
+                        }}
+                      >
+                        <UserCog className="mr-2 h-4 w-4" />
+                        Manage Roles
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleSuspendMember(member.id)}
+                        className="text-yellow-600"
+                      >
+                        Suspend Access
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleRevokeAccess(member.id)}
+                        className="text-destructive"
+                      >
+                        Revoke Access
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
+          {selectedMember && (
+            <RoleManagementDialog
+              member={selectedMember}
+              availableRoles={availableRoles}
+              onUpdateRoles={(roles) =>
+                handleUpdateRoles(selectedMember.id, roles)
+              }
+            />
+          )}
+        </Dialog>
+      </CardContent>
+    </Card>
+  )
+}

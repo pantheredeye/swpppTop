@@ -41,10 +41,10 @@ export const schema = gql`
   }
 
   type InviteMemberResponse {
-  userId: String!
-  organizationId: String!
-  status: MembershipStatus!
-}
+    userId: String!
+    organizationId: String!
+    status: MembershipStatus!
+  }
   enum InvitationChannel {
     EMAIL
     SLACK
@@ -109,5 +109,9 @@ export const schema = gql`
       userId: String!
       roleId: String!
     ): InviteMemberResponse! @requireAuth
+    revokeAccess(id: String!): Membership! @requireAuth
+    suspendMember(id: String!, status: MembershipStatus!): Membership!
+      @requireAuth
+    updateMemberRoles(id: String!, roles: [String!]!): Membership! @requireAuth
   }
 `

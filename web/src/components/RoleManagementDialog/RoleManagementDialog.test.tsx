@@ -1,14 +1,14 @@
 import { render } from "@redwoodjs/testing/web";
 
-import RoleManagementModal from "./RoleManagementModal";
+import RoleManagementDialog from "./RoleManagementDialog";
 
 //   Improve this test with help from the Redwood Testing Doc:
 //    https://redwoodjs.com/docs/testing#testing-components
 
-describe("RoleManagementModal", () => {
+describe("RoleManagementDialog", () => {
   it("renders successfully", () => {
     expect(() => {
-      render(<RoleManagementModal />);
+      render(<RoleManagementDialog />);
     }).not.toThrow();
   });
 });

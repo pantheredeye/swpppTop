@@ -101,6 +101,30 @@ export const deleteMembership: MutationResolvers['deleteMembership'] = ({
   })
 }
 
+export const revokeAccess = async ({ id }: { id: string }) => {
+  return db.membership.delete({
+    where: { id },
+  });
+};
+
+// export const suspendMember = async ({ id, status }: { id: string; status: string }) => {
+//   return db.membership.update({
+//     where: { id },
+//     data: { status },
+//   });
+// };
+
+export const updateMemberRoles = async ({ id, roles }: { id: string; roles: string[] }) => {
+  return db.membership.update({
+    where: { id },
+    data: {
+      roles: {
+        set: roles.map((roleId) => ({ id: roleId })),
+      },
+    },
+  });
+};
+
 export const Membership: MembershipRelationResolvers = {
   user: (_obj, { root }) => {
     return db.membership.findUnique({ where: { id: root?.id } }).user()
