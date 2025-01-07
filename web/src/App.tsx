@@ -8,17 +8,20 @@ import { AuthProvider, useAuth } from './auth'
 
 import './index.css'
 import './scaffold.css'
+import { ThemeProvider } from './context/ThemeProvider'
 
 const App = () => (
-  <FatalErrorBoundary page={FatalErrorPage}>
-    <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
-      <AuthProvider>
-        <RedwoodApolloProvider useAuth={useAuth}>
-          <Routes />
-        </RedwoodApolloProvider>
-      </AuthProvider>
-    </RedwoodProvider>
-  </FatalErrorBoundary>
+  <ThemeProvider defaultTheme="dark">
+    <FatalErrorBoundary page={FatalErrorPage}>
+      <RedwoodProvider titleTemplate="%PageTitle | %AppTitle">
+        <AuthProvider>
+          <RedwoodApolloProvider useAuth={useAuth}>
+            <Routes />
+          </RedwoodApolloProvider>
+        </AuthProvider>
+      </RedwoodProvider>
+    </FatalErrorBoundary>
+  </ThemeProvider>
 )
 
 export default App
