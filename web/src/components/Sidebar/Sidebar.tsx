@@ -15,6 +15,7 @@ import { Link, navigate, routes } from '@redwoodjs/router'
 import { useParams } from '@redwoodjs/router'
 
 import { useAuth } from 'src/auth'
+import { ThemeToggle } from '../ThemeToggle/ThemeToggle'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -76,6 +77,11 @@ const Sidebar = () => {
     >
       <div className="flex h-16 items-center justify-between px-4">
         <span className="text-2xl font-bold text-gray-200">SWPPP-Tip</span>
+
+      </div>
+      <div className="flex h-10 items-center justify-between px-4">
+
+      <ThemeToggle />
       </div>
 
       <nav className="flex-1 px-2">
