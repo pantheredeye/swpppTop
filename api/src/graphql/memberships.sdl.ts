@@ -45,6 +45,24 @@ export const schema = gql`
     organizationId: String!
     status: MembershipStatus!
   }
+
+  type InviteMemberResult {
+    userId: String
+    email: String!
+    status: MembershipStatus!
+    roles: [MembershipRole!]!
+  }
+
+  type InviteFailureResult {
+    email: String!
+    error: String!
+  }
+
+  type InviteMembersResponse {
+    successful: [InviteMemberResult!]!
+    failed: [InviteFailureResult!]!
+  }
+
   enum InvitationChannel {
     EMAIL
     SLACK
@@ -99,6 +117,22 @@ export const schema = gql`
     deactivationReason: String
   }
 
+  input InviteMemberInput {
+    userId: String
+    email: String!
+    roleIds: [String!]!
+  }
+
+  input InviteMembersInput {
+    organizationId: String!
+    invites: [InviteMemberInput!]!
+  }
+
+  input InviteMembersInput2 {
+    organizationId: String!
+    invites: [InviteMemberInput!]!
+  }
+
   type Mutation {
     createMembership(input: CreateMembershipInput!): Membership! @requireAuth
     updateMembership(id: String!, input: UpdateMembershipInput!): Membership!
@@ -113,5 +147,6 @@ export const schema = gql`
     suspendMember(id: String!, status: MembershipStatus!): Membership!
       @requireAuth
     updateMemberRoles(id: String!, roles: [String!]!): Membership! @requireAuth
+    inviteMembers(input: InviteMembersInput!): InviteMembersResponse! @requireAuth
   }
 `

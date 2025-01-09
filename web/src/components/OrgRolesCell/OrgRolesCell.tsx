@@ -108,7 +108,7 @@ export const Success = ({
           <h3 className="px-4 py-3 font-medium text-gray-200">
             {role.name}
             {role.isSystemDefined && (
-              <Badge variant="secondary" className="bg-gray-700 text-gray-300 ml-2">
+              <Badge variant="secondary" className=" text-gray-300 ml-2">
                 System
               </Badge>
             )}

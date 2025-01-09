@@ -23,7 +23,13 @@ const MembersSettings = ({ organizationId }) => {
                 Manage members, invite and assign roles.
               </CardDescription>
             </div>
-            <InviteMembersModal organizationId={organizationId} />
+            <InviteMembersModal
+              organizationId={organizationId}
+              onInviteComplete={() => {
+                // Refresh member list or show success message
+                console.log('complete')
+              }}
+            />
           </div>
         </CardHeader>
         <CardContent>
