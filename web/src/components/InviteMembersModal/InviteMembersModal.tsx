@@ -56,7 +56,7 @@ const SEARCH_USERS_QUERY = gql`
 `
 
 const FIND_ORG_ROLES_QUERY = gql`
-  query FindOrgRolesQuery($isSystemDefined: Boolean, $id: String) {
+  query FindOrgRolesQuery2($isSystemDefined: Boolean, $id: String) {
     organizationRoles: findMembershipRoles(
       isSystemDefined: $isSystemDefined
       organizationId: $id
@@ -144,8 +144,24 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
   )
 
   const defaultRole = useMemo(() => {
-    return rolesData?.organizationRoles.find((role) => role.isDefault)?.id
+    const roles = rolesData?.organizationRoles || []
+    const defaultRole = roles.find((role) => role.isDefault)?.id
+    return defaultRole || roles[0]?.id
   }, [rolesData])
+
+  const getInitials = (user) => {
+    if (!user.firstName && !user.lastName) {
+      return user.email.charAt(0).toUpperCase()
+    }
+    return `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase()
+  }
+
+  const getUserDisplayName = (user) => {
+    if (!user.firstName && !user.lastName) {
+      return user.email
+    }
+    return `${user.firstName || ''} ${user.lastName || ''}`.trim()
+  }
 
   const handleAddToQueue = (userOrEmail) => {
     setInviteQueue((queue) => {
@@ -160,12 +176,25 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
         return queue
       }
 
+      // Ensure selectedRoleForBatch or defaultRole is valid
+      const roleId = selectedRoleForBatch || defaultRole
+      if (!roleId) {
+        toast({
+          title: 'Error',
+          description:
+            'No role selected. Please select a role before adding to the queue.',
+          variant: 'destructive',
+          duration: 5000,
+        })
+        return queue
+      }
+
       return [
         ...queue,
         {
           user: isEmail ? null : userOrEmail,
           email: isEmail ? userOrEmail : userOrEmail.email,
-          roleId: selectedRoleForBatch || defaultRole,
+          roleIds: [roleId],
         },
       ]
     })
@@ -184,12 +213,21 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
   }
 
   const handleBatchRoleChange = () => {
-    if (!selectedRoleForBatch) return
+    if (!selectedRoleForBatch) {
+      toast({
+        title: 'Error',
+        description:
+          'No role selected. Please select a role before applying to all.',
+        variant: 'destructive',
+        duration: 5000,
+      })
+      return
+    }
 
     setInviteQueue((queue) =>
       queue.map((item) => ({
         ...item,
-        roleId: selectedRoleForBatch,
+        roleIds: [selectedRoleForBatch],
       }))
     )
 
@@ -204,7 +242,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
     setInviteQueue((queue) =>
       queue.map((item) =>
         item.user?.id === identifier || item.email === identifier
-          ? { ...item, roleId }
+          ? { ...item, roleIds: [roleId] }
           : item
       )
     )
@@ -232,17 +270,35 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
   }
 
   const handleInvite = async () => {
+    console.log('selectedRoleForBatch:', selectedRoleForBatch)
+    console.log('defaultRole:', defaultRole)
+    console.log('inviteQueue:', inviteQueue)
     if (!inviteQueue.length) return
+
+    // Validate roleIds before sending the mutation
+    const invalidInvites = inviteQueue.filter(
+      (item) => !item.roleIds || item.roleIds.some((id) => !id)
+    )
+    if (invalidInvites.length > 0) {
+      toast({
+        title: 'Error',
+        description:
+          'One or more invites have invalid roles. Please select a role for all invites.',
+        variant: 'destructive',
+        duration: 5000,
+      })
+      return
+    }
 
     try {
       await inviteMembers({
         variables: {
           input: {
             organizationId,
-            invites: inviteQueue.map(({ user, email, roleId }) => ({
+            invites: inviteQueue.map(({ user, email, roleIds }) => ({
               userId: user?.id,
               email: email,
-              roleId,
+              roleIds: roleIds, // Ensure roleIds is always an array with valid role IDs
             })),
           },
         },
@@ -302,186 +358,181 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
               </Button>
             </div>
           )}
-
-          {/* Search and Email Input */}
-          <div className="space-y-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                placeholder="Search existing users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Or enter email address..."
-                value={manualEmail}
-                onChange={handleEmailInput}
-                onKeyDown={handleKeyDown}
-                className="flex-1"
-              />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={handleAddEmail}
-                    disabled={!manualEmail || !EMAIL_REGEX.test(manualEmail)}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Add email to invite queue</TooltipContent>
-              </Tooltip>
-            </div>
+        </div>
+        {/* Search and Email Input */}
+        <div className="space-y-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Search existing users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
+          <div className="flex space-x-2">
+            <Input
+              placeholder="Or enter email address..."
+              value={manualEmail}
+              onChange={handleEmailInput}
+              onKeyDown={handleKeyDown}
+              className="flex-1"
+            />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleAddEmail}
+                  disabled={!manualEmail || !EMAIL_REGEX.test(manualEmail)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Add email to invite queue</TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
 
-          {/* Search Results */}
-          {searchTerm.length >= 2 && (
-            <div className="max-h-48 overflow-y-auto rounded-md border border-gray-200">
-              {searchLoading ? (
-                <div className="p-4 text-center text-gray-500">
-                  Searching...
-                </div>
-              ) : searchData?.searchUsers.length ? (
-                <div className="divide-y">
-                  {searchData.searchUsers.map((user) => (
-                    <div
-                      key={user.id}
-                      className="flex items-center justify-between p-3 hover:bg-gray-50"
+        {/* Search Results */}
+        {searchTerm.length >= 2 && (
+          <div className="max-h-48 overflow-y-auto rounded-md border border-gray-200">
+            {searchLoading ? (
+              <div className="p-4 text-center text-gray-500">Searching...</div>
+            ) : searchData?.searchUsers.length ? (
+              <div className="divide-y">
+                {searchData.searchUsers.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-3 hover:bg-gray-50"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="h-8 w-8 rounded-full bg-gray-200">
+                        {user.avatarUrl ? (
+                          <img
+                            src={user.avatarUrl}
+                            alt=""
+                            className="h-full w-full rounded-full"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-300 text-sm font-medium text-gray-600">
+                            {getInitials(user)}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium">
+                          {getUserDisplayName(user)}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {user.email}
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleAddToQueue(user)}
+                      disabled={inviteQueue.some(
+                        (item) => item.user?.id === user.id
+                      )}
                     >
-                      <div className="flex items-center space-x-3">
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-4 text-center text-gray-500">
+                No existing users found
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Invite Queue */}
+        {inviteQueue.length > 0 && (
+          <div className="space-y-4">
+            <h4 className="font-medium">
+              Pending Invites ({inviteQueue.length})
+            </h4>
+            <div className="space-y-3">
+              {inviteQueue.map((item) => (
+                <div
+                  key={item.user?.id || item.email}
+                  className="flex items-center justify-between rounded-lg border border-gray-200 p-3"
+                >
+                  <div className="flex items-center space-x-3">
+                    {item.user ? (
+                      <>
                         <div className="h-8 w-8 rounded-full bg-gray-200">
-                          {user.avatarUrl ? (
+                          {item.user.avatarUrl ? (
                             <img
-                              src={user.avatarUrl}
+                              src={item.user.avatarUrl}
                               alt=""
                               className="h-full w-full rounded-full"
                             />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-300 text-sm font-medium text-gray-600">
-                              {user.firstName[0]}
-                              {user.lastName[0]}
+                              {getInitials(item.user)}
                             </div>
                           )}
                         </div>
                         <div>
                           <div className="font-medium">
-                            {user.firstName} {user.lastName}
+                            {getUserDisplayName(item.user)}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {user.email}
+                            {item.user.email}
                           </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div>
+                        <div className="font-medium">New User Invite</div>
+                        <div className="text-sm text-gray-500">
+                          {item.email}
                         </div>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleAddToQueue(user)}
-                        disabled={inviteQueue.some(
-                          (item) => item.user?.id === user.id
-                        )}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-4 text-center text-gray-500">
-                  No existing users found
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Invite Queue */}
-          {inviteQueue.length > 0 && (
-            <div className="space-y-4">
-              <h4 className="font-medium">
-                Pending Invites ({inviteQueue.length})
-              </h4>
-              <div className="space-y-3">
-                {inviteQueue.map((item) => (
-                  <div
-                    key={item.user?.id || item.email}
-                    className="flex items-center justify-between rounded-lg border border-gray-200 p-3"
-                  >
-                    <div className="flex items-center space-x-3">
-                      {item.user ? (
-                        <>
-                          <div className="h-8 w-8 rounded-full bg-gray-200">
-                            {item.user.avatarUrl ? (
-                              <img
-                                src={item.user.avatarUrl}
-                                alt=""
-                                className="h-full w-full rounded-full"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-300 text-sm font-medium text-gray-600">
-                                {item.user.firstName[0]}
-                                {item.user.lastName[0]}
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <div className="font-medium">
-                              {item.user.firstName} {item.user.lastName}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {item.user.email}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div>
-                          <div className="font-medium">New User Invite</div>
-                          <div className="text-sm text-gray-500">
-                            {item.email}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Select
-                        value={item.roleId}
-                        onValueChange={(value) =>
-                          handleRoleChange(item.user?.id || item.email, value)
-                        }
-                      >
-                        <SelectTrigger className="w-[140px]">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {rolesData?.organizationRoles.map((role) => (
-                            <SelectItem key={role.id} value={role.id}>
-                              {role.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() =>
-                          handleRemoveFromQueue(item.user?.id || item.email)
-                        }
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    )}
                   </div>
-                ))}
-              </div>
+                  <div className="flex items-center space-x-3">
+                    <Select
+                      value={item.roleIds[0] || ''} // Fallback to an empty string if roleIds[0] is null/undefined
+                      onValueChange={(value) =>
+                        handleRoleChange(item.user?.id || item.email, value)
+                      }
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {rolesData?.organizationRoles.map((role) => (
+                          <SelectItem key={role.id} value={role.id}>
+                            {role.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() =>
+                        handleRemoveFromQueue(item.user?.id || item.email)
+                      }
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-        </div>
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         <DialogFooter>
           <Button
@@ -490,7 +541,9 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
           >
             {inviting
               ? 'Sending invites...'
-              : `Send ${inviteQueue.length} Invite${inviteQueue.length !== 1 ? 's' : ''}`}
+              : `Send ${inviteQueue.length} Invite${
+                  inviteQueue.length !== 1 ? 's' : ''
+                }`}
           </Button>
         </DialogFooter>
       </DialogContent>

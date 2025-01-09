@@ -128,11 +128,6 @@ export const schema = gql`
     invites: [InviteMemberInput!]!
   }
 
-  input InviteMembersInput2 {
-    organizationId: String!
-    invites: [InviteMemberInput!]!
-  }
-
   type Mutation {
     createMembership(input: CreateMembershipInput!): Membership! @requireAuth
     updateMembership(id: String!, input: UpdateMembershipInput!): Membership!
