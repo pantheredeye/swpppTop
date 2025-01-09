@@ -366,7 +366,9 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
           {searchTerm.length >= 2 && (
             <div className="max-h-56 overflow-y-auto rounded-md border">
               {searchLoading ? (
-                <div className="p-6 text-center text-muted-foreground">Searching...</div>
+                <div className="p-6 text-center text-muted-foreground">
+                  Searching...
+                </div>
               ) : searchData?.searchUsers.length ? (
                 <div className="divide-y divide-border">
                   {searchData.searchUsers.map((user) => (
@@ -381,15 +383,21 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
                           </span>
                         </div>
                         <div>
-                          <div className="font-medium">{getUserDisplayName(user)}</div>
-                          <div className="text-sm text-muted-foreground">{user.email}</div>
+                          <div className="font-medium">
+                            {getUserDisplayName(user)}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {user.email}
+                          </div>
                         </div>
                       </div>
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => handleAddToQueue(user)}
-                        disabled={inviteQueue.some((item) => item.user?.id === user.id)}
+                        disabled={inviteQueue.some(
+                          (item) => item.user?.id === user.id
+                        )}
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -467,7 +475,9 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
                       ) : (
                         <div>
                           <div className="font-medium">New User Invite</div>
-                          <div className="text-sm text-muted-foreground">{item.email}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {item.email}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -492,7 +502,9 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleRemoveFromQueue(item.user?.id || item.email)}
+                        onClick={() =>
+                          handleRemoveFromQueue(item.user?.id || item.email)
+                        }
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -523,10 +535,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-
-
+  )
 }
-
 
 export default InviteMembersModal

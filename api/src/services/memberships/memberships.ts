@@ -7,6 +7,8 @@ import type {
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
+import { cache } from 'src/lib/cache'
+
 export const memberships: QueryResolvers['memberships'] = () => {
   return db.membership.findMany()
 }
@@ -34,49 +36,6 @@ export const findOrgMembers: QueryResolvers['findOrgMembers'] = ({ organizationI
   })
 }
 
-// export const inviteMember: MutationResolvers['inviteMember'] = async ({ organizationId, userId, roleId }) => {
-//   try {
-//     // First check if membership already exists
-//     const existingMembership = await db.membership.findUnique({
-//       where: {
-//         userId_organizationId: {
-//           userId,
-//           organizationId,
-//         },
-//       },
-//     });
-
-//     if (existingMembership) {
-//       throw new Error('User is already a member of this organization');
-//     }
-
-//     const membership = await db.membership.create({
-//       data: {
-//         userId,
-//         organizationId,
-//         roles: {
-//           connect: [{ id: roleId }],
-//         },
-//         status: 'INVITED',
-//         invitationChannel: 'INTERNAL',
-//         invitedAt: new Date(),
-//         invitationExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-//       },
-//     });
-
-//     return {
-//       userId: membership.userId,
-//       organizationId: membership.organizationId,
-//       status: membership.status,
-//     };
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       throw new Error(`Failed to invite member: ${error.message}`);
-//     }
-//     throw new Error('Failed to invite member');
-//   }
-// };
-
 interface InviteMemberInput {
   userId?: string
   email: string
@@ -88,14 +47,17 @@ interface InviteMembersInput {
   invites: InviteMemberInput[]
 }
 
-export const inviteMembers = async ({ input }: { input: InviteMembersInput }) => {
-  const { organizationId, invites } = input
+async function processChunk(
+  prisma,
+  chunk: InviteMemberInput[],
+  organizationId: string
+) {
   const results = { successful: [], failed: [] }
 
-  await db.$transaction(async (prisma) => {
-    for (const invite of invites) {
+  await Promise.all(
+    chunk.map(async (invite) => {
       try {
-        let membership
+        let membership = null
 
         if (invite.userId) {
           membership = await handleExistingUserInvite(prisma, {
@@ -123,17 +85,119 @@ export const inviteMembers = async ({ input }: { input: InviteMembersInput }) =>
           roles,
         })
       } catch (error) {
-        logger.error(error)
+        logger.error(`Failed to process invite for ${invite.email}:`, error)
         results.failed.push({
           email: invite.email,
           error: error instanceof Error ? error.message : 'Unknown error occurred',
         })
       }
-    }
-  })
+    })
+  )
 
   return results
 }
+
+export const inviteMembers = async ({ input }: { input: InviteMembersInput }) => {
+  const { organizationId, invites } = input
+  const batchId = crypto.randomUUID()
+
+  if (!invites.length) {
+    throw new Error('No invites provided')
+  }
+
+  const cacheKey = `invite-batch-${batchId}`
+
+  // Initialize with empty arrays for required fields
+  await cache(
+    cacheKey,
+    () => ({
+      status: 'PROCESSING',
+      total: invites.length,
+      processed: 0,
+      results: {
+        successful: [], // Ensure this is always initialized as an empty array
+        failed: []
+      }
+    }),
+    { expires: 3600 }
+  )
+
+  // Start background processing
+  processInviteBatch(batchId, organizationId, invites).catch(error => {
+    logger.error('Batch processing failed:', error)
+    cache(cacheKey, () => ({
+      status: 'FAILED',
+      error: error.message,
+      total: invites.length,
+      processed: 0,
+      results: {
+        successful: [],
+        failed: []
+      }
+    }))
+  })
+
+  // Return initial state with required fields
+  return {
+    batchId,
+    status: 'PROCESSING',
+    total: invites.length,
+    successful: [] // Add this to satisfy the non-nullable requirement
+  }
+}
+async function processInviteBatch(batchId: string, organizationId: string, invites: InviteMemberInput[]) {
+  const CHUNK_SIZE = 25
+  const cacheKey = `invite-batch-${batchId}`
+  let processed = 0
+
+  try {
+    for (let i = 0; i < invites.length; i += CHUNK_SIZE) {
+      const chunk = invites.slice(i, i + CHUNK_SIZE)
+
+      await db.$transaction(async (prisma) => {
+        const results = await processChunk(prisma, chunk, organizationId)
+        processed += chunk.length
+
+        // Update progress in cache
+        const currentState = await cache(cacheKey, () => ({}))
+        await cache(cacheKey, () => ({
+          ...currentState,
+          status: 'PROCESSING',
+          processed,
+          results: {
+            successful: [...currentState.results.successful, ...results.successful],
+            failed: [...currentState.results.failed, ...results.failed]
+          }
+        }))
+      })
+    }
+
+    // Mark as complete
+    const finalState = await cache(cacheKey, () => ({}))
+    await cache(cacheKey, () => ({
+      ...finalState,
+      status: 'COMPLETED'
+    }))
+  } catch (error) {
+    logger.error(`Batch ${batchId} failed:`, error)
+    const currentState = await cache(cacheKey, () => ({}))
+    await cache(cacheKey, () => ({
+      ...currentState,
+      status: 'FAILED',
+      error: error.message
+    }))
+    throw error
+  }
+}
+
+export const getBatchStatus = async ({ batchId }: { batchId: string }) => {
+  const status = await cache(`invite-batch-${batchId}`, () => null)
+  if (!status) {
+    throw new Error('Batch not found')
+  }
+  return status
+}
+
 
 async function handleExistingUserInvite(
   prisma,
@@ -235,6 +299,7 @@ async function sendInvitationEmail(
   // You might want to use a service like SendGrid or AWS SES
   logger.info(`Sending invitation email to ${email}`)
 }
+
 export const createMembership: MutationResolvers['createMembership'] = ({
   input,
 }) => {
