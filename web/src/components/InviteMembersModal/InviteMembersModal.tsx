@@ -315,45 +315,44 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="bg-gray-800 hover:bg-gray-700">
+        <Button variant="outline">
           <UserPlus className="mr-2 h-4 w-4" />
           Invite Members
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] p-6">
-        <DialogHeader className="mb-8">
-          <DialogTitle className="text-2xl font-semibold">Invite Members</DialogTitle>
-          <DialogDescription className="text-base mt-2">
+      <DialogContent className="sm:max-w-[700px]">
+        <DialogHeader className="space-y-2">
+          <DialogTitle>Invite Members</DialogTitle>
+          <DialogDescription>
             Search existing users or invite by email address
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Search and Email Input Section */}
           <div className="space-y-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search existing users..."
-                className="pl-10 h-12 text-base"
+                className="pl-10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex space-x-3">
+            <div className="flex gap-3">
               <Input
                 placeholder="Or enter email address..."
                 value={manualEmail}
                 onChange={handleEmailInput}
                 onKeyDown={handleKeyDown}
-                className="h-12 text-base flex-1"
+                className="flex-1"
               />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     onClick={handleAddEmail}
                     disabled={!manualEmail || !EMAIL_REGEX.test(manualEmail)}
-                    className="h-12 px-4"
                   >
                     <Plus className="h-5 w-5" />
                   </Button>
@@ -365,27 +364,25 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
 
           {/* Search Results */}
           {searchTerm.length >= 2 && (
-            <div className="max-h-56 overflow-y-auto rounded-lg border">
+            <div className="max-h-56 overflow-y-auto rounded-md border">
               {searchLoading ? (
-                <div className="p-6 text-center text-gray-500">Searching...</div>
+                <div className="p-6 text-center text-muted-foreground">Searching...</div>
               ) : searchData?.searchUsers.length ? (
-                <div className="divide-y ">
+                <div className="divide-y divide-border">
                   {searchData.searchUsers.map((user) => (
                     <div
                       key={user.id}
-                      className="flex items-center justify-between p-4 hover:bg-gray-700 transition-colors"
+                      className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
                     >
-                      <div className="flex items-center space-x-4">
-                        <div className="h-10 w-10 rounded-full bg-gray-100">
-                          <div className="flex h-full w-full items-center justify-center rounded-full text-sm font-medium text-gray-600">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                          <span className="text-sm font-medium text-muted-foreground">
                             {getInitials(user)}
-                          </div>
+                          </span>
                         </div>
                         <div>
-                          <div className="font-medium">
-                            {getUserDisplayName(user)}
-                          </div>
-                          <div className="text-sm">{user.email}</div>
+                          <div className="font-medium">{getUserDisplayName(user)}</div>
+                          <div className="text-sm text-muted-foreground">{user.email}</div>
                         </div>
                       </div>
                       <Button
@@ -393,7 +390,6 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
                         variant="ghost"
                         onClick={() => handleAddToQueue(user)}
                         disabled={inviteQueue.some((item) => item.user?.id === user.id)}
-                        className="hover:bg-gray-100"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -401,7 +397,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
                   ))}
                 </div>
               ) : (
-                <div className="p-6 text-center text-gray-500">
+                <div className="p-6 text-center text-muted-foreground">
                   No existing users found
                 </div>
               )}
@@ -416,7 +412,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
                   Pending Invites ({inviteQueue.length})
                 </h4>
                 {inviteQueue.length > 1 && (
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-3">
                     <Select
                       value={selectedRoleForBatch}
                       onValueChange={setSelectedRoleForBatch}
@@ -449,33 +445,33 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
                 {inviteQueue.map((item) => (
                   <div
                     key={item.user?.id || item.email}
-                    className="flex items-center justify-between rounded-lg bg-gray-500 p-4 transition-colors"
+                    className="flex items-center justify-between rounded-lg bg-muted p-4"
                   >
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center gap-4">
                       {item.user ? (
                         <>
-                          <div className="h-10 w-10 rounded-full bg-white">
-                            <div className="flex h-full w-full items-center justify-center rounded-full text-sm font-medium text-gray-600">
+                          <div className="h-10 w-10 rounded-full bg-background flex items-center justify-center">
+                            <span className="text-sm font-medium text-muted-foreground">
                               {getInitials(item.user)}
-                            </div>
+                            </span>
                           </div>
                           <div>
-                            <div className="font-medium ">
+                            <div className="font-medium">
                               {getUserDisplayName(item.user)}
                             </div>
-                            <div className="text-sm">
+                            <div className="text-sm text-muted-foreground">
                               {item.user.email}
                             </div>
                           </div>
                         </>
                       ) : (
                         <div>
-                          <div className="font-medium ">New User Invite</div>
-                          <div className="text-sm">{item.email}</div>
+                          <div className="font-medium">New User Invite</div>
+                          <div className="text-sm text-muted-foreground">{item.email}</div>
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center gap-3">
                       <Select
                         value={item.roleIds[0] || ''}
                         onValueChange={(value) =>
@@ -497,7 +493,6 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleRemoveFromQueue(item.user?.id || item.email)}
-                        className="hover:bg-gray-200"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -515,7 +510,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
           )}
         </div>
 
-        <DialogFooter className="mt-8">
+        <DialogFooter>
           <Button
             onClick={handleInvite}
             disabled={inviting || !inviteQueue.length}
@@ -528,7 +523,9 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
+
+
 }
 
 
