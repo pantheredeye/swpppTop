@@ -324,10 +324,29 @@ export const deleteMembership: MutationResolvers['deleteMembership'] = ({
 }
 
 export const revokeAccess = async ({ id }: { id: string }) => {
-  return db.membership.delete({
-    where: { id },
-  })
-}
+  try {
+    const membership = await db.membership.findUnique({
+      where: { id },
+    });
+
+    if (!membership) {
+      return { success: false, message: 'Membership not found' };
+    }
+
+    await db.membership.delete({
+      where: { id },
+    });
+
+    return { success: true, message: 'Membership revoked successfully' };
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return { success: false, message: 'Membership not found' };
+    }
+
+    console.error('Error revoking access:', error);
+    return { success: false, message: 'An error occurred while revoking access' };
+  }
+};
 
 // export const suspendMember = async ({ id, status }: { id: string; status: string }) => {
 //   return db.membership.update({
