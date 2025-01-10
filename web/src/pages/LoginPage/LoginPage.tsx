@@ -20,12 +20,12 @@ const LoginPage = () => {
   const formMethods = useForm()
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && currentUser) {
       navigate(
         routes.dashboard({ organizationId: currentUser.defaultOrganizationId })
-      )
+      );
     }
-  }, [isAuthenticated, currentUser.defaultOrganizationId])
+  }, [isAuthenticated, currentUser?.defaultOrganizationId]);
 
   const emailRef = useRef<HTMLInputElement>(null)
   useEffect(() => {

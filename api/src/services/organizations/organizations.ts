@@ -193,7 +193,7 @@ export const setDefaultOrganization: MutationResolvers['setDefaultOrganization']
   }
 
 export const Organization: OrganizationRelationResolvers = {
-  users: (_obj, { root }) => {
+  members: (_obj, { root }) => {
     return db.organization.findUnique({ where: { id: root?.id } }).members()
   },
   sites: (_obj, { root }) => {
