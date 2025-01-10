@@ -19,10 +19,12 @@ export const membership: QueryResolvers['membership'] = ({ id }) => {
   })
 }
 
-export const findOrgMembers: QueryResolvers['findOrgMembers'] = ({ organizationId }) => {
+export const findOrgMembers: QueryResolvers['findOrgMembers'] = ({
+  organizationId,
+}) => {
   return db.membership.findMany({
     where: {
-        organizationId: organizationId ,
+      organizationId: organizationId,
     },
     select: {
       id: true,
@@ -31,7 +33,7 @@ export const findOrgMembers: QueryResolvers['findOrgMembers'] = ({ organizationI
       status: true,
       invitedEmail: true,
       invitedAt: true,
-      invitationExpiresAt: true
+      invitationExpiresAt: true,
     },
   })
 }
@@ -47,67 +49,107 @@ interface InviteMembersInput {
   invites: InviteMemberInput[]
 }
 
-async function processChunk(
-  prisma,
-  chunk: InviteMemberInput[],
-  organizationId: string
-) {
-  const results = { successful: [], failed: [] }
+async function processInviteBatch(batchId, organizationId, invites) {
+  const CHUNK_SIZE = 25;
+  const cacheKey = `invite-batch-${batchId}`;
+  let processed = 0;
 
-  await Promise.all(
-    chunk.map(async (invite) => {
-      try {
-        let membership = null
+  // Local state to reduce cache operations
+  let localState = {
+    status: 'PROCESSING',
+    processed: 0,
+    results: {
+      successful: [],
+      failed: [],
+    },
+  };
 
-        if (invite.userId) {
-          membership = await handleExistingUserInvite(prisma, {
-            userId: invite.userId,
-            organizationId,
-            roleIds: invite.roleIds,
-            email: invite.email,
-          })
-        } else {
-          membership = await handleEmailInvite(prisma, {
-            email: invite.email,
-            organizationId,
-            roleIds: invite.roleIds,
-          })
+  for (let i = 0; i < invites.length; i += CHUNK_SIZE) {
+    const chunk = invites.slice(i, i + CHUNK_SIZE);
+
+    const chunkResults = await Promise.all(
+      chunk.map(async (invite) => {
+        try {
+          const membership = invite.userId
+            ? await handleExistingUserInvite(db, {
+                userId: invite.userId,
+                organizationId,
+                roleIds: invite.roleIds,
+                email: invite.email,
+              })
+            : await handleEmailInvite(db, {
+                email: invite.email,
+                organizationId,
+                roleIds: invite.roleIds,
+              });
+
+          const roles = await db.membershipRole.findMany({
+            where: { id: { in: invite.roleIds } },
+          });
+
+          return {
+            success: true,
+            data: {
+              userId: membership.userId,
+              email: membership.invitedEmail || invite.email,
+              status: membership.status,
+              roles,
+            },
+          };
+        } catch (error) {
+          logger.error(`Failed to process invite for ${invite.email}:`, error);
+          return {
+            success: false,
+            data: {
+              email: invite.email,
+              error:
+                error instanceof Error
+                  ? error.message
+                  : 'Unknown error occurred',
+            },
+          };
         }
+      })
+    );
 
-        const roles = await prisma.membershipRole.findMany({
-          where: { id: { in: invite.roleIds } },
-        })
+    // Update local state
+    processed += chunk.length;
+    localState.processed = processed;
+    localState.results.successful.push(
+      ...chunkResults.filter((result) => result.success).map((result) => result.data)
+    );
+    localState.results.failed.push(
+      ...chunkResults.filter((result) => !result.success).map((result) => result.data)
+    );
 
-        results.successful.push({
-          userId: membership.userId,
-          email: membership.invitedEmail || invite.email,
-          status: membership.status,
-          roles,
-        })
-      } catch (error) {
-        logger.error(`Failed to process invite for ${invite.email}:`, error)
-        results.failed.push({
-          email: invite.email,
-          error: error instanceof Error ? error.message : 'Unknown error occurred',
-        })
-      }
-    })
-  )
+    // Periodically update cache (optional for real-time tracking)
+    await cache(cacheKey, () => ({
+      ...localState,
+    }));
+  }
 
-  return results
+  // Final state update
+  await cache(cacheKey, () => ({
+    ...localState,
+    status: 'COMPLETED',
+  }));
 }
 
-export const inviteMembers = async ({ input }: { input: InviteMembersInput }) => {
+
+export const inviteMembers = async ({
+  input,
+}: {
+  input: InviteMembersInput
+}) => {
   const { organizationId, invites } = input
   const batchId = crypto.randomUUID()
 
   if (!invites.length) {
     throw new Error('No invites provided')
   }
-
+  console.log('Invite length: ', invites.length)
   const cacheKey = `invite-batch-${batchId}`
 
-  // Initialize with empty arrays for required fields
   await cache(
     cacheKey,
     () => ({
@@ -115,15 +157,14 @@ export const inviteMembers = async ({ input }: { input: InviteMembersInput }) =>
       total: invites.length,
       processed: 0,
       results: {
-        successful: [], // Ensure this is always initialized as an empty array
-        failed: []
-      }
+        successful: [],
+        failed: [],
+      },
     }),
     { expires: 3600 }
   )
 
-  // Start background processing
-  processInviteBatch(batchId, organizationId, invites).catch(error => {
+  processInviteBatch(batchId, organizationId, invites).catch((error) => {
     logger.error('Batch processing failed:', error)
     cache(cacheKey, () => ({
       status: 'FAILED',
@@ -132,63 +173,20 @@ export const inviteMembers = async ({ input }: { input: InviteMembersInput }) =>
       processed: 0,
       results: {
         successful: [],
-        failed: []
-      }
+        failed: [],
+      },
     }))
   })
 
-  // Return initial state with required fields
   return {
     batchId,
     status: 'PROCESSING',
     total: invites.length,
-    successful: [] // Add this to satisfy the non-nullable requirement
+    successful: [],
+    failed: [],
   }
 }
-async function processInviteBatch(batchId: string, organizationId: string, invites: InviteMemberInput[]) {
-  const CHUNK_SIZE = 25
-  const cacheKey = `invite-batch-${batchId}`
-  let processed = 0
 
-  try {
-    for (let i = 0; i < invites.length; i += CHUNK_SIZE) {
-      const chunk = invites.slice(i, i + CHUNK_SIZE)
-
-      await db.$transaction(async (prisma) => {
-        const results = await processChunk(prisma, chunk, organizationId)
-        processed += chunk.length
-
-        // Update progress in cache
-        const currentState = await cache(cacheKey, () => ({}))
-        await cache(cacheKey, () => ({
-          ...currentState,
-          status: 'PROCESSING',
-          processed,
-          results: {
-            successful: [...currentState.results.successful, ...results.successful],
-            failed: [...currentState.results.failed, ...results.failed]
-          }
-        }))
-      })
-    }
-
-    // Mark as complete
-    const finalState = await cache(cacheKey, () => ({}))
-    await cache(cacheKey, () => ({
-      ...finalState,
-      status: 'COMPLETED'
-    }))
-  } catch (error) {
-    logger.error(`Batch ${batchId} failed:`, error)
-    const currentState = await cache(cacheKey, () => ({}))
-    await cache(cacheKey, () => ({
-      ...currentState,
-      status: 'FAILED',
-      error: error.message
-    }))
-    throw error
-  }
-}
 
 export const getBatchStatus = async ({ batchId }: { batchId: string }) => {
   const status = await cache(`invite-batch-${batchId}`, () => null)
@@ -197,7 +195,6 @@ export const getBatchStatus = async ({ batchId }: { batchId: string }) => {
   }
   return status
 }
-
 
 async function handleExistingUserInvite(
   prisma,
@@ -329,8 +326,8 @@ export const deleteMembership: MutationResolvers['deleteMembership'] = ({
 export const revokeAccess = async ({ id }: { id: string }) => {
   return db.membership.delete({
     where: { id },
-  });
-};
+  })
+}
 
 // export const suspendMember = async ({ id, status }: { id: string; status: string }) => {
 //   return db.membership.update({
@@ -339,7 +336,13 @@ export const revokeAccess = async ({ id }: { id: string }) => {
 //   });
 // };
 
-export const updateMemberRoles = async ({ id, roles }: { id: string; roles: string[] }) => {
+export const updateMemberRoles = async ({
+  id,
+  roles,
+}: {
+  id: string
+  roles: string[]
+}) => {
   return db.membership.update({
     where: { id },
     data: {
@@ -347,8 +350,8 @@ export const updateMemberRoles = async ({ id, roles }: { id: string; roles: stri
         set: roles.map((roleId) => ({ id: roleId })),
       },
     },
-  });
-};
+  })
+}
 
 export const Membership: MembershipRelationResolvers = {
   user: (_obj, { root }) => {

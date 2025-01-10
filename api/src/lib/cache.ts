@@ -20,5 +20,5 @@ if (process.env.NODE_ENV === 'test') {
 
 export const { cache, cacheFindMany, cacheClient, deleteCacheKey } = createCache(client, {
   logger,
-  timeout: 500,
+  timeout: 5000,
 })
