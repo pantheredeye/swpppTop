@@ -1,14 +1,14 @@
 import { render } from '@redwoodjs/testing/web'
 
-import InviteMembersModal from './InviteMembersModal'
+import ThemeToggle from './ThemeToggle'
 
 //   Improve this test with help from the Redwood Testing Doc:
 //    https://redwoodjs.com/docs/testing#testing-components
 
-describe('InviteMembersModal', () => {
+describe('ThemeToggle', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(<InviteMembersModal />)
+      render(<ThemeToggle />)
     }).not.toThrow()
   })
 })

@@ -1,6 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useQuery, useMutation } from '@redwoodjs/web'
+
+import { UserPlus } from 'lucide-react'
 import { useThrottle } from 'react-use'
+
+import { useQuery, useMutation } from '@redwoodjs/web'
+
+import { Alert, AlertDescription } from 'src/components/ui/Alert'
+import { Button } from 'src/components/ui/Button'
 import {
   Dialog,
   DialogTrigger,
@@ -10,23 +16,11 @@ import {
   DialogDescription,
   DialogFooter,
 } from 'src/components/ui/Dialog'
-import { Input } from 'src/components/ui/Input'
-import { Button } from 'src/components/ui/Button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'src/components/ui/Select'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'src/components/ui/Tooltip'
 import { useToast } from 'src/components/ui/UseToast'
-import { Plus, X, Search, UserPlus, Users } from 'lucide-react'
-import { Alert, AlertDescription } from 'src/components/ui/Alert'
+
+import InviteQueue from './InviteQueue/InviteQueue'
+import SearchInput from './SearchInput/SearchInput'
+import SearchResults from './SearchResults/SearchResults'
 
 const INVITE_MEMBERS_MUTATION = gql`
   mutation InviteMembers($input: InviteMembersInput!) {
@@ -66,7 +60,6 @@ const FIND_ORG_ROLES_QUERY = gql`
     }
   }
 `
-
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
@@ -79,14 +72,12 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
   const [error, setError] = useState('')
   const { toast } = useToast()
 
-  // Throttled search value to prevent excessive API calls
   const throttledSearchTerm = useThrottle(searchTerm, 1000)
 
   useEffect(() => {
     setDebouncedSearch(throttledSearchTerm)
   }, [throttledSearchTerm])
 
-  // Search users query with rate limiting
   const { data: searchData, loading: searchLoading } = useQuery(
     SEARCH_USERS_QUERY,
     {
@@ -95,22 +86,19 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
         searchTerm: debouncedSearch,
       },
       skip: debouncedSearch.length < 2,
-      fetchPolicy: 'network-only',
+      fetchPolicy: 'no-cache',
     }
   )
 
-  // Fetch roles
   const { data: rolesData } = useQuery(FIND_ORG_ROLES_QUERY, {
     variables: { organizationId },
   })
 
-  // Invite mutation
   const [inviteMembers, { loading: inviting }] = useMutation(
     INVITE_MEMBERS_MUTATION,
     {
       onCompleted: (data) => {
         const { successful, failed } = data.inviteMembers
-
         if (successful.length > 0) {
           toast({
             title: 'Invites Sent Successfully',
@@ -118,7 +106,6 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
             duration: 5000,
           })
         }
-
         if (failed.length > 0) {
           toast({
             title: 'Some Invites Failed',
@@ -127,7 +114,6 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
             duration: 7000,
           })
         }
-
         setInviteQueue([])
         setIsOpen(false)
         onInviteComplete?.()
@@ -149,20 +135,6 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
     return defaultRole || roles[0]?.id
   }, [rolesData])
 
-  const getInitials = (user) => {
-    if (!user.firstName && !user.lastName) {
-      return user.email.charAt(0).toUpperCase()
-    }
-    return `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase()
-  }
-
-  const getUserDisplayName = (user) => {
-    if (!user.firstName && !user.lastName) {
-      return user.email
-    }
-    return `${user.firstName || ''} ${user.lastName || ''}`.trim()
-  }
-
   const handleAddToQueue = (userOrEmail) => {
     setInviteQueue((queue) => {
       const isEmail = typeof userOrEmail === 'string'
@@ -176,7 +148,6 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
         return queue
       }
 
-      // Ensure selectedRoleForBatch or defaultRole is valid
       const roleId = selectedRoleForBatch || defaultRole
       if (!roleId) {
         toast({
@@ -272,7 +243,6 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
   const handleInvite = async () => {
     if (!inviteQueue.length) return
 
-    // Validate roleIds before sending the mutation
     const invalidInvites = inviteQueue.filter(
       (item) => !item.roleIds || item.roleIds.some((id) => !id)
     )
@@ -327,190 +297,34 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Search and Email Input Section */}
-          <div className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search existing users..."
-                className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-3">
-              <Input
-                placeholder="Or enter email address..."
-                value={manualEmail}
-                onChange={handleEmailInput}
-                onKeyDown={handleKeyDown}
-                className="flex-1"
-              />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={handleAddEmail}
-                    disabled={!manualEmail || !EMAIL_REGEX.test(manualEmail)}
-                  >
-                    <Plus className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Add email to invite queue</TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
+          <SearchInput
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            manualEmail={manualEmail}
+            setManualEmail={setManualEmail}
+            handleAddEmail={handleAddEmail}
+            handleKeyDown={handleKeyDown}
+          />
 
-          {/* Search Results */}
           {searchTerm.length >= 2 && (
-            <div className="max-h-56 overflow-y-auto rounded-md border">
-              {searchLoading ? (
-                <div className="p-6 text-center text-muted-foreground">
-                  Searching...
-                </div>
-              ) : searchData?.searchUsers.length ? (
-                <div className="divide-y divide-border">
-                  {searchData.searchUsers.map((user) => (
-                    <div
-                      key={user.id}
-                      className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                          <span className="text-sm font-medium text-muted-foreground">
-                            {getInitials(user)}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="font-medium">
-                            {getUserDisplayName(user)}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {user.email}
-                          </div>
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleAddToQueue(user)}
-                        disabled={inviteQueue.some(
-                          (item) => item.user?.id === user.id
-                        )}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-6 text-center text-muted-foreground">
-                  No existing users found
-                </div>
-              )}
-            </div>
+            <SearchResults
+              searchData={searchData}
+              searchLoading={searchLoading}
+              inviteQueue={inviteQueue}
+              handleAddToQueue={handleAddToQueue}
+            />
           )}
 
-          {/* Invite Queue */}
           {inviteQueue.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="text-lg font-medium">
-                  Pending Invites ({inviteQueue.length})
-                </h4>
-                {inviteQueue.length > 1 && (
-                  <div className="flex items-center gap-3">
-                    <Select
-                      value={selectedRoleForBatch}
-                      onValueChange={setSelectedRoleForBatch}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select role for all" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {rolesData?.organizationRoles.map((role) => (
-                          <SelectItem key={role.id} value={role.id}>
-                            {role.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="secondary"
-                      onClick={handleBatchRoleChange}
-                      disabled={!selectedRoleForBatch}
-                      className="whitespace-nowrap"
-                    >
-                      <Users className="mr-2 h-4 w-4" />
-                      Apply to All
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-3">
-                {inviteQueue.map((item) => (
-                  <div
-                    key={item.user?.id || item.email}
-                    className="flex items-center justify-between rounded-lg bg-muted p-4"
-                  >
-                    <div className="flex items-center gap-4">
-                      {item.user ? (
-                        <>
-                          <div className="h-10 w-10 rounded-full bg-background flex items-center justify-center">
-                            <span className="text-sm font-medium text-muted-foreground">
-                              {getInitials(item.user)}
-                            </span>
-                          </div>
-                          <div>
-                            <div className="font-medium">
-                              {getUserDisplayName(item.user)}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {item.user.email}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div>
-                          <div className="font-medium">New User Invite</div>
-                          <div className="text-sm text-muted-foreground">
-                            {item.email}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Select
-                        value={item.roleIds[0] || ''}
-                        onValueChange={(value) =>
-                          handleRoleChange(item.user?.id || item.email, value)
-                        }
-                      >
-                        <SelectTrigger className="w-[160px]">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {rolesData?.organizationRoles.map((role) => (
-                            <SelectItem key={role.id} value={role.id}>
-                              {role.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() =>
-                          handleRemoveFromQueue(item.user?.id || item.email)
-                        }
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <InviteQueue
+              inviteQueue={inviteQueue}
+              rolesData={rolesData}
+              selectedRoleForBatch={selectedRoleForBatch}
+              setSelectedRoleForBatch={setSelectedRoleForBatch}
+              handleBatchRoleChange={handleBatchRoleChange}
+              handleRoleChange={handleRoleChange}
+              handleRemoveFromQueue={handleRemoveFromQueue}
+            />
           )}
 
           {error && (

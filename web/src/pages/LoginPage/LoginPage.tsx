@@ -25,7 +25,7 @@ const LoginPage = () => {
         routes.dashboard({ organizationId: currentUser.defaultOrganizationId })
       )
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, currentUser.defaultOrganizationId])
 
   const emailRef = useRef<HTMLInputElement>(null)
   useEffect(() => {

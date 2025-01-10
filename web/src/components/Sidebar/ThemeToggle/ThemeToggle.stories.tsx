@@ -10,17 +10,17 @@
 //
 // See https://storybook.js.org/docs/react/writing-stories/args.
 
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from '@storybook/react'
 
-import ThemeToggle from "./ThemeToggle";
+import ThemeToggle from './ThemeToggle'
 
 const meta: Meta<typeof ThemeToggle> = {
   component: ThemeToggle,
-  tags: ["autodocs"],
-};
+  tags: ['autodocs'],
+}
 
-export default meta;
+export default meta
 
-type Story = StoryObj<typeof ThemeToggle>;
+type Story = StoryObj<typeof ThemeToggle>
 
-export const Primary: Story = {};
+export const Primary: Story = {}

@@ -1,14 +1,14 @@
 import { render } from '@redwoodjs/testing/web'
 
-import InviteMembersModal from './InviteMembersModal'
+import SearchResults from './SearchResults'
 
 //   Improve this test with help from the Redwood Testing Doc:
 //    https://redwoodjs.com/docs/testing#testing-components
 
-describe('InviteMembersModal', () => {
+describe('SearchResults', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(<InviteMembersModal />)
+      render(<SearchResults />)
     }).not.toThrow()
   })
 })

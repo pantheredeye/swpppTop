@@ -1,3 +1,6 @@
+import { useState } from 'react'
+
+import { MoreHorizontal, UserCog } from 'lucide-react'
 import type { OrgMembersQuery, OrgMembersQueryVariables } from 'types/graphql'
 
 import {
@@ -6,15 +9,16 @@ import {
   TypedDocumentNode,
   useMutation,
 } from '@redwoodjs/web'
-import { useState } from 'react'
 
-import { MoreHorizontal, UserCog } from 'lucide-react'
+import { Badge } from 'src/components/ui/Badge'
+import { Button } from 'src/components/ui/Button'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from 'src/components/ui/Card'
+import { Dialog } from 'src/components/ui/Dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,8 +27,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'src/components/ui/DropdownMenu'
-import { Button } from 'src/components/ui/Button'
-
 import {
   Table,
   TableBody,
@@ -33,9 +35,8 @@ import {
   TableHeader,
   TableRow,
 } from 'src/components/ui/Table'
-import { Badge } from 'src/components/ui/Badge'
-import { Dialog } from 'src/components/ui/Dialog'
-import RoleManagementDialog from '../RoleManagementDialog/RoleManagementDialog'
+
+import RoleManagementDialog from '../../RolesSettings/RoleManagementDialog/RoleManagementDialog'
 
 export const QUERY: TypedDocumentNode<
   OrgMembersQuery,

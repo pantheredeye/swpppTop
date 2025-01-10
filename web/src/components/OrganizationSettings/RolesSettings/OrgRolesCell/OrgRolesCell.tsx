@@ -49,31 +49,46 @@ export const QUERY: TypedDocumentNode<
 
 const PermissionAccordion = ({ permissions }) => {
   const actionGroups = permissions.reduce((acc, perm) => {
-    const action = perm.permission.action;
-    const subject = perm.permission.subject;
+    const action = perm.permission.action
+    const subject = perm.permission.subject
     if (!acc[action]) {
-      acc[action] = [];
+      acc[action] = []
     }
-    acc[action].push(subject);
-    return acc;
-  }, {});
+    acc[action].push(subject)
+    return acc
+  }, {})
 
   return (
     <Accordion type="single" collapsible className="space-y-4">
       {Object.keys(actionGroups).map((action) => (
-        <AccordionItem key={action} value={action} className="border border-gray-700 rounded-lg bg-gray-800">
+        <AccordionItem
+          key={action}
+          value={action}
+          className="border border-gray-700 rounded-lg bg-gray-800"
+        >
           <AccordionTrigger className="px-4 py-3 hover:bg-gray-750">
             <div className="flex items-center space-x-4">
               <Shield className="h-5 w-5 text-indigo-400" />
-              <span className="font-medium text-gray-200">{action} Permissions</span>
+              <span className="font-medium text-gray-200">
+                {action} Permissions
+              </span>
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 py-3">
             <ul className="space-y-2">
               {actionGroups[action].map((subject, index) => (
-                <li key={index} className="flex items-center justify-between rounded-md bg-gray-750 px-3 py-2">
-                  <span className="text-sm font-medium text-gray-300">{subject}</span>
-                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-300">
+                <li
+                  key={index}
+                  className="flex items-center justify-between rounded-md bg-gray-750 px-3 py-2"
+                >
+                  <span className="text-sm font-medium text-gray-300">
+                    {subject}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-400 hover:text-gray-300"
+                  >
                     <Copy className="mr-2 h-4 w-4" />
                     Clone Permission
                   </Button>
@@ -84,9 +99,8 @@ const PermissionAccordion = ({ permissions }) => {
         </AccordionItem>
       ))}
     </Accordion>
-  );
-};
-
+  )
+}
 
 export const Loading = () => <div>Loading...</div>
 
@@ -101,10 +115,13 @@ export const Failure = ({
 export const Success = ({
   organizationRoles,
 }: CellSuccessProps<FindOrgRolesQuery, FindOrgRolesQueryVariables>) => {
-   return (
+  return (
     <div>
       {organizationRoles.map((role) => (
-        <div key={role.id} className="border border-gray-700 rounded-lg bg-gray-800 mb-4">
+        <div
+          key={role.id}
+          className="border border-gray-700 rounded-lg bg-gray-800 mb-4"
+        >
           <h3 className="px-4 py-3 font-medium text-gray-200">
             {role.name}
             {role.isSystemDefined && (
@@ -117,5 +134,5 @@ export const Success = ({
         </div>
       ))}
     </div>
-  );
-};
+  )
+}

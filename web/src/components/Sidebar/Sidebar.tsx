@@ -1,11 +1,5 @@
 import { useEffect } from 'react'
-import { Link, navigate, routes } from '@redwoodjs/router'
-import { useParams } from '@redwoodjs/router'
-import { useAuth } from 'src/auth'
-import { ThemeToggle } from '../ThemeToggle/ThemeToggle'
-import { Button } from "src/components/ui/Button"
-import { ScrollArea } from "src/components/ui/ScrollArea"
-import { Tooltip, TooltipContent, TooltipTrigger } from "src/components/ui/Tooltip"
+
 import {
   Home,
   Users,
@@ -15,9 +9,23 @@ import {
   LogOut,
   ArrowLeft,
   User,
-  Settings
-} from "lucide-react"
-import { cn } from "src/lib/utils"
+  Settings,
+} from 'lucide-react'
+
+import { Link, navigate, routes } from '@redwoodjs/router'
+import { useParams } from '@redwoodjs/router'
+
+import { useAuth } from 'src/auth'
+import { Button } from 'src/components/ui/Button'
+import { ScrollArea } from 'src/components/ui/ScrollArea'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'src/components/ui/Tooltip'
+import { cn } from 'src/lib/utils'
+
+import { ThemeToggle } from './ThemeToggle/ThemeToggle'
 
 // Define the props interface for the Sidebar
 interface SidebarProps {
@@ -94,15 +102,17 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
       <Link
         to={item.href}
         className={cn(
-          "group flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-800 hover:text-gray-200",
-          "transition-all duration-200 ease-in-out",
-          "focus:bg-gray-800 focus:text-gray-200 focus:outline-none"
+          'group flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-800 hover:text-gray-200',
+          'transition-all duration-200 ease-in-out',
+          'focus:bg-gray-800 focus:text-gray-200 focus:outline-none'
         )}
       >
-        <item.icon className={cn(
-          "h-5 w-5 text-gray-400 group-hover:text-gray-200",
-          collapsed ? "mx-auto" : "mr-3"
-        )} />
+        <item.icon
+          className={cn(
+            'h-5 w-5 text-gray-400 group-hover:text-gray-200',
+            collapsed ? 'mx-auto' : 'mr-3'
+          )}
+        />
         {!collapsed && <span>{item.name}</span>}
       </Link>
     )
@@ -133,16 +143,18 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
         variant="ghost"
         onClick={handleAction}
         className={cn(
-          "w-full group flex items-center rounded-lg px-3 py-2 text-sm font-medium",
-          "hover:bg-gray-800 hover:text-gray-200",
-          "focus:bg-gray-800 focus:text-gray-200",
-          "justify-start"
+          'w-full group flex items-center rounded-lg px-3 py-2 text-sm font-medium',
+          'hover:bg-gray-800 hover:text-gray-200',
+          'focus:bg-gray-800 focus:text-gray-200',
+          'justify-start'
         )}
       >
-        <action.icon className={cn(
-          "h-5 w-5 text-gray-400 group-hover:text-gray-200",
-          collapsed ? "mx-auto" : "mr-3"
-        )} />
+        <action.icon
+          className={cn(
+            'h-5 w-5 text-gray-400 group-hover:text-gray-200',
+            collapsed ? 'mx-auto' : 'mr-3'
+          )}
+        />
         {!collapsed && <span>{action.name}</span>}
       </Button>
     )
@@ -162,21 +174,25 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
   return (
     <div
       className={cn(
-        "flex flex-col bg-gray-900 text-gray-300 shadow-inner",
-        collapsed ? "w-16" : "w-64",
-        "transition-all duration-300"
+        'flex flex-col bg-gray-900 text-gray-300 shadow-inner',
+        collapsed ? 'w-16' : 'w-64',
+        'transition-all duration-300'
       )}
     >
       {/* Header */}
       <div className="flex h-16 items-center px-4 justify-between">
-        {!collapsed && <span className="text-2xl font-bold text-gray-200">SWPPP-Tip</span>}
+        {!collapsed && (
+          <span className="text-2xl font-bold text-gray-200">SWPPP-Tip</span>
+        )}
       </div>
 
       {/* Theme Toggle */}
-      <div className={cn(
-        "flex h-10 items-center px-4",
-        collapsed ? "justify-center" : "justify-between"
-      )}>
+      <div
+        className={cn(
+          'flex h-10 items-center px-4',
+          collapsed ? 'justify-center' : 'justify-between'
+        )}
+      >
         <ThemeToggle />
       </div>
 
@@ -192,9 +208,9 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
         <div className="py-2">
           <NavItem
             item={{
-              name: "Switch Organizations",
+              name: 'Switch Organizations',
               href: routes.switch({ organizationId }),
-              icon: Building2
+              icon: Building2,
             }}
           />
         </div>

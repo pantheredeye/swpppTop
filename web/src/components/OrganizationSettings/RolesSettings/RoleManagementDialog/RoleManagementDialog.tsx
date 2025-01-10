@@ -1,28 +1,26 @@
+import { useState } from 'react'
 
+import { Button } from 'src/components/ui/Button'
+import { Checkbox } from 'src/components/ui/Checkbox'
 import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from 'src/components/ui/Dialog';
-
-import { Button } from 'src/components/ui/Button';
-import { Checkbox } from 'src/components/ui/Checkbox';
-import { useState } from 'react';
-
+} from 'src/components/ui/Dialog'
 
 // Component for managing member roles
 const RoleManagementDialog = ({ member, availableRoles, onUpdateRoles }) => {
   const [selectedRoles, setSelectedRoles] = useState(
     member.roles.map((role) => role.id)
-  );
+  )
 
   const handleRoleToggle = (roleId) => {
-    setSelectedRoles(current =>
+    setSelectedRoles((current) =>
       current.includes(roleId)
-        ? current.filter(id => id !== roleId)
+        ? current.filter((id) => id !== roleId)
         : [...current, roleId]
-    );
-  };
+    )
+  }
 
   return (
     <DialogContent className="sm:max-w-md">
@@ -57,8 +55,7 @@ const RoleManagementDialog = ({ member, availableRoles, onUpdateRoles }) => {
         </Button>
       </div>
     </DialogContent>
-  );
-};
+  )
+}
 
-
-export default RoleManagementDialog;
+export default RoleManagementDialog

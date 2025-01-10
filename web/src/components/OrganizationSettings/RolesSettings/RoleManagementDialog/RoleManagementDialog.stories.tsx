@@ -10,17 +10,17 @@
 //
 // See https://storybook.js.org/docs/react/writing-stories/args.
 
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from '@storybook/react'
 
-import RoleManagementDialog from "./RoleManagementDialog";
+import RoleManagementDialog from './RoleManagementDialog'
 
 const meta: Meta<typeof RoleManagementDialog> = {
   component: RoleManagementDialog,
-  tags: ["autodocs"],
-};
+  tags: ['autodocs'],
+}
 
-export default meta;
+export default meta
 
-type Story = StoryObj<typeof RoleManagementDialog>;
+type Story = StoryObj<typeof RoleManagementDialog>
 
-export const Primary: Story = {};
+export const Primary: Story = {}

@@ -1,11 +1,13 @@
 import { useState, ReactNode } from 'react'
-import { Sheet, SheetContent, SheetTrigger } from "src/components/ui/Sheet"
-import { Button } from "src/components/ui/Button"
-import { Menu, ChevronLeft } from "lucide-react"
+
+import { Menu, ChevronLeft } from 'lucide-react'
+
 import Sidebar from 'src/components/Sidebar'
-import { Toast } from "src/components/ui/Toast"
-import { ScrollArea } from "src/components/ui/ScrollArea"
-import { useMediaQuery } from "src/lib/use-media-query"
+import { Button } from 'src/components/ui/Button'
+import { ScrollArea } from 'src/components/ui/ScrollArea'
+import { Sheet, SheetContent, SheetTrigger } from 'src/components/ui/Sheet'
+import { Toast } from 'src/components/ui/Toast'
+import { useMediaQuery } from 'src/lib/use-media-query'
 
 interface AuthenticatedLayoutProps {
   children: ReactNode
@@ -15,9 +17,10 @@ interface AuthenticatedLayoutProps {
 // Custom hook for handling sidebar state with persistence
 const useSidebarState = () => {
   // Initialize from localStorage if available, otherwise default to true for desktop
-  const initialState = typeof window !== 'undefined'
-    ? localStorage.getItem('sidebarOpen') === 'true'
-    : true
+  const initialState =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('sidebarOpen') === 'true'
+      : true
 
   const [isOpen, setIsOpen] = useState(initialState)
 
@@ -34,7 +37,7 @@ const useSidebarState = () => {
 
 const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
   // Check if we're on mobile
-  const isMobile = useMediaQuery("(max-width: 1024px)")
+  const isMobile = useMediaQuery('(max-width: 1024px)')
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const { isOpen: desktopSidebarOpen, toggleSidebar } = useSidebarState()
 
@@ -52,10 +55,7 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
             <Menu className="h-6 w-6" />
           </Button>
         </SheetTrigger>
-        <SheetContent
-          side="left"
-          className="w-[300px] p-0"
-        >
+        <SheetContent side="left" className="w-[300px] p-0">
           <ScrollArea className="h-full">
             <Sidebar />
           </ScrollArea>
@@ -63,9 +63,11 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
       </Sheet>
 
       {/* Desktop Sidebar - Collapsible */}
-      <div className={`hidden lg:flex lg:flex-col lg:shadow-lg transition-all duration-300 ${
-        desktopSidebarOpen ? 'lg:w-64' : 'lg:w-16'
-      }`}>
+      <div
+        className={`hidden lg:flex lg:flex-col lg:shadow-lg transition-all duration-300 ${
+          desktopSidebarOpen ? 'lg:w-64' : 'lg:w-16'
+        }`}
+      >
         <div className="relative">
           <Button
             variant="ghost"
@@ -73,9 +75,11 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
             className="absolute right-[-12px] top-4 z-10 hidden lg:flex"
             onClick={toggleSidebar}
           >
-            <ChevronLeft className={`h-4 w-4 transition-transform ${
-              desktopSidebarOpen ? '' : 'rotate-180'
-            }`} />
+            <ChevronLeft
+              className={`h-4 w-4 transition-transform ${
+                desktopSidebarOpen ? '' : 'rotate-180'
+              }`}
+            />
           </Button>
           <ScrollArea className="h-screen">
             <Sidebar collapsed={!desktopSidebarOpen} />
@@ -89,9 +93,7 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
         <header className="sticky top-0 z-10 border-b bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75">
           <div className="flex h-16 items-center gap-4 px-4">
             {title && (
-              <h1 className="text-xl font-semibold text-gray-100">
-                {title}
-              </h1>
+              <h1 className="text-xl font-semibold text-gray-100">{title}</h1>
             )}
           </div>
         </header>
@@ -100,9 +102,7 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
         <ScrollArea className="flex-grow">
           <main className="py-6">
             <div className="px-4 sm:px-6 lg:px-8">
-              <div className="rounded-xl p-3 shadow-lg">
-                {children}
-              </div>
+              <div className="rounded-xl p-3 shadow-lg">{children}</div>
             </div>
           </main>
         </ScrollArea>

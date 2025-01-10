@@ -87,7 +87,10 @@ export const membershipRole: QueryResolvers['membershipRole'] = ({ id }) => {
   })
 }
 
-export const findMembershipRoles: QueryResolvers['findMembershipRoles'] = ({ isSystemDefined, organizationId }) => {
+export const findMembershipRoles: QueryResolvers['findMembershipRoles'] = ({
+  isSystemDefined,
+  organizationId,
+}) => {
   return db.membershipRole.findMany({
     where: {
       OR: [

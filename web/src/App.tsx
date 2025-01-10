@@ -5,12 +5,10 @@ import FatalErrorPage from 'src/pages/FatalErrorPage'
 import Routes from 'src/Routes'
 
 import { AuthProvider, useAuth } from './auth'
-
+import { ThemeProvider } from './context/ThemeProvider'
+import { UIProviders } from './context/UIProviders'
 import './index.css'
 import './scaffold.css'
-import { ThemeProvider } from './context/ThemeProvider'
-
-import { UIProviders } from './context/UIProviders'
 
 const App = () => (
   <ThemeProvider defaultTheme="dark">

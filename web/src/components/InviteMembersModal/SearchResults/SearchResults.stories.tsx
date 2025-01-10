@@ -12,15 +12,15 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-import InviteMembersModal from './InviteMembersModal'
+import SearchResults from './SearchResults'
 
-const meta: Meta<typeof InviteMembersModal> = {
-  component: InviteMembersModal,
+const meta: Meta<typeof SearchResults> = {
+  component: SearchResults,
   tags: ['autodocs'],
 }
 
 export default meta
 
-type Story = StoryObj<typeof InviteMembersModal>
+type Story = StoryObj<typeof SearchResults>
 
 export const Primary: Story = {}

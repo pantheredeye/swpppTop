@@ -1,6 +1,6 @@
-import InviteMembersModal from 'src/components/InviteMembersModal/InviteMembersModal'
+import { useState } from 'react'
 
-import OrgMembersCell from 'src/components/OrgMembersCell'
+import InviteMembersModal from 'src/components/InviteMembersModal/InviteMembersModal'
 import {
   Card,
   CardHeader,
@@ -9,7 +9,7 @@ import {
   CardDescription,
 } from 'src/components/ui/Card'
 
-import { useState } from 'react'
+import OrgMembersCell from './OrgMembersCell/'
 
 const MembersSettings = ({ organizationId }) => {
   const [refreshKey, setRefreshKey] = useState(0)
@@ -38,7 +38,11 @@ const MembersSettings = ({ organizationId }) => {
           </div>
         </CardHeader>
         <CardContent>
-          <OrgMembersCell id={organizationId} key={refreshKey} handleRefresh={handleRefresh} />
+          <OrgMembersCell
+            id={organizationId}
+            key={refreshKey}
+            handleRefresh={handleRefresh}
+          />
         </CardContent>
       </Card>
     </div>

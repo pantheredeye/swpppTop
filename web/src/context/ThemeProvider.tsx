@@ -33,7 +33,9 @@ export function ThemeProvider({
 
   useEffect(() => {
     // Check if user prefers dark mode
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches
 
     // If no theme is saved, use system preference
     if (!localStorage.getItem('theme')) {

@@ -1,6 +1,5 @@
 import { Plus } from 'lucide-react'
 
-import OrgRolesCell from 'src/components/OrgRolesCell'
 import { Button } from 'src/components/ui/Button'
 import {
   Card,
@@ -10,6 +9,8 @@ import {
   CardDescription,
 } from 'src/components/ui/Card'
 
+import OrgRolesCell from './OrgRolesCell/'
+
 const RolesSettings = ({ organizationId }) => {
   return (
     <div className="space-y-6">
@@ -17,17 +18,13 @@ const RolesSettings = ({ organizationId }) => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl">
-                Roles & Permissions
-              </CardTitle>
+              <CardTitle className="text-2xl">Roles & Permissions</CardTitle>
               <CardDescription className="mt-2">
                 Manage access control with predefined system roles or create
                 custom roles
               </CardDescription>
             </div>
-            <Button
-              variant="outline"
-            >
+            <Button variant="outline">
               <Plus className="mr-2 h-4 w-4" />
               Create Custom Role
             </Button>

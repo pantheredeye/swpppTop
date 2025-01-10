@@ -4,10 +4,9 @@ import type {
   MembershipRelationResolvers,
 } from 'types/graphql'
 
+import { cache } from 'src/lib/cache'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
-
-import { cache } from 'src/lib/cache'
 
 export const memberships: QueryResolvers['memberships'] = () => {
   return db.membership.findMany()
@@ -50,22 +49,22 @@ interface InviteMembersInput {
 }
 
 async function processInviteBatch(batchId, organizationId, invites) {
-  const CHUNK_SIZE = 25;
-  const cacheKey = `invite-batch-${batchId}`;
-  let processed = 0;
+  const CHUNK_SIZE = 25
+  const cacheKey = `invite-batch-${batchId}`
+  let processed = 0
 
   // Local state to reduce cache operations
-  let localState = {
+  const localState = {
     status: 'PROCESSING',
     processed: 0,
     results: {
       successful: [],
       failed: [],
     },
-  };
+  }
 
   for (let i = 0; i < invites.length; i += CHUNK_SIZE) {
-    const chunk = invites.slice(i, i + CHUNK_SIZE);
+    const chunk = invites.slice(i, i + CHUNK_SIZE)
 
     const chunkResults = await Promise.all(
       chunk.map(async (invite) => {
@@ -81,11 +80,11 @@ async function processInviteBatch(batchId, organizationId, invites) {
                 email: invite.email,
                 organizationId,
                 roleIds: invite.roleIds,
-              });
+              })
 
           const roles = await db.membershipRole.findMany({
             where: { id: { in: invite.roleIds } },
-          });
+          })
 
           return {
             success: true,
@@ -95,9 +94,9 @@ async function processInviteBatch(batchId, organizationId, invites) {
               status: membership.status,
               roles,
             },
-          };
+          }
         } catch (error) {
-          logger.error(`Failed to process invite for ${invite.email}:`, error);
+          logger.error(`Failed to process invite for ${invite.email}:`, error)
           return {
             success: false,
             data: {
@@ -107,34 +106,37 @@ async function processInviteBatch(batchId, organizationId, invites) {
                   ? error.message
                   : 'Unknown error occurred',
             },
-          };
+          }
         }
       })
-    );
+    )
 
     // Update local state
-    processed += chunk.length;
-    localState.processed = processed;
+    processed += chunk.length
+    localState.processed = processed
     localState.results.successful.push(
-      ...chunkResults.filter((result) => result.success).map((result) => result.data)
-    );
+      ...chunkResults
+        .filter((result) => result.success)
+        .map((result) => result.data)
+    )
     localState.results.failed.push(
-      ...chunkResults.filter((result) => !result.success).map((result) => result.data)
-    );
+      ...chunkResults
+        .filter((result) => !result.success)
+        .map((result) => result.data)
+    )
 
     // Periodically update cache (optional for real-time tracking)
     await cache(cacheKey, () => ({
       ...localState,
-    }));
+    }))
   }
 
   // Final state update
   await cache(cacheKey, () => ({
     ...localState,
     status: 'COMPLETED',
-  }));
+  }))
 }
-
 
 export const inviteMembers = async ({
   input,
@@ -186,7 +188,6 @@ export const inviteMembers = async ({
     failed: [],
   }
 }
-
 
 export const getBatchStatus = async ({ batchId }: { batchId: string }) => {
   const status = await cache(`invite-batch-${batchId}`, () => null)
@@ -327,29 +328,36 @@ export const revokeAccess = async ({ id }: { id: string }) => {
   try {
     const membership = await db.membership.findUnique({
       where: { id },
-    });
+    })
 
     if (!membership) {
-      logger.warn(`Membership with ID ${id} not found`);
-      return { success: false, message: 'Membership not found' };
+      logger.warn(`Membership with ID ${id} not found`)
+      return { success: false, message: 'Membership not found' }
     }
 
     const deletedMembership = await db.membership.delete({
       where: { id },
-    });
+    })
 
-    logger.info(`Membership with ID ${id} revoked successfully`);
-    return { success: true, message: 'Membership revoked successfully', deletedMembership };
+    logger.info(`Membership with ID ${id} revoked successfully`)
+    return {
+      success: true,
+      message: 'Membership revoked successfully',
+      deletedMembership,
+    }
   } catch (error) {
     if (error.code === 'P2025') {
-      logger.warn(`Membership with ID ${id} not found during deletion`);
-      return { success: false, message: 'Membership not found' };
+      logger.warn(`Membership with ID ${id} not found during deletion`)
+      return { success: false, message: 'Membership not found' }
     }
 
-    logger.error(`Error revoking access for membership ID ${id}:`, error);
-    return { success: false, message: 'An error occurred while revoking access' };
+    logger.error(`Error revoking access for membership ID ${id}:`, error)
+    return {
+      success: false,
+      message: 'An error occurred while revoking access',
+    }
   }
-};
+}
 
 // export const suspendMember = async ({ id, status }: { id: string; status: string }) => {
 //   return db.membership.update({
