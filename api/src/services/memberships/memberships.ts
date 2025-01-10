@@ -330,20 +330,23 @@ export const revokeAccess = async ({ id }: { id: string }) => {
     });
 
     if (!membership) {
+      logger.warn(`Membership with ID ${id} not found`);
       return { success: false, message: 'Membership not found' };
     }
 
-    await db.membership.delete({
+    const deletedMembership = await db.membership.delete({
       where: { id },
     });
 
-    return { success: true, message: 'Membership revoked successfully' };
+    logger.info(`Membership with ID ${id} revoked successfully`);
+    return { success: true, message: 'Membership revoked successfully', deletedMembership };
   } catch (error) {
     if (error.code === 'P2025') {
+      logger.warn(`Membership with ID ${id} not found during deletion`);
       return { success: false, message: 'Membership not found' };
     }
 
-    console.error('Error revoking access:', error);
+    logger.error(`Error revoking access for membership ID ${id}:`, error);
     return { success: false, message: 'An error occurred while revoking access' };
   }
 };

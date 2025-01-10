@@ -65,7 +65,11 @@ export const QUERY: TypedDocumentNode<
 const REVOKE_ACCESS_MUTATION = gql`
   mutation RevokeAccess($id: String!) {
     revokeAccess(id: $id) {
-      id
+      success
+      message
+      deletedMembership {
+        id
+      }
     }
   }
 `
@@ -93,12 +97,23 @@ const UPDATE_MEMBER_ROLES_MUTATION = gql`
 
 // Status badge configurations for consistent styling
 const STATUS_CONFIGS = {
-  ACTIVE: { variant: 'default', label: 'Active', className: 'bg-green-500 hover:bg-green-500/80' },
-  INVITED: { variant: 'secondary', label: 'Invited', className: 'bg-yellow-500 hover:bg-yellow-500/80' },
-  PENDING: { variant: 'outline', label: 'Pending', className: 'border-blue-500 text-blue-500' },
-  SUSPENDED: { variant: 'destructive', label: 'Suspended' }
-} as const; // Using 'as const' to make TypeScript understand these are literal types
-
+  ACTIVE: {
+    variant: 'default',
+    label: 'Active',
+    className: 'bg-green-500 hover:bg-green-500/80',
+  },
+  INVITED: {
+    variant: 'secondary',
+    label: 'Invited',
+    className: 'bg-yellow-500 hover:bg-yellow-500/80',
+  },
+  PENDING: {
+    variant: 'outline',
+    label: 'Pending',
+    className: 'border-blue-500 text-blue-500',
+  },
+  SUSPENDED: { variant: 'destructive', label: 'Suspended' },
+} as const // Using 'as const' to make TypeScript understand these are literal types
 
 const availableRoles = [
   { id: '1', name: 'OWNER' },

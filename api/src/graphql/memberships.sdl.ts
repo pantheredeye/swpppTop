@@ -128,6 +128,11 @@ export const schema = gql`
     invites: [InviteMemberInput!]!
   }
 
+  type RevokeAccessResponse {
+    success: Boolean!
+    message: String
+    deletedMembership: Membership
+  }
   type Mutation {
     createMembership(input: CreateMembershipInput!): Membership! @requireAuth
     updateMembership(id: String!, input: UpdateMembershipInput!): Membership!
@@ -138,10 +143,12 @@ export const schema = gql`
       userId: String!
       roleId: String!
     ): InviteMemberResponse! @requireAuth
-    revokeAccess(id: String!): Membership! @requireAuth
+    revokeAccess(id: String!): RevokeAccessResponse! @requireAuth
+
     suspendMember(id: String!, status: MembershipStatus!): Membership!
       @requireAuth
     updateMemberRoles(id: String!, roles: [String!]!): Membership! @requireAuth
-    inviteMembers(input: InviteMembersInput!): InviteMembersResponse! @requireAuth
+    inviteMembers(input: InviteMembersInput!): InviteMembersResponse!
+      @requireAuth
   }
 `
