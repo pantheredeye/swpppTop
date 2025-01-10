@@ -9,7 +9,15 @@ import {
   CardDescription,
 } from 'src/components/ui/Card'
 
+import { useState } from 'react'
+
 const MembersSettings = ({ organizationId }) => {
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const handleRefresh = () => {
+    setRefreshKey((prevKey) => prevKey + 1)
+  }
+
   return (
     <div className="space-y-6">
       <Card className="bg-gray-900 shadow-xl">
@@ -25,15 +33,12 @@ const MembersSettings = ({ organizationId }) => {
             </div>
             <InviteMembersModal
               organizationId={organizationId}
-              onInviteComplete={() => {
-                // Refresh member list or show success message
-                console.log('complete')
-              }}
+              onInviteComplete={handleRefresh}
             />
           </div>
         </CardHeader>
         <CardContent>
-          <OrgMembersCell id={organizationId} />
+          <OrgMembersCell id={organizationId} key={refreshKey} handleRefresh={handleRefresh} />
         </CardContent>
       </Card>
     </div>

@@ -270,9 +270,6 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
   }
 
   const handleInvite = async () => {
-    console.log('selectedRoleForBatch:', selectedRoleForBatch)
-    console.log('defaultRole:', defaultRole)
-    console.log('inviteQueue:', inviteQueue)
     if (!inviteQueue.length) return
 
     // Validate roleIds before sending the mutation
@@ -298,7 +295,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
             invites: inviteQueue.map(({ user, email, roleIds }) => ({
               userId: user?.id,
               email: email,
-              roleIds: roleIds, // Ensure roleIds is always an array with valid role IDs
+              roleIds: roleIds,
             })),
           },
         },
@@ -312,6 +309,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
       })
     }
   }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>

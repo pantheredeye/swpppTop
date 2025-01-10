@@ -129,7 +129,10 @@ export const Failure = ({ error }: CellFailureProps) => (
   <div style={{ color: 'red' }}>Error: {error?.message}</div>
 )
 
-export const Success = ({ orgMembers }: CellSuccessProps<OrgMembersQuery>) => {
+export const Success = ({
+  orgMembers,
+  handleRefresh,
+}: CellSuccessProps<OrgMembersQuery> & { handleRefresh: () => void }) => {
   const [showRoleDialog, setShowRoleDialog] = useState(false)
   const [selectedMember, setSelectedMember] = useState(null)
   const [revokeAccess] = useMutation(REVOKE_ACCESS_MUTATION)
@@ -140,7 +143,7 @@ export const Success = ({ orgMembers }: CellSuccessProps<OrgMembersQuery>) => {
   const handleRevokeAccess = async (memberId) => {
     try {
       await revokeAccess({ variables: { id: memberId } })
-      // Add toast notification for success
+      handleRefresh()
     } catch (error) {
       // Add error handling with toast
       console.error('Failed to revoke access:', error)
