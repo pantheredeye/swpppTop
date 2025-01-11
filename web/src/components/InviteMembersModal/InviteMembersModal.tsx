@@ -86,7 +86,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
         searchTerm: debouncedSearch,
       },
       skip: debouncedSearch.length < 2,
-      fetchPolicy: 'no-cache',
+      // fetchPolicy: 'no-cache',
     }
   )
 
@@ -97,6 +97,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
   const [inviteMembers, { loading: inviting }] = useMutation(
     INVITE_MEMBERS_MUTATION,
     {
+      refetchQueries: ["SearchUsers"],
       onCompleted: (data) => {
         const { successful, failed } = data.inviteMembers
         if (successful.length > 0) {

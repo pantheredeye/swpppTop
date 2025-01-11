@@ -20,14 +20,14 @@ const MembersSettings = ({ organizationId }) => {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-gray-900 shadow-xl">
+      <Card className="shadow-xl">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl text-gray-100">
+              <CardTitle className="text-2xl">
                 Organization Members
               </CardTitle>
-              <CardDescription className="mt-2 text-gray-400">
+              <CardDescription className="mt-2">
                 Manage members, invite and assign roles.
               </CardDescription>
             </div>

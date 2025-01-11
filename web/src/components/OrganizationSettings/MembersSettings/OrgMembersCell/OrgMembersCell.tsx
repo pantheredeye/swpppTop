@@ -122,12 +122,12 @@ const availableRoles = [
   { id: '3', name: 'ADMIN' },
 ]
 
-export const beforeQuery = (props) => {
-  return {
-    variables: props,
-    fetchPolicy: 'no-cache', // Set fetchPolicy to 'no-cache'
-  }
-}
+// export const beforeQuery = (props) => {
+//   return {
+//     variables: props,
+//     fetchPolicy: 'no-cache', // Set fetchPolicy to 'no-cache'
+//   }
+// }
 
 export const Loading = () => <div>Loading...</div>
 
@@ -143,9 +143,9 @@ export const Success = ({
 }: CellSuccessProps<OrgMembersQuery> & { handleRefresh: () => void }) => {
   const [showRoleDialog, setShowRoleDialog] = useState(false)
   const [selectedMember, setSelectedMember] = useState(null)
-  const [revokeAccess] = useMutation(REVOKE_ACCESS_MUTATION)
+  const [revokeAccess] = useMutation(REVOKE_ACCESS_MUTATION, {refetchQueries: ["OrgMembersQuery"]})
   const [suspendMember] = useMutation(SUSPEND_MEMBER_MUTATION)
-  const [updateMemberRoles] = useMutation(UPDATE_MEMBER_ROLES_MUTATION)
+  const [updateMemberRoles] = useMutation(UPDATE_MEMBER_ROLES_MUTATION, {refetchQueries: ["OrgMembersQuery"]})
 
   // Action handlers with optimistic updates
   const handleRevokeAccess = async (memberId) => {
@@ -203,9 +203,6 @@ export const Success = ({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Organization Members</CardTitle>
-      </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
