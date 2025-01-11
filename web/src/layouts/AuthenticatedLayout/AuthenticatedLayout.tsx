@@ -14,6 +14,9 @@ import {
   DropdownMenuTrigger,
 } from 'src/components/ui/DropdownMenu'
 import { Separator } from 'src/components/ui/Separator'
+import OrganizationSwitcher from 'src/components/OrganizationSwitcher/OrganizationSwitcher'
+import { useOrganization } from 'src/context/OrganizationContext'
+import { useParams } from '@redwoodjs/router'
 
 interface AuthenticatedLayoutProps {
   children: ReactNode
@@ -39,10 +42,15 @@ const useSidebarState = () => {
   return { isOpen, toggleSidebar }
 }
 
-const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
+const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
   const isMobile = useMediaQuery('(max-width: 1024px)')
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const { isOpen: desktopSidebarOpen, toggleSidebar } = useSidebarState()
+  const { organizationId } = useParams()
+  const {
+    availableOrganizations,
+    currentOrganization,
+  } = useOrganization()
 
   return (
     <div className="flex min-h-screen bg-background font-sans text-foreground">
@@ -71,7 +79,7 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
           <Button
             variant="secondary"
             size="default"
-            className="absolute -right-4 top-6 z-10 hidden h-8 w-8 rounded-full shadow-md lg:flex items-center justify-center hover:scale-105 transition-transform"
+            className="absolute right-2 top-6 z-10 hidden h-8 w-8 rounded-full shadow-md lg:flex items-center justify-center hover:scale-105 transition-transform"
             onClick={toggleSidebar}
           >
             <ChevronLeft
@@ -91,11 +99,9 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
         <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex h-14 items-center justify-between px-4">
             <div className="flex items-center gap-4">
-              {title && (
-                <h1 className="text-lg font-semibold tracking-tight">
-                  {title}
-                </h1>
-              )}
+            <OrganizationSwitcher
+                organizations={availableOrganizations}
+              />
             </div>
             <div className="flex items-center gap-4">
               <DropdownMenu>

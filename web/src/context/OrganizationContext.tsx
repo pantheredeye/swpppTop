@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-
 import { navigate } from '@redwoodjs/router'
-import { useQuery } from '@redwoodjs/web'
-
+import { useMutation, useQuery } from '@redwoodjs/web'
 import { useAuth } from 'src/auth'
 
 interface Organization {
@@ -12,17 +10,18 @@ interface Organization {
   status: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED' | 'PENDING'
 }
 
+
 interface OrganizationContextType {
   currentOrganization: Organization | null
+  defaultOrganization: Organization | null
   availableOrganizations: Organization[]
-  switchOrganization: (
-    organizationId: string,
-    redirect?: boolean
-  ) => Promise<{ success: boolean }>
+  switchOrganization: (organizationId: string, redirect?: boolean) => Promise<{ success: boolean }>
+  setDefaultOrganization: (organizationId: string) => Promise<void>
   loading: boolean
   error: Error | null
   refreshOrganizations: () => Promise<void>
 }
+
 
 const OrganizationContext = createContext<OrganizationContextType | null>(null)
 
@@ -37,23 +36,28 @@ const GET_USER_ORGANIZATIONS = gql`
   }
 `
 
+const SET_DEFAULT_ORGANIZATION_MUTATION = gql`
+  mutation SetDefaultOrganization($id: String!) {
+    setDefaultOrganization(id: $id) {
+      id
+      defaultOrganizationId
+    }
+  }
+`
+
 export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [currentOrganization, setCurrentOrganization] =
-    useState<Organization | null>(null)
-  const [availableOrganizations, setAvailableOrganizations] = useState<
-    Organization[]
-  >([])
+  const [currentOrganization, setCurrentOrganization] = useState<Organization | null>(null)
+  const [availableOrganizations, setAvailableOrganizations] = useState<Organization[]>([])
+  const [defaultOrganization, setDefaultOrganization] = useState<Organization | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
   const { currentUser } = useAuth()
-  const {
-    data,
-    error: queryError,
-    refetch,
-  } = useQuery(GET_USER_ORGANIZATIONS, {
+  const [setDefaultOrgMutation] = useMutation(SET_DEFAULT_ORGANIZATION_MUTATION)
+
+  const { data, error: queryError, refetch } = useQuery(GET_USER_ORGANIZATIONS, {
     fetchPolicy: 'cache-first',
   })
 
@@ -66,12 +70,20 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       return []
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err
-          : new Error('Failed to refresh organizations')
-      )
+      setError(err instanceof Error ? err : new Error('Failed to refresh organizations'))
       return []
+    }
+  }
+
+  const setDefaultOrg = async (organizationId: string) => {
+    try {
+      await setDefaultOrgMutation({ variables: { id: organizationId } })
+      const newDefaultOrg = availableOrganizations.find(org => org.id === organizationId)
+      if (newDefaultOrg) {
+        setDefaultOrganization(newDefaultOrg)
+      }
+    } catch (err) {
+      throw new Error('Failed to set default organization')
     }
   }
 
@@ -79,9 +91,19 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
     if (data?.userOrganizations) {
       setAvailableOrganizations(data.userOrganizations)
 
-      const defaultOrgId = currentUser?.defaultOrganizationId
+      // Handle defaultOrganization from currentUser
+      if (currentUser?.defaultOrganizationId) {
+        const defaultOrg = data.userOrganizations.find(
+          (org) => org.id === currentUser.defaultOrganizationId
+        )
+        if (defaultOrg) {
+          setDefaultOrganization(defaultOrg)
+        }
+      }
+
+      // Handle currentOrganization
       const storedOrgId = localStorage.getItem('currentOrganizationId')
-      const targetOrgId = defaultOrgId || storedOrgId
+      const targetOrgId = storedOrgId || currentUser?.defaultOrganizationId
 
       if (targetOrgId) {
         const org = data.userOrganizations.find((org) => org.id === targetOrgId)
@@ -99,22 +121,14 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(false)
   }, [data, queryError, currentUser])
 
-  const switchOrganization = async (
-    organizationId: string,
-    redirect: boolean = true
-  ) => {
+  const switchOrganization = async (organizationId: string, redirect: boolean = true) => {
     try {
-      let newOrg = availableOrganizations.find(
-        (org) => org.id === organizationId
-      )
+      let newOrg = availableOrganizations.find((org) => org.id === organizationId)
 
       if (!newOrg) {
         const refreshedOrgs = await refreshOrganizations()
         newOrg = refreshedOrgs.find((org) => org.id === organizationId)
-
-        if (!newOrg) {
-          throw new Error('Organization not found even after refresh')
-        }
+        if (!newOrg) throw new Error('Organization not found')
       }
 
       setCurrentOrganization(newOrg)
@@ -126,8 +140,7 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
 
       return { success: true }
     } catch (err) {
-      const error =
-        err instanceof Error ? err : new Error('Failed to switch organization')
+      const error = err instanceof Error ? err : new Error('Failed to switch organization')
       setError(error)
       throw error
     }
@@ -137,8 +150,10 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
     <OrganizationContext.Provider
       value={{
         currentOrganization,
+        defaultOrganization,
         availableOrganizations,
         switchOrganization,
+        setDefaultOrganization: setDefaultOrg,
         loading,
         error,
         refreshOrganizations,
