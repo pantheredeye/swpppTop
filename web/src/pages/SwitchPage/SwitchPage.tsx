@@ -1,10 +1,32 @@
 import { useEffect, useState } from 'react'
-
 import { navigate, Link, routes, useParams } from '@redwoodjs/router'
 import { Metadata } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
-
+import { useMutation } from '@redwoodjs/web'
 import { useOrganization } from 'src/context/OrganizationContext'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from 'src/components/ui/Card'
+import { Button } from 'src/components/ui/Button'
+import { Badge } from 'src/components/ui/Badge'
+import { Switch } from 'src/components/ui/Switch'
+import { BuildingIcon, PlusCircleIcon } from 'lucide-react'
+import { ScrollArea } from 'src/components/ui/ScrollArea'
+import { Separator } from 'src/components/ui/Separator'
+
+const SET_DEFAULT_ORGANIZATION_MUTATION = gql`
+  mutation SetDefaultOrganization($id: String!) {
+    setDefaultOrganization(id: $id) {
+      id
+      defaultOrganizationId
+    }
+  }
+`
 
 const SwitchPage = () => {
   const { organizationId } = useParams()
@@ -14,36 +36,61 @@ const SwitchPage = () => {
     switchOrganization,
     loading,
   } = useOrganization()
-  const [switchingOrgId, setSwitchingOrgId] = useState<string | null>(null)
+  const [switchingOrgId, setSwitchingOrgId] = useState(null)
+  const [defaultOrgId, setDefaultOrgId] = useState(
+    currentOrganization?.id || null
+  )
+
+  const [setDefaultOrganization] = useMutation(SET_DEFAULT_ORGANIZATION_MUTATION, {
+    onCompleted: () => {
+      toast.success('Default organization updated')
+    },
+    onError: (error) => {
+      toast.error('Failed to update default organization')
+      console.error(error)
+    },
+  })
 
   useEffect(() => {
-    if (!organizationId) {
-      navigate('/')
-    }
+    if (!organizationId) navigate('/')
   }, [organizationId])
 
-  const handleSwitchOrg = async (orgId: string) => {
+  const handleSwitchOrg = async (orgId) => {
     if (orgId === currentOrganization?.id) return
     try {
       setSwitchingOrgId(orgId)
       const { success } = await switchOrganization(orgId)
-      // TODO: Fix Toast & Handle Switching more elegantly
-      // if (success) {
-      //   toast.success('Organization switched successfully')
-      // }
+      if (success) {
+        toast.success('Organization switched successfully')
+      }
     } catch (error) {
-      console.error('Failed to switch organization:', error)
+      toast.error('Failed to switch organization')
     } finally {
       setSwitchingOrgId(null)
     }
   }
 
+  const handleSetDefaultOrg = async (orgId) => {
+    if (orgId === defaultOrgId) return
+    try {
+      await setDefaultOrganization({ variables: { id: orgId } })
+      setDefaultOrgId(orgId)
+    } catch (error) {
+      toast.error('Failed to set default organization')
+    }
+  }
+
   if (!organizationId || loading) {
     return (
-      <div className="min-h-screen bg-gray-800 p-6">
-        <div className="mx-auto max-w-3xl text-center text-gray-200">
-          Loading organizations...
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center space-x-2">
+              <BuildingIcon className="h-5 w-5 animate-pulse text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Loading organizations...</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -55,92 +102,107 @@ const SwitchPage = () => {
         description="Switch between your organizations"
       />
 
-      <div className="min-h-screen bg-gray-800 p-6">
-        <div className="mx-auto max-w-3xl">
-          <div className="rounded-xl bg-gray-900 p-8 shadow-2xl">
-            <div className="border-b border-gray-700 pb-5">
-              <h2 className="text-3xl font-bold text-gray-100">
-                Switch Organizations
-              </h2>
-              <p className="mt-2 text-sm text-gray-400">
-                Select an organization to switch to, or create a new one
-              </p>
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <div className="flex items-center space-x-2">
+              <BuildingIcon className="h-6 w-6 text-primary" />
+              <CardTitle>Organizations</CardTitle>
             </div>
+            <CardDescription>
+              Manage and switch between your organizations
+            </CardDescription>
+          </CardHeader>
 
-            <div className="mt-8 space-y-4">
+          <ScrollArea className="h-[400px] px-6">
+            <div className="space-y-4">
               {availableOrganizations.map((org) => (
                 <div
                   key={org.id}
-                  className={`rounded-lg border p-4 ${
+                  className={`rounded-lg border p-4 transition-colors ${
                     org.id === currentOrganization?.id
-                      ? 'border-indigo-500 bg-gray-800'
-                      : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                      ? 'border-primary bg-muted'
+                      : 'border-border hover:border-primary/50'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-100">
-                        {org.name}
-                      </h3>
-                      <span className="mt-1 text-sm text-gray-400">
-                        Status: {org.status}
-                      </span>
+                    <div className="flex items-center space-x-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                        <BuildingIcon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-medium">
+                            {org.name}
+                          </h3>
+                          {org.status !== 'ACTIVE' && (
+                            <Badge variant="secondary" className="text-xs">
+                              {org.status}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {org.id === currentOrganization?.id ? 'Current organization' : '\u00A0'}
+                        </p>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => handleSwitchOrg(org.id)}
-                      disabled={
-                        org.id === currentOrganization?.id ||
-                        org.status !== 'ACTIVE'
-                      }
-                      className={`rounded-lg px-4 py-2 text-sm font-medium ${
-                        org.id === currentOrganization?.id
-                          ? 'bg-gray-700 text-gray-400'
-                          : org.status === 'ACTIVE'
-                            ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-                            : 'bg-gray-700 text-gray-400'
-                      }`}
-                    >
-                      {org.id === currentOrganization?.id
-                        ? 'Current'
-                        : switchingOrgId === org.id
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          checked={org.id === defaultOrgId}
+                          onCheckedChange={() => handleSetDefaultOrg(org.id)}
+                          disabled={org.status !== 'ACTIVE'}
+                        />
+                        <span className="text-sm text-muted-foreground">Default</span>
+                      </div>
+                      <Button
+                        variant={org.id === currentOrganization?.id ? "secondary" : "default"}
+                        disabled={org.id === currentOrganization?.id || org.status !== 'ACTIVE'}
+                        onClick={() => handleSwitchOrg(org.id)}
+                      >
+                        {org.id === currentOrganization?.id
+                          ? 'Current'
+                          : switchingOrgId === org.id
                           ? 'Switching...'
                           : 'Switch'}
-                    </button>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
 
               {availableOrganizations.length === 0 && (
-                <div className="text-center py-8 text-gray-400">
-                  No organizations available
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <BuildingIcon className="mb-2 h-8 w-8 text-muted-foreground" />
+                  <p className="text-muted-foreground">No organizations available</p>
                 </div>
               )}
             </div>
+          </ScrollArea>
 
-            <div className="mt-8 flex justify-between border-t border-gray-700 pt-6">
-              <Link
-                to={routes.requestInvite({ organizationId })}
-                className="rounded-lg border border-gray-600 bg-transparent px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-800"
-              >
+          <Separator className="my-6" />
+
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" asChild>
+              <Link to={routes.requestInvite({ organizationId })}>
                 Request to Join
               </Link>
-              <div className="space-x-4">
-                <Link
-                  to={routes.dashboard({ organizationId })}
-                  className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-600"
-                >
+            </Button>
+            <div className="space-x-2">
+              <Button variant="outline" asChild>
+                <Link to={routes.dashboard({ organizationId })}>
                   Cancel
                 </Link>
-                <Link
-                  to={routes.createOrganization({ organizationId })}
-                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
-                >
-                  Create New Organization
+              </Button>
+              <Button asChild>
+                <Link to={routes.createOrganization({ organizationId })}>
+                  <PlusCircleIcon className="mr-2 h-4 w-4" />
+                  New Organization
                 </Link>
-              </div>
+              </Button>
             </div>
-          </div>
-        </div>
+          </CardFooter>
+        </Card>
       </div>
     </>
   )
