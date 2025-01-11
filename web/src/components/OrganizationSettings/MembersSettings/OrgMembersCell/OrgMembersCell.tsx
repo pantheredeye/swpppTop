@@ -122,6 +122,13 @@ const availableRoles = [
   { id: '3', name: 'ADMIN' },
 ]
 
+export const beforeQuery = (props) => {
+  return {
+    variables: props,
+    fetchPolicy: 'no-cache', // Set fetchPolicy to 'no-cache'
+  }
+}
+
 export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>Empty</div>
