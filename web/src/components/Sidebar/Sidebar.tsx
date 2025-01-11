@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-
 import {
   Home,
   Users,
@@ -11,28 +10,22 @@ import {
   User,
   Settings,
 } from 'lucide-react'
-
 import { Link, navigate, routes } from '@redwoodjs/router'
 import { useParams } from '@redwoodjs/router'
-
 import { useAuth } from 'src/auth'
+
 import { Button } from 'src/components/ui/Button'
 import { ScrollArea } from 'src/components/ui/ScrollArea'
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from 'src/components/ui/Tooltip'
+import { Separator } from 'src/components/ui/Separator'
 import { cn } from 'src/lib/utils'
-
 import { ThemeToggle } from './ThemeToggle/ThemeToggle'
 
-// Define the props interface for the Sidebar
-interface SidebarProps {
-  collapsed?: boolean
-}
-
-// Helper function to create navigation items
 interface NavigationItem {
   name: string
   href: string
@@ -45,6 +38,10 @@ interface ActionItem {
   icon: React.ComponentType<{ className?: string }>
 }
 
+interface SidebarProps {
+  collapsed?: boolean
+}
+
 const actions: ActionItem[] = [
   { name: 'Back', action: 'back', icon: ArrowLeft },
   { name: 'Logout', action: 'logout', icon: LogOut },
@@ -55,14 +52,10 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
   const { organizationId } = useParams()
 
   useEffect(() => {
-    if (!organizationId) {
-      navigate('/')
-    }
+    if (!organizationId) navigate('/')
   }, [organizationId])
 
-  if (!organizationId) {
-    return null
-  }
+  if (!organizationId) return null
 
   const navigation: NavigationItem[] = [
     {
@@ -102,15 +95,18 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
       <Link
         to={item.href}
         className={cn(
-          'group flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-800 hover:text-gray-200',
-          'transition-all duration-200 ease-in-out',
-          'focus:bg-gray-800 focus:text-gray-200 focus:outline-none'
+          'group flex w-full items-center rounded-md px-3 py-2',
+          'text-sm font-medium',
+          'hover:bg-accent hover:text-accent-foreground',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'transition-colors'
         )}
       >
         <item.icon
           className={cn(
-            'h-5 w-5 text-gray-400 group-hover:text-gray-200',
-            collapsed ? 'mx-auto' : 'mr-3'
+            'h-4 w-4',
+            'text-muted-foreground group-hover:text-current',
+            collapsed ? 'mx-auto' : 'mr-2'
           )}
         />
         {!collapsed && <span>{item.name}</span>}
@@ -118,9 +114,9 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
     )
 
     return collapsed ? (
-      <Tooltip delayDuration={0}>
+      <Tooltip>
         <TooltipTrigger asChild>{content}</TooltipTrigger>
-        <TooltipContent side="right" className="bg-gray-800 text-gray-200">
+        <TooltipContent side="right" sideOffset={20}>
           {item.name}
         </TooltipContent>
       </Tooltip>
@@ -143,16 +139,18 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
         variant="ghost"
         onClick={handleAction}
         className={cn(
-          'w-full group flex items-center rounded-lg px-3 py-2 text-sm font-medium',
-          'hover:bg-gray-800 hover:text-gray-200',
-          'focus:bg-gray-800 focus:text-gray-200',
-          'justify-start'
+          'w-full justify-start',
+          'group flex items-center rounded-md px-3 py-2',
+          'text-sm font-medium',
+          'hover:bg-accent hover:text-accent-foreground',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
         )}
       >
         <action.icon
           className={cn(
-            'h-5 w-5 text-gray-400 group-hover:text-gray-200',
-            collapsed ? 'mx-auto' : 'mr-3'
+            'h-4 w-4',
+            'text-muted-foreground group-hover:text-current',
+            collapsed ? 'mx-auto' : 'mr-2'
           )}
         />
         {!collapsed && <span>{action.name}</span>}
@@ -160,9 +158,9 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
     )
 
     return collapsed ? (
-      <Tooltip delayDuration={0}>
+      <Tooltip>
         <TooltipTrigger asChild>{content}</TooltipTrigger>
-        <TooltipContent side="right" className="bg-gray-800 text-gray-200">
+        <TooltipContent side="right" sideOffset={20}>
           {action.name}
         </TooltipContent>
       </Tooltip>
@@ -172,57 +170,60 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
   }
 
   return (
-    <div
-      className={cn(
-        'flex flex-col bg-gray-900 text-gray-300 shadow-inner',
-        collapsed ? 'w-16' : 'w-64',
-        'transition-all duration-300'
-      )}
-    >
-      {/* Header */}
-      <div className="flex h-16 items-center px-4 justify-between">
-        {!collapsed && (
-          <span className="text-2xl font-bold text-gray-200">SWPPP-Tip</span>
-        )}
-      </div>
-
-      {/* Theme Toggle */}
+    <TooltipProvider delayDuration={0}>
       <div
         className={cn(
-          'flex h-10 items-center px-4',
-          collapsed ? 'justify-center' : 'justify-between'
+          'flex h-screen flex-col border-r bg-background',
+          collapsed ? 'w-16' : 'w-64',
+          'transition-all duration-300'
         )}
       >
-        <ThemeToggle />
+        <div className="flex h-16 items-center px-4">
+          {!collapsed && (
+            <span className="text-xl font-semibold">SWPPP-Tip</span>
+          )}
+        </div>
+
+        <div
+          className={cn(
+            'flex h-12 items-center px-4',
+            collapsed ? 'justify-center' : 'justify-between'
+          )}
+        >
+          <ThemeToggle />
+        </div>
+
+        <Separator />
+
+        <ScrollArea className="flex-1 py-2">
+          <nav className="space-y-1 px-2">
+            {navigation.map((item) => (
+              <NavItem key={item.name} item={item} />
+            ))}
+          </nav>
+
+          <Separator className="my-4" />
+
+          <div className="px-2">
+            <NavItem
+              item={{
+                name: 'Switch Organizations',
+                href: routes.switch({ organizationId }),
+                icon: Building2,
+              }}
+            />
+          </div>
+
+          <Separator className="my-4" />
+
+          <div className="space-y-1 px-2">
+            {actions.map((action) => (
+              <ActionButton key={action.name} action={action} />
+            ))}
+          </div>
+        </ScrollArea>
       </div>
-
-      {/* Navigation */}
-      <ScrollArea className="flex-1 px-2">
-        <nav className="space-y-1 py-4">
-          {navigation.map((item) => (
-            <NavItem key={item.name} item={item} />
-          ))}
-        </nav>
-
-        {/* Organization Switcher */}
-        <div className="py-2">
-          <NavItem
-            item={{
-              name: 'Switch Organizations',
-              href: routes.switch({ organizationId }),
-              icon: Building2,
-            }}
-          />
-        </div>
-
-        {/* Actions */}
-        <div className="space-y-1 py-2">
-          {actions.map((action) => (
-            <ActionButton key={action.name} action={action} />
-          ))}
-        </div>
-      </ScrollArea>
-    </div>
+    </TooltipProvider>
   )
 }
 

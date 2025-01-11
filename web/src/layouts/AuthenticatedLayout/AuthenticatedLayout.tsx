@@ -1,22 +1,26 @@
 import { useState, ReactNode } from 'react'
-
-import { Menu, ChevronLeft } from 'lucide-react'
+import { Menu, ChevronLeft, Settings } from 'lucide-react'
 
 import Sidebar from 'src/components/Sidebar'
 import { Button } from 'src/components/ui/Button'
 import { ScrollArea } from 'src/components/ui/ScrollArea'
 import { Sheet, SheetContent, SheetTrigger } from 'src/components/ui/Sheet'
-import { Toast } from 'src/components/ui/Toast'
+import { Toaster } from 'src/components/ui/Toaster'
 import { useMediaQuery } from 'src/lib/use-media-query'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'src/components/ui/DropdownMenu'
+import { Separator } from 'src/components/ui/Separator'
 
 interface AuthenticatedLayoutProps {
   children: ReactNode
   title?: string
 }
 
-// Custom hook for handling sidebar state with persistence
 const useSidebarState = () => {
-  // Initialize from localStorage if available, otherwise default to true for desktop
   const initialState =
     typeof window !== 'undefined'
       ? localStorage.getItem('sidebarOpen') === 'true'
@@ -36,23 +40,18 @@ const useSidebarState = () => {
 }
 
 const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
-  // Check if we're on mobile
   const isMobile = useMediaQuery('(max-width: 1024px)')
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const { isOpen: desktopSidebarOpen, toggleSidebar } = useSidebarState()
 
   return (
-    <div className="flex min-h-screen font-sans text-gray-300">
-      {/* Mobile Sidebar using Sheet */}
+    <div className="flex min-h-screen bg-background font-sans text-foreground">
+      {/* Mobile Sidebar */}
       <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
         <SheetTrigger asChild className="lg:hidden">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="p-4 text-gray-300 hover:text-gray-200 focus:outline-none"
-          >
+          <Button variant="ghost" size="icon" className="ml-2 mt-2">
+            <Menu className="h-5 w-5" />
             <span className="sr-only">Open sidebar</span>
-            <Menu className="h-6 w-6" />
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="w-[300px] p-0">
@@ -62,21 +61,21 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
         </SheetContent>
       </Sheet>
 
-      {/* Desktop Sidebar - Collapsible */}
+      {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex lg:flex-col lg:shadow-lg transition-all duration-300 ${
+        className={`hidden lg:flex lg:flex-col transition-all duration-300 border-r relative ${
           desktopSidebarOpen ? 'lg:w-64' : 'lg:w-16'
         }`}
       >
         <div className="relative">
           <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-[-12px] top-4 z-10 hidden lg:flex"
+            variant="secondary"
+            size="default"
+            className="absolute -right-4 top-6 z-10 hidden h-8 w-8 rounded-full shadow-md lg:flex items-center justify-center hover:scale-105 transition-transform"
             onClick={toggleSidebar}
           >
             <ChevronLeft
-              className={`h-4 w-4 transition-transform ${
+              className={`h-5 w-5 transition-transform ${
                 desktopSidebarOpen ? '' : 'rotate-180'
               }`}
             />
@@ -88,35 +87,64 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 flex-col border-l">
-        {/* Header Section */}
-        <header className="sticky top-0 z-10 border-b bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75">
-          <div className="flex h-16 items-center gap-4 px-4">
-            {title && (
-              <h1 className="text-xl font-semibold text-gray-100">{title}</h1>
-            )}
+      <div className="flex flex-1 flex-col">
+        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-14 items-center justify-between px-4">
+            <div className="flex items-center gap-4">
+              {title && (
+                <h1 className="text-lg font-semibold tracking-tight">
+                  {title}
+                </h1>
+              )}
+            </div>
+            <div className="flex items-center gap-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Settings className="h-5 w-5" />
+                    <span className="sr-only">Open settings</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <Separator className="my-2" />
+                  <DropdownMenuItem>Log out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </header>
 
-        {/* Main Section with ScrollArea */}
         <ScrollArea className="flex-grow">
-          <main className="py-6">
-            <div className="px-4 sm:px-6 lg:px-8">
-              <div className="rounded-xl p-3 shadow-lg">{children}</div>
+          <main className="container py-6">
+            <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-sm">
+              {children}
             </div>
           </main>
         </ScrollArea>
 
-        {/* Footer */}
-        <footer className="border-t bg-gray-900 py-4 text-center">
-          <p className="text-sm text-gray-500">
-            &copy; 2024 SWPPP-TOP. All rights reserved.
-          </p>
+        <footer className="border-t bg-muted/50 py-6">
+          <div className="container flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              &copy; 2024 SWPPP-TOP. All rights reserved.
+            </p>
+            <nav className="flex gap-4">
+              <Button variant="link" className="text-sm text-muted-foreground">
+                Privacy
+              </Button>
+              <Button variant="link" className="text-sm text-muted-foreground">
+                Terms
+              </Button>
+              <Button variant="link" className="text-sm text-muted-foreground">
+                Contact
+              </Button>
+            </nav>
+          </div>
         </footer>
-      </div>
 
-      {/* Global Toast Notifications */}
-      <Toast />
+        <Toaster />
+      </div>
     </div>
   )
 }
