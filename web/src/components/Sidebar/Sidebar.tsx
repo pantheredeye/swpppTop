@@ -9,11 +9,11 @@ import {
   ArrowLeft,
   User,
   Settings,
+  ChevronLeft,
 } from 'lucide-react'
-import { Link, navigate, routes } from '@redwoodjs/router'
+import { Link, navigate, routes, useLocation } from '@redwoodjs/router'
 import { useParams } from '@redwoodjs/router'
 import { useAuth } from 'src/auth'
-
 import { Button } from 'src/components/ui/Button'
 import { ScrollArea } from 'src/components/ui/ScrollArea'
 import {
@@ -26,12 +26,6 @@ import { Separator } from 'src/components/ui/Separator'
 import { cn } from 'src/lib/utils'
 import { ThemeToggle } from './ThemeToggle/ThemeToggle'
 
-interface NavigationItem {
-  name: string
-  href: string
-  icon: React.ComponentType<{ className?: string }>
-}
-
 interface ActionItem {
   name: string
   action: 'back' | 'logout'
@@ -39,7 +33,8 @@ interface ActionItem {
 }
 
 interface SidebarProps {
-  collapsed?: boolean
+  collapsed: boolean
+  onToggleCollapse: () => void
 }
 
 const actions: ActionItem[] = [
@@ -47,9 +42,10 @@ const actions: ActionItem[] = [
   { name: 'Logout', action: 'logout', icon: LogOut },
 ]
 
-const Sidebar = ({ collapsed = false }: SidebarProps) => {
+const Sidebar = ({ collapsed = false, onToggleCollapse }: SidebarProps) => {
   const { logOut, currentUser } = useAuth()
   const { organizationId } = useParams()
+  const location = useLocation()
 
   useEffect(() => {
     if (!organizationId) navigate('/')
@@ -57,27 +53,15 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
 
   if (!organizationId) return null
 
-  const navigation: NavigationItem[] = [
-    {
-      name: 'Dashboard',
-      href: `/org/${organizationId}/dashboard`,
-      icon: Home,
-    },
+  const navigation = [
+    { name: 'Dashboard', href: `/org/${organizationId}/dashboard`, icon: Home },
     {
       name: 'Inspections',
       href: `/org/${organizationId}/inspections`,
       icon: Users,
     },
-    {
-      name: 'Sites',
-      href: `/org/${organizationId}/sites`,
-      icon: FolderOpen,
-    },
-    {
-      name: 'BMPs',
-      href: `/org/${organizationId}/bmps`,
-      icon: FileText,
-    },
+    { name: 'Sites', href: `/org/${organizationId}/sites`, icon: FolderOpen },
+    { name: 'BMPs', href: `/org/${organizationId}/bmps`, icon: FileText },
     {
       name: 'Profile',
       href: `/org/${organizationId}/profile/${currentUser.id}`,
@@ -90,22 +74,25 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
     },
   ]
 
-  const NavItem = ({ item }: { item: NavigationItem }) => {
+  const NavItem = ({ item }) => {
+    const active = location.pathname === item.href
     const content = (
       <Link
         to={item.href}
         className={cn(
           'group flex w-full items-center rounded-md px-3 py-2',
-          'text-sm font-medium',
-          'hover:bg-accent hover:text-accent-foreground',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-          'transition-colors'
+          'text-sm font-medium transition-colors',
+          active
+            ? 'bg-primary/10 text-primary'
+            : 'hover:bg-accent hover:text-accent-foreground'
         )}
       >
         <item.icon
           className={cn(
             'h-4 w-4',
-            'text-muted-foreground group-hover:text-current',
+            active
+              ? 'text-primary'
+              : 'text-muted-foreground group-hover:text-current',
             collapsed ? 'mx-auto' : 'mr-2'
           )}
         />
@@ -178,10 +165,27 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
           'transition-all duration-300'
         )}
       >
-        <div className="flex h-16 items-center px-4">
+        {/* New Integrated Header */}
+        <div className="flex h-16 items-center justify-between px-4 border-b">
           {!collapsed && (
-            <span className="text-xl font-semibold">SWPPP-Tip</span>
+            <span className="text-xl font-semibold">SWPPP-TOP</span>
           )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleCollapse}
+            className={cn(
+              'p-2 hover:bg-accent rounded-md',
+              collapsed ? 'w-full justify-center' : 'ml-auto'
+            )}
+          >
+            <ChevronLeft
+              className={cn(
+                'h-4 w-4 transition-transform',
+                collapsed && 'rotate-180'
+              )}
+            />
+          </Button>
         </div>
 
         <div
@@ -201,7 +205,6 @@ const Sidebar = ({ collapsed = false }: SidebarProps) => {
               <NavItem key={item.name} item={item} />
             ))}
           </nav>
-
           <Separator className="my-4" />
 
           <div className="px-2">

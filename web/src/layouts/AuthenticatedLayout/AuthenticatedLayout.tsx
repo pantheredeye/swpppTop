@@ -43,14 +43,9 @@ const useSidebarState = () => {
 }
 
 const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
-  const isMobile = useMediaQuery('(max-width: 1024px)')
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const { isOpen: desktopSidebarOpen, toggleSidebar } = useSidebarState()
-  const { organizationId } = useParams()
-  const {
-    availableOrganizations,
-    currentOrganization,
-  } = useOrganization()
+  const { availableOrganizations } = useOrganization()
 
   return (
     <div className="flex min-h-screen bg-background font-sans text-foreground">
@@ -64,8 +59,10 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
         </SheetTrigger>
         <SheetContent side="left" className="w-[300px] p-0">
           <ScrollArea className="h-full">
-            <Sidebar />
-          </ScrollArea>
+          <Sidebar
+  collapsed={!desktopSidebarOpen}
+  onToggleCollapse={toggleSidebar}
+/>          </ScrollArea>
         </SheetContent>
       </Sheet>
 
@@ -89,19 +86,19 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
             />
           </Button>
           <ScrollArea className="h-screen">
-            <Sidebar collapsed={!desktopSidebarOpen} />
-          </ScrollArea>
+          <Sidebar
+  collapsed={!desktopSidebarOpen}
+  onToggleCollapse={toggleSidebar}
+/>          </ScrollArea>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col">
         <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-14 items-center justify-between px-4">
-            <div className="flex items-center gap-4">
-            <OrganizationSwitcher
-                organizations={availableOrganizations}
-              />
+          <div className="container max-w-7xl mx-auto">
+            <div className="flex h-16 items-center justify-between px-4">
+              <OrganizationSwitcher organizations={availableOrganizations} />
             </div>
             <div className="flex items-center gap-4">
               <DropdownMenu>
@@ -124,13 +121,13 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
 
         <ScrollArea className="flex-grow">
           <main className="container py-6">
-            <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-sm">
+            <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
               {children}
             </div>
           </main>
         </ScrollArea>
 
-        <footer className="border-t bg-muted/50 py-6">
+        <footer className="border-t bg-muted/50 py-4 lg:py-6">
           <div className="container flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
               &copy; 2024 SWPPP-TOP. All rights reserved.
