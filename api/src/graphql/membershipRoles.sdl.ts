@@ -25,6 +25,7 @@ export const schema = gql`
     findMembershipRoles(
       isSystemDefined: Boolean
       organizationId: String
+      excludeRoles: [String]
     ): [FindMembershipRoles!]! @requireAuth
   }
 

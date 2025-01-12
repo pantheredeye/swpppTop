@@ -90,12 +90,20 @@ export const membershipRole: QueryResolvers['membershipRole'] = ({ id }) => {
 export const findMembershipRoles: QueryResolvers['findMembershipRoles'] = ({
   isSystemDefined,
   organizationId,
+  excludeRoles,
 }) => {
   return db.membershipRole.findMany({
     where: {
-      OR: [
-        { isSystemDefined: isSystemDefined ?? true },
-        { organizationId: organizationId },
+      AND: [
+        {
+          OR: [
+            { isSystemDefined: isSystemDefined ?? true },
+            { organizationId: organizationId },
+          ],
+        },
+        excludeRoles && excludeRoles.length > 0
+          ? { name: { notIn: excludeRoles } }
+          : {},
       ],
     },
     select: {

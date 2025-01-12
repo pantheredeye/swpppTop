@@ -50,10 +50,12 @@ const SEARCH_USERS_QUERY = gql`
 `
 
 const FIND_ORG_ROLES_QUERY = gql`
-  query FindOrgRolesQuery2($isSystemDefined: Boolean, $id: String) {
+  query FindOrgRolesQuery2($isSystemDefined: Boolean, $id: String, $excludeRoles: [String!] ) {
     organizationRoles: findMembershipRoles(
       isSystemDefined: $isSystemDefined
       organizationId: $id
+      excludeRoles: $excludeRoles
+
     ) {
       id
       name
@@ -91,7 +93,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
   )
 
   const { data: rolesData } = useQuery(FIND_ORG_ROLES_QUERY, {
-    variables: { organizationId },
+    variables: { organizationId, excludeRoles: ['OWNER'], },
   })
 
   const [inviteMembers, { loading: inviting }] = useMutation(
