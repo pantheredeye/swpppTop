@@ -87,8 +87,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
         organizationId,
         searchTerm: debouncedSearch,
       },
-      skip: debouncedSearch.length < 2,
-      // fetchPolicy: 'no-cache',
+      skip: debouncedSearch.length < 3,
     }
   )
 
@@ -103,6 +102,7 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
       onCompleted: (data) => {
         const { successful, failed } = data.inviteMembers
         if (successful.length > 0) {
+          console.log("Invites sent successfully")
           toast({
             title: 'Invites Sent Successfully',
             description: `Successfully sent ${successful.length} invite${successful.length > 1 ? 's' : ''}.`,
