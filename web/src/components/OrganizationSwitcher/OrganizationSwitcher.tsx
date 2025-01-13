@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Building2, Search, Star, PlusCircle, Loader2, ArrowDown, ArrowDownIcon, ArrowDownUp, ChevronDown } from 'lucide-react'
+import { useState } from 'react'
+import { Building2, Search, Star, PlusCircle, Loader2, ChevronDown } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
