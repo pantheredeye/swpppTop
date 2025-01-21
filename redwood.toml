@@ -15,6 +15,9 @@
   ]
 [api]
   port = 8911
+[[api.functions]]
+  name = "stripeWebhook"
+  path = "/stripeWebhook"
 [browser]
   open = true
 [notifications]
