@@ -41,7 +41,11 @@ model Organization {
   sites                  Site[]
   settings               Json? // Stores settings specific to the organization
   billingEmail           String?
-  stripeCustomerId       String?
+  stripeCustomerId       String?                  @unique
+  subscriptionId         String?                  @unique
+  subscriptionStatus     String?
+  subscriptionPeriodEnd  DateTime?
+  priceId                String?
   inspection             Inspection[]
   event                  Event[]
   membershipRoles        MembershipRole[]

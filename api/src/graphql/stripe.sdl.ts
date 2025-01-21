@@ -3,8 +3,13 @@ export const schema = gql`
     url: String!
   }
 
+  input CreateBillingPortalSessionInput {
+    organizationId: String!
+  }
+
   type Mutation {
-    createBillingPortalSession(organizationId: String!): StripePortalResponse! @requireAuth
+    createBillingPortalSession(input: CreateBillingPortalSessionInput!): StripePortalResponse! @requireAuth
     createStripeCheckoutSession(organizationId: String!, priceId: String!): StripePortalResponse! @requireAuth
+
   }
 `

@@ -2,8 +2,8 @@
 import { useMutation } from '@redwoodjs/web'
 
 const CREATE_BILLING_PORTAL_SESSION = gql`
-  mutation CreateBillingPortalSession($organizationId: String!) {
-    createBillingPortalSession(organizationId: $organizationId) {
+  mutation CreateBillingPortalSession($input: CreateBillingPortalSessionInput!) {
+    createBillingPortalSession(input: $input) {
       url
     }
   }
@@ -29,7 +29,7 @@ export const useStripe = () => {
       window.location.href = data.createBillingPortalSession.url
     } catch (error) {
       console.error('Error redirecting to billing portal:', error)
-      toast.error('Failed to access billing portal')
+      // toast.error('Failed to access billing portal')
     }
   }
 
@@ -41,7 +41,7 @@ export const useStripe = () => {
       window.location.href = data.createStripeCheckoutSession.url
     } catch (error) {
       console.error('Error redirecting to checkout:', error)
-      toast.error('Failed to start checkout process')
+      // toast.error('Failed to start checkout process')
     }
   }
 

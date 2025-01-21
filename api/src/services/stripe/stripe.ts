@@ -3,18 +3,60 @@ import Stripe from 'stripe'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-export const createBillingPortalSession = async ({ organizationId }) => {
-  const organization = await db.organization.findUnique({
-    where: { id: organizationId },
-    select: { stripeCustomerId: true }
+export const createBillingPortalSession = async ({ input }) => {
+  const { organizationId } = input
+
+  // Get current user's membership in the organization
+  const currentUser = context.currentUser
+  const membership = await db.membership.findFirst({
+    where: {
+      userId: currentUser.id,
+      organizationId: organizationId,
+      status: 'ACTIVE',
+    },
   })
 
-  if (!organization?.stripeCustomerId) {
-    throw new Error('No Stripe customer ID found for this organization')
+  if (!membership) {
+    throw new Error('Not authorized to access billing for this organization')
+  }
+
+  const organization = await db.organization.findUnique({
+    where: { id: organizationId },
+    select: {
+      stripeCustomerId: true,
+      billingEmail: true,
+      name: true
+    }
+  })
+
+  if (!organization) {
+    throw new Error('Organization not found')
+  }
+
+  let { stripeCustomerId } = organization
+
+  // If no Stripe customer exists, create one
+  if (!stripeCustomerId) {
+    const customer = await stripe.customers.create({
+      // TODO: look into currentUser email
+      // email: organization.billingEmail || currentUser.email, <-- look into this
+      email: organization.billingEmail,
+      name: organization.name,
+      metadata: {
+        organizationId: organizationId
+      }
+    })
+
+    stripeCustomerId = customer.id
+
+    await db.organization.update({
+      where: { id: organizationId },
+      data: { stripeCustomerId: customer.id }
+    })
   }
 
   const session = await stripe.billingPortal.sessions.create({
-    customer: organization.stripeCustomerId,
+    customer: stripeCustomerId,
     return_url: `${process.env.REDWOOD_ENV_FRONTEND_URL}/settings`,
   })
 
@@ -22,7 +64,6 @@ export const createBillingPortalSession = async ({ organizationId }) => {
     url: session.url
   }
 }
-
 export const createStripeCheckoutSession = async ({ organizationId, priceId }) => {
   const organization = await db.organization.findUnique({
     where: { id: organizationId },

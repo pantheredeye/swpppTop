@@ -1,20 +1,28 @@
 import { db } from 'src/lib/db'
 import Stripe from 'stripe'
+import { OrganizationStatus } from '@prisma/client'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
-export const handler = async (event) => {
+interface StripeEvent {
+  type: string
+  data: {
+    object: Stripe.Subscription
+  }
+}
+
+export const handler = async (event: { body: string; headers: { [key: string]: string } }) => {
   try {
     const sig = event.headers['stripe-signature']
-    let stripeEvent
+    let stripeEvent: StripeEvent
 
     try {
       stripeEvent = stripe.webhooks.constructEvent(
         event.body,
         sig,
         endpointSecret
-      )
+      ) as StripeEvent
     } catch (err) {
       return {
         statusCode: 400,
@@ -24,20 +32,23 @@ export const handler = async (event) => {
 
     switch (stripeEvent.type) {
       case 'customer.subscription.updated':
-      case 'customer.subscription.deleted':
+      case 'customer.subscription.deleted': {
         const subscription = stripeEvent.data.object
+
         await db.organization.update({
           where: {
-            stripeCustomerId: subscription.customer
+            stripeCustomerId: subscription.customer as string,
           },
           data: {
-            // Update organization based on subscription status
-            status: subscription.status === 'active' ? 'ACTIVE' : 'SUSPENDED',
+            subscriptionId: subscription.id,
+            subscriptionStatus: subscription.status,
+            subscriptionPeriodEnd: new Date(subscription.current_period_end * 1000),
+            priceId: subscription.items.data[0]?.price.id,
+            status: getOrgStatus(subscription.status)
           },
         })
         break
-
-      // Add more webhook event handlers as needed
+      }
     }
 
     return {
@@ -47,7 +58,21 @@ export const handler = async (event) => {
   } catch (error) {
     return {
       statusCode: 400,
-      body: `Webhook Error: ${error.message}`,
+      body: `Webhook Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
     }
+  }
+}
+
+const getOrgStatus = (stripeStatus: string): OrganizationStatus => {
+  switch (stripeStatus) {
+    case 'active':
+      return 'ACTIVE'
+    case 'past_due':
+    case 'unpaid':
+      return 'SUSPENDED'
+    case 'canceled':
+      return 'ARCHIVED'
+    default:
+      return 'PENDING'
   }
 }
