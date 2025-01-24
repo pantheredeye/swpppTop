@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { Card, CardContent } from 'src/components/ui/Card'
+
+import { Building2, User, Bell, CreditCard } from 'lucide-react'
+
 import {
   Accordion,
   AccordionContent,
@@ -7,6 +9,7 @@ import {
   AccordionTrigger,
 } from 'src/components/ui/Accordion'
 import { Button } from 'src/components/ui/Button'
+import { Card, CardContent } from 'src/components/ui/Card'
 import { Input } from 'src/components/ui/Input'
 import {
   Select,
@@ -16,10 +19,7 @@ import {
   SelectValue,
 } from 'src/components/ui/Select'
 import { Switch } from 'src/components/ui/Switch'
-import { Building2, User, Bell, CreditCard, HelpCircle } from 'lucide-react'
-// import { useStripe } from '@stripe/stripe-js'
-import { toast } from 'react-hot-toast'
-
+import { useToast } from 'src/components/ui/UseToast'
 import { useStripe } from 'src/utils/useStripe'
 
 const GeneralSettings = ({
@@ -29,15 +29,38 @@ const GeneralSettings = ({
   onUpdateOrganization,
   onUpdateUser,
 }) => {
-  const stripe = useStripe()
+  const _stripe = useStripe()
   const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
 
   const { redirectToBillingPortal } = useStripe()
 
   const handleManageSubscription = async () => {
     redirectToBillingPortal(organization.id)
   }
-
+  const handleUpdateOrganization = async () => {
+    try {
+      setIsLoading(true)
+      const updatedOrg = await updateOrganization({
+        name: nameInput.current.value,
+        type: typeSelect.current.value,
+        status: statusSelect.current.value,
+        billingEmail: billingEmailInput.current.value,
+      })
+      toast({
+        title: 'Organization Updated',
+        description: 'Your organization settings have been saved.',
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Could not update organization',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <Accordion type="single" collapsible className="w-full">
@@ -52,13 +75,21 @@ const GeneralSettings = ({
               <CardContent className="pt-6 space-y-6">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="font-medium">Organization Name</label>
-                    <Input defaultValue={organization?.name} />
+                    <label htmlFor="orgName" className="font-medium">
+                      Organization Name
+                    </label>
+                    <Input
+                      id="orgName"
+                      name="orgName"
+                      defaultValue={organization?.name}
+                    />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="font-medium">Organization Type</label>
-                    <Select defaultValue={organization?.type}>
+                    <label htmlFor="orgType" className="font-medium">
+                      Organization Type
+                    </label>
+                    <Select name="orgType" defaultValue={organization?.type}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
@@ -70,8 +101,13 @@ const GeneralSettings = ({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="font-medium">Status</label>
-                    <Select defaultValue={organization?.status}>
+                    <label htmlFor="orgStatus" className="font-medium">
+                      Status
+                    </label>
+                    <Select
+                      name="orgStatus"
+                      defaultValue={organization?.status}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
@@ -89,7 +125,7 @@ const GeneralSettings = ({
           </AccordionContent>
         </AccordionItem>
 
-        {/* Profile Settings */}
+        {/* Profile Settings - Should be organizational not user information */}
         <AccordionItem value="profile">
           <AccordionTrigger className="flex items-center gap-2 text-lg font-semibold">
             <User className="h-5 w-5 text-primary" />
@@ -100,18 +136,34 @@ const GeneralSettings = ({
               <CardContent className="pt-6 space-y-6">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="font-medium">First Name</label>
-                    <Input defaultValue={currentUser?.firstName} />
+                    <label htmlFor="firstName" className="font-medium">
+                      First Name
+                    </label>
+                    <Input
+                      name="firstName"
+                      defaultValue={currentUser?.firstName}
+                    />
                   </div>
                   <div className="space-y-2">
-                    <label className="font-medium">Last Name</label>
-                    <Input defaultValue={currentUser?.lastName} />
+                    <label htmlFor="lastName" className="font-medium">
+                      Last Name
+                    </label>
+                    <Input
+                      name="lastName"
+                      defaultValue={currentUser?.lastName}
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="font-medium">Phone Number</label>
-                  <Input type="tel" defaultValue={currentUser?.phoneNumber} />
+                  <label htmlFor="phoneNumber" className="font-medium">
+                    Phone Number
+                  </label>
+                  <Input
+                    name="phoneNumber"
+                    type="tel"
+                    defaultValue={currentUser?.phoneNumber}
+                  />
                 </div>
               </CardContent>
             </Card>
