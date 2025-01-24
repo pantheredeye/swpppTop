@@ -46,6 +46,13 @@ model Organization {
   subscriptionStatus     String?
   subscriptionPeriodEnd  DateTime?
   priceId                String?
+  description            String?
+  timezone               String?
+  primaryLanguage        String?
+  fiscalYearStart        DateTime?
+  logoUrl                String?
+  contactEmail           String?
+  contactPhone           String?
   inspection             Inspection[]
   event                  Event[]
   membershipRoles        MembershipRole[]
