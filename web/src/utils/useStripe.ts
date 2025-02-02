@@ -2,7 +2,9 @@
 import { useMutation } from '@redwoodjs/web'
 
 const CREATE_BILLING_PORTAL_SESSION = gql`
-  mutation CreateBillingPortalSession($input: CreateBillingPortalSessionInput!) {
+  mutation CreateBillingPortalSession(
+    $input: CreateBillingPortalSessionInput!
+  ) {
     createBillingPortalSession(input: $input) {
       url
     }
@@ -11,7 +13,10 @@ const CREATE_BILLING_PORTAL_SESSION = gql`
 
 const CREATE_CHECKOUT_SESSION = gql`
   mutation CreateCheckoutSession($organizationId: String!, $priceId: String!) {
-    createStripeCheckoutSession(organizationId: $organizationId, priceId: $priceId) {
+    createStripeCheckoutSession(
+      organizationId: $organizationId
+      priceId: $priceId
+    ) {
       url
     }
   }
@@ -24,7 +29,7 @@ export const useStripe = () => {
   const redirectToBillingPortal = async (organizationId) => {
     try {
       const { data } = await createPortalSession({
-        variables: { organizationId },
+        variables: { input: { organizationId } },
       })
       window.location.href = data.createBillingPortalSession.url
     } catch (error) {

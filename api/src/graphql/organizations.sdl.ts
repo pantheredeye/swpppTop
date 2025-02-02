@@ -9,6 +9,14 @@ export const schema = gql`
     settings: JSON
     billingEmail: String
     stripeCustomerId: String
+    subscriptionStatus: String
+    subscriptionPeriodEnd: DateTime
+    timezone: String
+    primaryLanguage: String
+    fiscalYearStart: DateTime
+    logoUrl: String
+    contactEmail: String
+    contactPhone: String
     inspection: [Inspection]!
     event: [Event]!
     membershipRoles: [MembershipRole]!
@@ -47,6 +55,14 @@ export const schema = gql`
     settings: JSON
     billingEmail: String
     stripeCustomerId: String
+    subscriptionStatus: String
+    subscriptionPeriodEnd: DateTime
+    timezone: String
+    primaryLanguage: String
+    fiscalYearStart: DateTime
+    logoUrl: String
+    contactEmail: String
+    contactPhone: String
     deletedAt: DateTime
     status: OrganizationStatus!
   }
@@ -57,6 +73,14 @@ export const schema = gql`
     settings: JSON
     billingEmail: String
     stripeCustomerId: String
+    subscriptionStatus: String
+    subscriptionPeriodEnd: DateTime
+    timezone: String
+    primaryLanguage: String
+    fiscalYearStart: DateTime
+    logoUrl: String
+    contactEmail: String
+    contactPhone: String
     deletedAt: DateTime
     status: OrganizationStatus
   }
@@ -64,15 +88,11 @@ export const schema = gql`
   type Mutation {
     createOrganization(input: CreateOrganizationInput!): Organization!
       @requireAuth
-
     updateOrganization(
       id: String!
       input: UpdateOrganizationInput!
     ): Organization! @requireAuth
-
     deleteOrganization(id: String!): Organization! @requireAuth
-
     setDefaultOrganization(id: String!): User! @requireAuth
   }
 `
-// deleteOrganization(id: String!): Organization! @requireAuth(roles: ["OWNER"])

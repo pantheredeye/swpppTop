@@ -1,19 +1,21 @@
 import { useState, ReactNode } from 'react'
+
 import { Menu, Settings } from 'lucide-react'
+
+import OrganizationSwitcher from 'src/components/OrganizationSwitcher'
+import Sidebar from 'src/components/Sidebar/Sidebar'
 import { Button } from 'src/components/ui/Button'
-import { ScrollArea } from 'src/components/ui/ScrollArea'
-import { Sheet, SheetContent, SheetTrigger } from 'src/components/ui/Sheet'
-import { Toaster } from 'src/components/ui/Toaster'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'src/components/ui/DropdownMenu'
+import { ScrollArea } from 'src/components/ui/ScrollArea'
 import { Separator } from 'src/components/ui/Separator'
-import OrganizationSwitcher from 'src/components/OrganizationSwitcher'
+import { Sheet, SheetContent, SheetTrigger } from 'src/components/ui/Sheet'
+import { Toaster } from 'src/components/ui/Toaster'
 import { useOrganization } from 'src/context/OrganizationContext'
-import Sidebar from 'src/components/Sidebar/Sidebar'
 interface LayoutProps {
   children: ReactNode
   title?: string
@@ -58,9 +60,11 @@ const AuthenticatedLayout = ({ children }: LayoutProps) => {
       </Sheet>
 
       {/* Desktop Sidebar */}
-      <div className={`hidden lg:flex lg:flex-col transition-all duration-300 border-r ${
-        desktopSidebarOpen ? 'lg:w-64' : 'lg:w-16'
-      }`}>
+      <div
+        className={`hidden lg:flex lg:flex-col transition-all duration-300 border-r ${
+          desktopSidebarOpen ? 'lg:w-64' : 'lg:w-16'
+        }`}
+      >
         <ScrollArea className="h-screen">
           <Sidebar
             isMobile={false}
@@ -92,8 +96,8 @@ const AuthenticatedLayout = ({ children }: LayoutProps) => {
         </header>
 
         <ScrollArea className="flex-grow">
-          <main className="container py-6">
-            <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
+          <main className="container py-6 px-4 sm:px-6">
+            <div className="rounded-lg border bg-card p-4 sm:p-6 text-card-foreground shadow-sm">
               {children}
             </div>
           </main>

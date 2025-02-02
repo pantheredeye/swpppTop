@@ -8,8 +8,12 @@ export const schema = gql`
   }
 
   type Mutation {
-    createBillingPortalSession(input: CreateBillingPortalSessionInput!): StripePortalResponse! @requireAuth
-    createStripeCheckoutSession(organizationId: String!, priceId: String!): StripePortalResponse! @requireAuth
-
+    createBillingPortalSession(
+      input: CreateBillingPortalSessionInput!
+    ): StripePortalResponse! @requireAuth
+    createStripeCheckoutSession(
+      organizationId: String!
+      priceId: String!
+    ): StripePortalResponse! @requireAuth
   }
 `

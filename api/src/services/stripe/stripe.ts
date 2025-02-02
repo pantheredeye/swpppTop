@@ -1,5 +1,6 @@
-import { db } from 'src/lib/db'
 import Stripe from 'stripe'
+
+import { db } from 'src/lib/db'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -25,8 +26,8 @@ export const createBillingPortalSession = async ({ input }) => {
     select: {
       stripeCustomerId: true,
       billingEmail: true,
-      name: true
-    }
+      name: true,
+    },
   })
 
   if (!organization) {
@@ -43,15 +44,15 @@ export const createBillingPortalSession = async ({ input }) => {
       email: organization.billingEmail,
       name: organization.name,
       metadata: {
-        organizationId: organizationId
-      }
+        organizationId: organizationId,
+      },
     })
 
     stripeCustomerId = customer.id
 
     await db.organization.update({
       where: { id: organizationId },
-      data: { stripeCustomerId: customer.id }
+      data: { stripeCustomerId: customer.id },
     })
   }
 
@@ -61,17 +62,21 @@ export const createBillingPortalSession = async ({ input }) => {
   })
 
   return {
-    url: session.url
+    url: session.url,
   }
 }
-export const createStripeCheckoutSession = async ({ organizationId, priceId }) => {
+
+export const createStripeCheckoutSession = async ({
+  organizationId,
+  priceId,
+}) => {
   const organization = await db.organization.findUnique({
     where: { id: organizationId },
     select: {
       stripeCustomerId: true,
       name: true,
-      billingEmail: true
-    }
+      billingEmail: true,
+    },
   })
 
   let customer = organization?.stripeCustomerId
@@ -81,15 +86,15 @@ export const createStripeCheckoutSession = async ({ organizationId, priceId }) =
       email: organization.billingEmail,
       name: organization.name,
       metadata: {
-        organizationId: organizationId
-      }
+        organizationId: organizationId,
+      },
     })
 
     customer = newCustomer.id
 
     await db.organization.update({
       where: { id: organizationId },
-      data: { stripeCustomerId: customer }
+      data: { stripeCustomerId: customer },
     })
   }
 
@@ -97,15 +102,17 @@ export const createStripeCheckoutSession = async ({ organizationId, priceId }) =
     customer: customer,
     mode: 'subscription',
     payment_method_types: ['card'],
-    line_items: [{
-      price: priceId,
-      quantity: 1,
-    }],
+    line_items: [
+      {
+        price: priceId,
+        quantity: 1,
+      },
+    ],
     success_url: `${process.env.REDWOOD_ENV_FRONTEND_URL}/settings?success=true`,
     cancel_url: `${process.env.REDWOOD_ENV_FRONTEND_URL}/settings?canceled=true`,
   })
 
   return {
-    url: session.url
+    url: session.url,
   }
 }

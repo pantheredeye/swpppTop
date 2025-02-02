@@ -14,7 +14,7 @@ const OrganizationSettingsPage = () => {
   const renderTabContent = () => {
     switch (tab) {
       case 'general':
-        return <GeneralSettings />
+        return <GeneralSettings organizationId={organizationId} />
       case 'roles':
         return <RolesSettings organizationId={organizationId} />
       case 'members':
@@ -22,14 +22,14 @@ const OrganizationSettingsPage = () => {
       case 'delete':
         return <DeleteOrganization />
       default:
-        return <GeneralSettings />
+        return <GeneralSettings organizationId={organizationId} />
     }
   }
 
   return (
     <OrganizationSettingsLayout>
       <Metadata title="Organization Settings" />
-      {renderTabContent()}
+      <div className="max-w-full overflow-x-hidden">{renderTabContent()}</div>
     </OrganizationSettingsLayout>
   )
 }

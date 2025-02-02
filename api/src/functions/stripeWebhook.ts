@@ -1,6 +1,7 @@
-import { db } from 'src/lib/db'
-import Stripe from 'stripe'
 import { OrganizationStatus } from '@prisma/client'
+import Stripe from 'stripe'
+
+import { db } from 'src/lib/db'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -12,7 +13,10 @@ interface StripeEvent {
   }
 }
 
-export const handler = async (event: { body: string; headers: { [key: string]: string } }) => {
+export const handler = async (event: {
+  body: string
+  headers: { [key: string]: string }
+}) => {
   try {
     const sig = event.headers['stripe-signature']
     let stripeEvent: StripeEvent
@@ -42,9 +46,11 @@ export const handler = async (event: { body: string; headers: { [key: string]: s
           data: {
             subscriptionId: subscription.id,
             subscriptionStatus: subscription.status,
-            subscriptionPeriodEnd: new Date(subscription.current_period_end * 1000),
+            subscriptionPeriodEnd: new Date(
+              subscription.current_period_end * 1000
+            ),
             priceId: subscription.items.data[0]?.price.id,
-            status: getOrgStatus(subscription.status)
+            status: getOrgStatus(subscription.status),
           },
         })
         break
