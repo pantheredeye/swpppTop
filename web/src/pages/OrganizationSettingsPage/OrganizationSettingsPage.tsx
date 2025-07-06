@@ -2,11 +2,11 @@
 import { useParams } from '@cedarjs/router'
 import { Metadata } from '@cedarjs/web'
 
-import DeleteOrganization from 'src/components/OrganizationSettings/DeleteOrganization'
-import GeneralSettings from 'src/components/OrganizationSettings/GeneralSettings'
-import MembersSettings from 'src/components/OrganizationSettings/MembersSettings'
-import RolesSettings from 'src/components/OrganizationSettings/RolesSettings'
-import OrganizationSettingsLayout from 'src/layouts/OrganizationSettingsLayout'
+import DeleteOrganization from 'src/components/OrganizationSettings/DeleteOrganization/DeleteOrganization'
+import GeneralSettings from 'src/components/OrganizationSettings/GeneralSettings/GeneralSettings'
+import MembersSettings from 'src/components/OrganizationSettings/MembersSettings/MembersSettings'
+import RolesSettings from 'src/components/OrganizationSettings/RolesSettings/RolesSettings'
+import OrganizationSettingsLayout from 'src/layouts/OrganizationSettingsLayout/OrganizationSettingsLayout'
 
 const OrganizationSettingsPage = () => {
   const { organizationId, tab = 'general' } = useParams()

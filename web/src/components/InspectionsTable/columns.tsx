@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from 'src/components/ui/DropdownMenu'
 
-import ExportPDFButton from '../ExportPDFButton/ExportPDFButton'
+// import ExportPDFButton from '../ExportPDFButton/ExportPDFButton'
 export type Inspection = {
   id: number
   site: {
@@ -92,7 +92,7 @@ export const columns: ColumnDef<Inspection>[] = [
               View inspection
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <ExportPDFButton inspectionId={inspection.id} />
+              {/* <ExportPDFButton inspectionId={inspection.id} /> */}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

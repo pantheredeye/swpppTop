@@ -19,7 +19,7 @@ import { useAuth } from 'src/auth'
 import BmpsCell from 'src/components/BmpsCell'
 import CloudinaryUploadWidget from 'src/components/CloudinaryUploadWidget/CloudinaryUploadWidget'
 import SitesCell from 'src/components/SitesCell'
-import UsersCell from 'src/components/UsersCell'
+// import UsersCell from 'src/components/UsersCell'
 
 const CREATE_INSPECTION_MUTATION = gql`
   mutation CreateInspectionMutation($input: CreateInspectionInput!) {

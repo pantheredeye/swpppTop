@@ -2,14 +2,14 @@
 import { pdf } from '@react-pdf/renderer'
 
 import InspectionPDF from 'src/components/InspectionPDF/InspectionPDF'
-// import { useFetchInspection } from 'src/utils/fetchInspection'
+import { useFetchInspection } from 'src/utils/fetchInspection'
 
 interface ExportPDFButtonProps {
   inspectionId: number
 }
 
 const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({ inspectionId }) => {
-  // const { fetchInspection, loading, error } = useFetchInspection()
+  const { fetchInspection, loading, error } = useFetchInspection()
 
   const handleExportPDF = async () => {
     if (loading) return
