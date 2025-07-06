@@ -7,7 +7,7 @@ import type {
   CellSuccessProps,
   CellFailureProps,
   TypedDocumentNode,
-} from '@redwoodjs/web'
+} from '@cedarjs/web'
 
 import { columns } from 'src/components/InspectionsTable/columns'
 import DataTable from 'src/components/InspectionsTable/InspectionsTable'

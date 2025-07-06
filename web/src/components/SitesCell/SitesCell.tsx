@@ -1,11 +1,11 @@
 import type { SitesQuery, SitesQueryVariables } from 'types/graphql'
 
-import { SelectField } from '@redwoodjs/forms'
+import { SelectField } from '@cedarjs/forms'
 import type {
   CellSuccessProps,
   CellFailureProps,
   TypedDocumentNode,
-} from '@redwoodjs/web'
+} from '@cedarjs/web'
 
 export const QUERY: TypedDocumentNode<SitesQuery, SitesQueryVariables> = gql`
   query SitesQuery {

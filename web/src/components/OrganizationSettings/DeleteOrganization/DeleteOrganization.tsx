@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
-import { navigate, routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
+import { navigate, routes } from '@cedarjs/router'
+import { useMutation } from '@cedarjs/web'
+import { toast } from '@cedarjs/web/toast'
 
 import { Alert, AlertDescription } from 'src/components/ui/Alert'
 import { Button } from 'src/components/ui/Button'

@@ -1,4 +1,4 @@
-import { useParams, navigate, routes } from '@redwoodjs/router'
+import { useParams, navigate, routes } from '@cedarjs/router'
 import { useOrganization } from 'src/context/OrganizationContext'
 import { Card, CardContent, CardHeader, CardTitle } from "src/components/ui/Card"
 import { Tabs, TabsList, TabsTrigger } from "src/components/ui/Tabs"

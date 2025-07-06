@@ -1,6 +1,6 @@
 // web/src/pages/OrganizationSettingsPage/OrganizationSettingsPage.jsx
-import { useParams } from '@redwoodjs/router'
-import { Metadata } from '@redwoodjs/web'
+import { useParams } from '@cedarjs/router'
+import { Metadata } from '@cedarjs/web'
 
 import DeleteOrganization from 'src/components/OrganizationSettings/DeleteOrganization'
 import GeneralSettings from 'src/components/OrganizationSettings/GeneralSettings'

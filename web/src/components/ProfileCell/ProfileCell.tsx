@@ -4,7 +4,7 @@ import type {
   CellSuccessProps,
   CellFailureProps,
   TypedDocumentNode,
-} from '@redwoodjs/web'
+} from '@cedarjs/web'
 
 import ProfileForm from '../ProfileForm/ProfileForm'
 

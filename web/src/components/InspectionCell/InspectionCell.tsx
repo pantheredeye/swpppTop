@@ -7,7 +7,7 @@ import type {
   CellSuccessProps,
   CellFailureProps,
   TypedDocumentNode,
-} from '@redwoodjs/web'
+} from '@cedarjs/web'
 
 import { Card } from 'src/components/ui/Card'
 

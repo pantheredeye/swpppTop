@@ -8,7 +8,7 @@ import {
   CellFailureProps,
   TypedDocumentNode,
   useMutation,
-} from '@redwoodjs/web'
+} from '@cedarjs/web'
 
 import { Badge } from 'src/components/ui/Badge'
 import { Button } from 'src/components/ui/Button'

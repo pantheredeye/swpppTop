@@ -3,7 +3,7 @@ import React from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal } from 'lucide-react'
 
-import { navigate, routes } from '@redwoodjs/router'
+import { navigate, routes } from '@cedarjs/router'
 
 import { useAuth } from 'src/auth'
 import { Button } from 'src/components/ui/Button'

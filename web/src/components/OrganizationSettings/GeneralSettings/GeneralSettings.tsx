@@ -3,7 +3,7 @@ import { useState } from 'react'
 import gql from 'graphql-tag'
 import { Building2, User, Bell, CreditCard } from 'lucide-react'
 
-import { useQuery, useMutation } from '@redwoodjs/web'
+import { useQuery, useMutation } from '@cedarjs/web'
 
 import { Button } from 'src/components/ui/Button'
 import {

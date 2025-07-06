@@ -11,7 +11,7 @@ import {
 import { Input } from 'src/components/ui/Input'
 import { Button } from 'src/components/ui/Button'
 import { cn } from 'src/utils/cn'
-import { navigate, routes, useParams } from '@redwoodjs/router'
+import { navigate, routes, useParams } from '@cedarjs/router'
 import { useOrganization } from 'src/context/OrganizationContext'
 import { useToast } from 'src/components/ui/UseToast'
 

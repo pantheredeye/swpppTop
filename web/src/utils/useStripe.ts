@@ -1,5 +1,5 @@
 // web/src/hooks/useStripe.js
-import { useMutation } from '@redwoodjs/web'
+import { useMutation } from '@cedarjs/web'
 
 const CREATE_BILLING_PORTAL_SESSION = gql`
   mutation CreateBillingPortalSession(

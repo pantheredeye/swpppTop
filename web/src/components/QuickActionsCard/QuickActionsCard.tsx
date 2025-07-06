@@ -1,5 +1,5 @@
-import { Link, routes } from '@redwoodjs/router'
-import { useQuery } from '@redwoodjs/web'
+import { Link, routes } from '@cedarjs/router'
+import { useQuery } from '@cedarjs/web'
 
 import { useAuth } from 'src/auth'
 // const GET_QUICK_ACTIONS = gql`

@@ -11,8 +11,8 @@ import {
   Settings,
   ChevronLeft,
 } from 'lucide-react'
-import { Link, navigate, routes, useLocation } from '@redwoodjs/router'
-import { useParams } from '@redwoodjs/router'
+import { Link, navigate, routes, useLocation } from '@cedarjs/router'
+import { useParams } from '@cedarjs/router'
 import { useAuth } from 'src/auth'
 import { Button } from 'src/components/ui/Button'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'src/components/ui/Tooltip'

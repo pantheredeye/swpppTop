@@ -1,4 +1,4 @@
-import { render } from '@redwoodjs/testing/web'
+import { render } from '@cedarjs/testing/web'
 
 import { Loading, Empty, Failure, Success } from './SitesCell'
 import { standard } from './SitesCell.mock'
@@ -31,7 +31,7 @@ describe('SitesCell', () => {
   // When you're ready to test the actual output of your component render
   // you could test that, for example, certain text is present:
   //
-  // 1. import { screen } from '@redwoodjs/testing/web'
+  // 1. import { screen } from '@cedarjs/testing/web'
   // 2. Add test: expect(screen.getByText('Hello, world')).toBeInTheDocument()
 
   it.skip('renders Success successfully', async () => {

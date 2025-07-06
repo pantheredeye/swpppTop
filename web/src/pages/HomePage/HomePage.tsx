@@ -1,6 +1,6 @@
 import * as HeroIcons from '@heroicons/react/24/outline'
 
-import { Link, routes } from '@redwoodjs/router'
+import { Link, routes } from '@cedarjs/router'
 
 import background from './Daytime Background.png'
 

@@ -4,7 +4,7 @@ import type {
   OrganizationRelationResolvers,
 } from 'types/graphql'
 
-import { AuthenticationError } from '@redwoodjs/graphql-server'
+import { AuthenticationError } from '@cedarjs/graphql-server'
 
 import { db } from 'src/lib/db'
 

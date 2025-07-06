@@ -15,7 +15,7 @@
     "prettier-plugin-tailwindcss": "0.4.1"
   },
   "eslintConfig": {
-    "extends": "@redwoodjs/eslint-config",
+    "extends": "@cedarjs/eslint-config",
     "root": true
   },
   "engines": {
@@ -30,7 +30,6 @@
     "@heroicons/react": "^2.1.3",
     "@radix-ui/react-label": "^2.1.0",
     "@tailwindcss/forms": "^0.5.7",
-    "rw-shad": "^1.1.0",
     "web": "workspace:^"
   },
   "resolutions": {

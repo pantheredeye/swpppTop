@@ -1,8 +1,4 @@
-import type {
-  CellSuccessProps,
-  CellFailureProps,
-  TypedDocumentNode,
-} from '@redwoodjs/web'
+import type { CellFailureProps } from '@cedarjs/web'
 
 import BmpItem from '../BmpItem/BmpItem'
 

@@ -1,4 +1,4 @@
-import { Link, routes, useLocation } from '@redwoodjs/router'
+import { Link, routes, useLocation } from '@cedarjs/router'
 
 import { useAuth } from 'src/auth'
 

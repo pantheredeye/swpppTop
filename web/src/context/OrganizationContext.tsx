@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { navigate } from '@redwoodjs/router'
-import { useMutation, useQuery } from '@redwoodjs/web'
+import { navigate } from '@cedarjs/router'
+import { useMutation, useQuery } from '@cedarjs/web'
 import { useAuth } from 'src/auth'
 
 interface Organization {

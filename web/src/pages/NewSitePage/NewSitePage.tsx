@@ -10,10 +10,10 @@ import {
   TextField,
   TextAreaField,
   Submit,
-} from '@redwoodjs/forms'
-import { navigate, routes } from '@redwoodjs/router'
-import { useMutation, useQuery } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
+} from '@cedarjs/forms'
+import { navigate, routes } from '@cedarjs/router'
+import { useMutation, useQuery } from '@cedarjs/web'
+import { toast } from '@cedarjs/web/toast'
 
 import { useAuth } from 'src/auth'
 

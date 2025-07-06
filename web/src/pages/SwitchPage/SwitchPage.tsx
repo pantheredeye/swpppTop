@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { navigate, Link, routes, useParams } from '@redwoodjs/router'
-import { Metadata } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-import { useMutation } from '@redwoodjs/web'
+import { navigate, Link, routes, useParams } from '@cedarjs/router'
+import { Metadata } from '@cedarjs/web'
+import { toast } from '@cedarjs/web/toast'
+import { useMutation } from '@cedarjs/web'
 import { useOrganization } from 'src/context/OrganizationContext'
 import {
   Card,

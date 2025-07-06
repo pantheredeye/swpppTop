@@ -4,9 +4,9 @@ import {
   EmailField,
   Submit,
   FieldError,
-} from '@redwoodjs/forms'
-import { useLocation, navigate } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
+} from '@cedarjs/forms'
+import { useLocation, navigate } from '@cedarjs/router'
+import { useMutation } from '@cedarjs/web'
 
 import { Label } from 'src/components/ui/Label'
 

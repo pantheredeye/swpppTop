@@ -1,4 +1,4 @@
-import { useParams } from '@redwoodjs/router'
+import { useParams } from '@cedarjs/router'
 
 import ProfileCell from 'src/components/ProfileCell'
 

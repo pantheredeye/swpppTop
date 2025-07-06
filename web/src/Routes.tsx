@@ -1,4 +1,4 @@
-import { Router, Route, Set, PrivateSet } from '@redwoodjs/router'
+import { Router, Route, Set, PrivateSet } from '@cedarjs/router'
 
 import MainLayout from 'src/layouts/MainLayout/MainLayout'
 

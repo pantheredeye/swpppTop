@@ -2,7 +2,7 @@ import type {
   CellSuccessProps,
   CellFailureProps,
   TypedDocumentNode,
-} from '@redwoodjs/web'
+} from '@cedarjs/web'
 
 // export const QUERY: TypedDocumentNode<
 //   FindStandardBmpsQuery,

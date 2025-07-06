@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { UserPlus } from 'lucide-react'
 import { useThrottle } from 'react-use'
 
-import { useQuery, useMutation } from '@redwoodjs/web'
+import { useQuery, useMutation } from '@cedarjs/web'
 
 import { Alert, AlertDescription } from 'src/components/ui/Alert'
 import { Button } from 'src/components/ui/Button'

@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react'
 
-import { TextField } from '@redwoodjs/forms'
+import { TextField } from '@cedarjs/forms'
 
 interface InputProps {
   label: string

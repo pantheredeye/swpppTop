@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import type { FindInspectionQuery } from 'types/graphql'
 
-import { useParams } from '@redwoodjs/router'
+import { useParams } from '@cedarjs/router'
 
 import InspectionCell from 'src/components/InspectionCell'
 import InspectionPDF from 'src/components/InspectionPDF/InspectionPDF'
