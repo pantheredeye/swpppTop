@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+
 import {
   Home,
   Users,
@@ -11,13 +12,20 @@ import {
   Settings,
   ChevronLeft,
 } from 'lucide-react'
+
 import { Link, navigate, routes, useLocation } from '@cedarjs/router'
 import { useParams } from '@cedarjs/router'
+
 import { useAuth } from 'src/auth'
 import { Button } from 'src/components/ui/Button'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'src/components/ui/Tooltip'
 import { Separator } from 'src/components/ui/Separator'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'src/components/ui/Tooltip'
 import { cn } from 'src/lib/utils'
+
 import { ThemeToggle } from './ThemeToggle'
 
 interface SidebarProps {
@@ -31,7 +39,7 @@ const Sidebar = ({
   isMobile,
   collapsed = false,
   onToggleCollapse,
-  onNavigate
+  onNavigate,
 }: SidebarProps) => {
   const { logOut, currentUser } = useAuth()
   const { organizationId } = useParams()
@@ -45,11 +53,23 @@ const Sidebar = ({
 
   const navigation = [
     { name: 'Dashboard', href: `/org/${organizationId}/dashboard`, icon: Home },
-    { name: 'Inspections', href: `/org/${organizationId}/inspections`, icon: Users },
+    {
+      name: 'Inspections',
+      href: `/org/${organizationId}/inspections`,
+      icon: Users,
+    },
     { name: 'Sites', href: `/org/${organizationId}/sites`, icon: FolderOpen },
     { name: 'BMPs', href: `/org/${organizationId}/bmps`, icon: FileText },
-    { name: 'Profile', href: `/org/${organizationId}/profile/${currentUser.id}`, icon: User },
-    { name: 'Organization Settings', href: `/org/${organizationId}/organization-settings`, icon: Settings },
+    {
+      name: 'Profile',
+      href: `/org/${organizationId}/profile/${currentUser.id}`,
+      icon: User,
+    },
+    {
+      name: 'Organization Settings',
+      href: `/org/${organizationId}/organization-settings`,
+      icon: Settings,
+    },
   ]
 
   const handleNavigation = () => {
@@ -98,21 +118,25 @@ const Sidebar = ({
   }
 
   return (
-    <div className={cn(
-      'flex h-screen flex-col border-r bg-background',
-      collapsed && !isMobile ? 'w-16' : 'w-64',
-      'transition-all duration-300'
-    )}>
+    <div
+      className={cn(
+        'flex h-screen flex-col border-r bg-background',
+        collapsed && !isMobile ? 'w-16' : 'w-64',
+        'transition-all duration-300'
+      )}
+    >
       <div className="flex h-16 items-center justify-between px-4 border-b">
         {(!collapsed || isMobile) && (
           <span className="text-xl font-semibold">SWPPP-TOP</span>
         )}
       </div>
 
-      <div className={cn(
-        'flex h-12 items-center px-4',
-        collapsed && !isMobile ? 'justify-center' : 'justify-between'
-      )}>
+      <div
+        className={cn(
+          'flex h-12 items-center px-4',
+          collapsed && !isMobile ? 'justify-center' : 'justify-between'
+        )}
+      >
         <ThemeToggle />
         {!isMobile && onToggleCollapse && (
           <Button
@@ -123,10 +147,12 @@ const Sidebar = ({
           >
             <Tooltip>
               <TooltipTrigger asChild>
-                <ChevronLeft className={cn(
-                  'h-4 w-4 transition-transform',
-                  collapsed && 'rotate-180'
-                )} />
+                <ChevronLeft
+                  className={cn(
+                    'h-4 w-4 transition-transform',
+                    collapsed && 'rotate-180'
+                  )}
+                />
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={20}>
                 {collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
@@ -144,7 +170,6 @@ const Sidebar = ({
         ))}
       </nav>
 
-
       <Separator />
 
       <div className="p-2">
@@ -156,10 +181,12 @@ const Sidebar = ({
           }}
           className="w-full justify-start"
         >
-          <LogOut className={cn(
-            'h-4 w-4 text-muted-foreground',
-            collapsed && !isMobile ? 'mx-auto' : 'mr-2'
-          )} />
+          <LogOut
+            className={cn(
+              'h-4 w-4 text-muted-foreground',
+              collapsed && !isMobile ? 'mx-auto' : 'mr-2'
+            )}
+          />
           {(!collapsed || isMobile) && <span>Logout</span>}
         </Button>
       </div>

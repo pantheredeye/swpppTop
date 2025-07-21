@@ -1,10 +1,4 @@
-import {
-  Form,
-  TextField,
-  EmailField,
-  Submit,
-  FieldError,
-} from '@cedarjs/forms'
+import { Form, TextField, EmailField, Submit, FieldError } from '@cedarjs/forms'
 import { useLocation, navigate } from '@cedarjs/router'
 import { useMutation } from '@cedarjs/web'
 

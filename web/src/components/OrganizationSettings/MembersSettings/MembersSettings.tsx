@@ -24,9 +24,7 @@ const MembersSettings = ({ organizationId }) => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl">
-                Organization Members
-              </CardTitle>
+              <CardTitle className="text-2xl">Organization Members</CardTitle>
               <CardDescription className="mt-2">
                 Manage members, invite and assign roles.
               </CardDescription>

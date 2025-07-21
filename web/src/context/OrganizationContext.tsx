@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
+
 import { navigate } from '@cedarjs/router'
 import { useMutation, useQuery } from '@cedarjs/web'
+
 import { useAuth } from 'src/auth'
 
 interface Organization {
@@ -10,18 +12,19 @@ interface Organization {
   status: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED' | 'PENDING'
 }
 
-
 interface OrganizationContextType {
   currentOrganization: Organization | null
   defaultOrganization: Organization | null
   availableOrganizations: Organization[]
-  switchOrganization: (organizationId: string, redirect?: boolean) => Promise<{ success: boolean }>
+  switchOrganization: (
+    organizationId: string,
+    redirect?: boolean
+  ) => Promise<{ success: boolean }>
   setDefaultOrganization: (organizationId: string) => Promise<void>
   loading: boolean
   error: Error | null
   refreshOrganizations: () => Promise<void>
 }
-
 
 const OrganizationContext = createContext<OrganizationContextType | null>(null)
 
@@ -48,16 +51,24 @@ const SET_DEFAULT_ORGANIZATION_MUTATION = gql`
 export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [currentOrganization, setCurrentOrganization] = useState<Organization | null>(null)
-  const [availableOrganizations, setAvailableOrganizations] = useState<Organization[]>([])
-  const [defaultOrganization, setDefaultOrganization] = useState<Organization | null>(null)
+  const [currentOrganization, setCurrentOrganization] =
+    useState<Organization | null>(null)
+  const [availableOrganizations, setAvailableOrganizations] = useState<
+    Organization[]
+  >([])
+  const [defaultOrganization, setDefaultOrganization] =
+    useState<Organization | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
   const { currentUser } = useAuth()
   const [setDefaultOrgMutation] = useMutation(SET_DEFAULT_ORGANIZATION_MUTATION)
 
-  const { data, error: queryError, refetch } = useQuery(GET_USER_ORGANIZATIONS, {
+  const {
+    data,
+    error: queryError,
+    refetch,
+  } = useQuery(GET_USER_ORGANIZATIONS, {
     fetchPolicy: 'cache-first',
   })
 
@@ -70,7 +81,11 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       return []
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to refresh organizations'))
+      setError(
+        err instanceof Error
+          ? err
+          : new Error('Failed to refresh organizations')
+      )
       return []
     }
   }
@@ -78,7 +93,9 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   const setDefaultOrg = async (organizationId: string) => {
     try {
       await setDefaultOrgMutation({ variables: { id: organizationId } })
-      const newDefaultOrg = availableOrganizations.find(org => org.id === organizationId)
+      const newDefaultOrg = availableOrganizations.find(
+        (org) => org.id === organizationId
+      )
       if (newDefaultOrg) {
         setDefaultOrganization(newDefaultOrg)
       }
@@ -121,9 +138,14 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(false)
   }, [data, queryError, currentUser])
 
-  const switchOrganization = async (organizationId: string, redirect: boolean = true) => {
+  const switchOrganization = async (
+    organizationId: string,
+    redirect: boolean = true
+  ) => {
     try {
-      let newOrg = availableOrganizations.find((org) => org.id === organizationId)
+      let newOrg = availableOrganizations.find(
+        (org) => org.id === organizationId
+      )
 
       if (!newOrg) {
         const refreshedOrgs = await refreshOrganizations()
@@ -140,7 +162,8 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
 
       return { success: true }
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to switch organization')
+      const error =
+        err instanceof Error ? err : new Error('Failed to switch organization')
       setError(error)
       throw error
     }

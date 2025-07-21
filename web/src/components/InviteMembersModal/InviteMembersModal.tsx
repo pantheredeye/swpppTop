@@ -50,12 +50,15 @@ const SEARCH_USERS_QUERY = gql`
 `
 
 const FIND_ORG_ROLES_QUERY = gql`
-  query FindOrgRolesQuery2($isSystemDefined: Boolean, $id: String, $excludeRoles: [String!] ) {
+  query FindOrgRolesQuery2(
+    $isSystemDefined: Boolean
+    $id: String
+    $excludeRoles: [String!]
+  ) {
     organizationRoles: findMembershipRoles(
       isSystemDefined: $isSystemDefined
       organizationId: $id
       excludeRoles: $excludeRoles
-
     ) {
       id
       name
@@ -92,17 +95,17 @@ const InviteMembersModal = ({ organizationId, onInviteComplete }) => {
   )
 
   const { data: rolesData } = useQuery(FIND_ORG_ROLES_QUERY, {
-    variables: { organizationId, excludeRoles: ['OWNER'], },
+    variables: { organizationId, excludeRoles: ['OWNER'] },
   })
 
   const [inviteMembers, { loading: inviting }] = useMutation(
     INVITE_MEMBERS_MUTATION,
     {
-      refetchQueries: ["SearchUsers"],
+      refetchQueries: ['SearchUsers'],
       onCompleted: (data) => {
         const { successful, failed } = data.inviteMembers
         if (successful.length > 0) {
-          console.log("Invites sent successfully")
+          console.log('Invites sent successfully')
           toast({
             title: 'Invites Sent Successfully',
             description: `Successfully sent ${successful.length} invite${successful.length > 1 ? 's' : ''}.`,

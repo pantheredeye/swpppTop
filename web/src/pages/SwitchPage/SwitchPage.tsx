@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react'
+
+import { BuildingIcon, PlusCircleIcon } from 'lucide-react'
+
 import { navigate, Link, routes, useParams } from '@cedarjs/router'
 import { Metadata } from '@cedarjs/web'
-import { toast } from '@cedarjs/web/toast'
 import { useMutation } from '@cedarjs/web'
-import { useOrganization } from 'src/context/OrganizationContext'
+import { toast } from '@cedarjs/web/toast'
+
+import { Badge } from 'src/components/ui/Badge'
+import { Button } from 'src/components/ui/Button'
 import {
   Card,
   CardHeader,
@@ -12,12 +17,10 @@ import {
   CardContent,
   CardFooter,
 } from 'src/components/ui/Card'
-import { Button } from 'src/components/ui/Button'
-import { Badge } from 'src/components/ui/Badge'
-import { Switch } from 'src/components/ui/Switch'
-import { BuildingIcon, PlusCircleIcon } from 'lucide-react'
 import { ScrollArea } from 'src/components/ui/ScrollArea'
 import { Separator } from 'src/components/ui/Separator'
+import { Switch } from 'src/components/ui/Switch'
+import { useOrganization } from 'src/context/OrganizationContext'
 
 const SET_DEFAULT_ORGANIZATION_MUTATION = gql`
   mutation SetDefaultOrganization($id: String!) {
@@ -41,15 +44,18 @@ const SwitchPage = () => {
     currentOrganization?.id || null
   )
 
-  const [setDefaultOrganization] = useMutation(SET_DEFAULT_ORGANIZATION_MUTATION, {
-    onCompleted: () => {
-      toast.success('Default organization updated')
-    },
-    onError: (error) => {
-      toast.error('Failed to update default organization')
-      console.error(error)
-    },
-  })
+  const [setDefaultOrganization] = useMutation(
+    SET_DEFAULT_ORGANIZATION_MUTATION,
+    {
+      onCompleted: () => {
+        toast.success('Default organization updated')
+      },
+      onError: (error) => {
+        toast.error('Failed to update default organization')
+        console.error(error)
+      },
+    }
+  )
 
   useEffect(() => {
     if (!organizationId) navigate('/')
@@ -87,7 +93,9 @@ const SwitchPage = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-center space-x-2">
               <BuildingIcon className="h-5 w-5 animate-pulse text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Loading organizations...</span>
+              <span className="text-sm text-muted-foreground">
+                Loading organizations...
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -132,9 +140,7 @@ const SwitchPage = () => {
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h3 className="font-medium">
-                            {org.name}
-                          </h3>
+                          <h3 className="font-medium">{org.name}</h3>
                           {org.status !== 'ACTIVE' && (
                             <Badge variant="secondary" className="text-xs">
                               {org.status}
@@ -142,7 +148,9 @@ const SwitchPage = () => {
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {org.id === currentOrganization?.id ? 'Current organization' : '\u00A0'}
+                          {org.id === currentOrganization?.id
+                            ? 'Current organization'
+                            : '\u00A0'}
                         </p>
                       </div>
                     </div>
@@ -153,18 +161,27 @@ const SwitchPage = () => {
                           onCheckedChange={() => handleSetDefaultOrg(org.id)}
                           disabled={org.status !== 'ACTIVE'}
                         />
-                        <span className="text-sm text-muted-foreground">Default</span>
+                        <span className="text-sm text-muted-foreground">
+                          Default
+                        </span>
                       </div>
                       <Button
-                        variant={org.id === currentOrganization?.id ? "secondary" : "default"}
-                        disabled={org.id === currentOrganization?.id || org.status !== 'ACTIVE'}
+                        variant={
+                          org.id === currentOrganization?.id
+                            ? 'secondary'
+                            : 'default'
+                        }
+                        disabled={
+                          org.id === currentOrganization?.id ||
+                          org.status !== 'ACTIVE'
+                        }
                         onClick={() => handleSwitchOrg(org.id)}
                       >
                         {org.id === currentOrganization?.id
                           ? 'Current'
                           : switchingOrgId === org.id
-                          ? 'Switching...'
-                          : 'Switch'}
+                            ? 'Switching...'
+                            : 'Switch'}
                       </Button>
                     </div>
                   </div>
@@ -174,7 +191,9 @@ const SwitchPage = () => {
               {availableOrganizations.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
                   <BuildingIcon className="mb-2 h-8 w-8 text-muted-foreground" />
-                  <p className="text-muted-foreground">No organizations available</p>
+                  <p className="text-muted-foreground">
+                    No organizations available
+                  </p>
                 </div>
               )}
             </div>
@@ -190,9 +209,7 @@ const SwitchPage = () => {
             </Button>
             <div className="space-x-2">
               <Button variant="outline" asChild>
-                <Link to={routes.dashboard({ organizationId })}>
-                  Cancel
-                </Link>
+                <Link to={routes.dashboard({ organizationId })}>Cancel</Link>
               </Button>
               <Button asChild>
                 <Link to={routes.createOrganization({ organizationId })}>

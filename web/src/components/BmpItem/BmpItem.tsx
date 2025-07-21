@@ -1,12 +1,7 @@
 // src/components/BmpItem/BmpItem.tsx
 import { useState, useEffect } from 'react'
 
-import {
-  CheckboxField,
-  TextField,
-  TextAreaField,
-  Label,
-} from '@cedarjs/forms'
+import { CheckboxField, TextField, TextAreaField, Label } from '@cedarjs/forms'
 
 import useBmpStore from 'src/stores/bmpStore'
 

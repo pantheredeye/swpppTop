@@ -1,8 +1,14 @@
 import { useParams, navigate, routes } from '@cedarjs/router'
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from 'src/components/ui/Card'
+import { Separator } from 'src/components/ui/Separator'
+import { Tabs, TabsList, TabsTrigger } from 'src/components/ui/Tabs'
 import { useOrganization } from 'src/context/OrganizationContext'
-import { Card, CardContent, CardHeader, CardTitle } from "src/components/ui/Card"
-import { Tabs, TabsList, TabsTrigger } from "src/components/ui/Tabs"
-import { Separator } from "src/components/ui/Separator"
 
 type OrganizationSettingLayoutProps = {
   children?: React.ReactNode
@@ -64,9 +70,7 @@ const OrganizationSettingLayout = ({
               </TabsList>
             </Tabs>
           </CardHeader>
-          <CardContent className="pt-6">
-            {children}
-          </CardContent>
+          <CardContent className="pt-6">{children}</CardContent>
         </Card>
       </div>
     </div>
