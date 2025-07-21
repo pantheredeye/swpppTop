@@ -11,10 +11,10 @@
     ]
   },
   "dependencies": {
-    "@cedarjs/auth-dbauth-web": "0.1.1",
-    "@cedarjs/forms": "0.1.1",
-    "@cedarjs/router": "0.1.1",
-    "@cedarjs/web": "0.1.1",
+    "@cedarjs/auth-dbauth-web": "0.4.0",
+    "@cedarjs/forms": "0.4.0",
+    "@cedarjs/router": "0.4.0",
+    "@cedarjs/web": "0.4.0",
     "@cloudinary/react": "^1.13.0",
     "@cloudinary/url-gen": "^1.21.0",
     "@radix-ui/react-accordion": "^1.2.2",
@@ -45,7 +45,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@cedarjs/vite": "0.1.1",
+    "@cedarjs/vite": "0.4.0",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "autoprefixer": "^10.4.19",

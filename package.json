@@ -7,10 +7,10 @@
     ]
   },
   "devDependencies": {
-    "@cedarjs/auth-dbauth-setup": "0.1.1",
-    "@cedarjs/cli-storybook-vite": "0.1.1",
-    "@cedarjs/core": "0.1.1",
-    "@cedarjs/project-config": "0.1.1",
+    "@cedarjs/auth-dbauth-setup": "0.4.0",
+    "@cedarjs/cli-storybook-vite": "0.4.0",
+    "@cedarjs/core": "0.4.0",
+    "@cedarjs/project-config": "0.4.0",
     "node-ssh": "^13.2.0",
     "prettier-plugin-tailwindcss": "0.4.1"
   },
